@@ -1,0 +1,10 @@
+openwrt/build_dir/
+openwrt/staging_dir/
+openwrt/dl/
+openwrt/tmp/
+openwrt/logs/
+openwrt/bin/
+openwrt/.config.old
+*.tar.gz
+*.tar.zst
+build_log*.txt
