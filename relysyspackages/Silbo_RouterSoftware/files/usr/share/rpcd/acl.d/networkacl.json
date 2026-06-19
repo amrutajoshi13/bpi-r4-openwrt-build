@@ -1,0 +1,29 @@
+{
+    "sysconfig": {
+        "description": "Network Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updatewanconfig":[
+                "configure",
+                "delete"
+                   
+                ]
+            },
+            "uci": [
+                "sysconfig",
+                "networkinterfaces",
+                "dhcprelayconfig"
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "sysconfig",
+               "networkinterfaces",
+               "dhcprelayconfig"
+             
+            ]
+        }
+    }
+}

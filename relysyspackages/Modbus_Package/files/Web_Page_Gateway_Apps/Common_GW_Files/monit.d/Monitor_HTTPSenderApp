@@ -1,0 +1,3 @@
+check process HTTPSenderApp with matching "HTTPSenderApp" every 1 cycles
+    start program = "/root/HTTPSenderAppComponent/HTTPSenderApp > /dev/null 2>&1 &"
+    stop program = "/usr/bin/killall HTTPSenderApp > /dev/null 2>&1"

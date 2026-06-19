@@ -1,0 +1,342 @@
+#!/bin/sh
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+case "$1" in
+    list)
+        echo '{"run":{"utility":"UtilityName","action":"ActionName","section":"sectionName","usrinputs":{"input1":"Input1Values","input2":"Input2Value","input3":"Input3Value"}}}'
+        ;;
+        
+    call)
+        case "$2" in
+            run)
+                # read the arguments
+                read -r input;
+    
+                # parse the received arguments
+                json_load "$input" > /dev/null 2>&1
+                json_get_var UtilityName utility
+                json_get_var ActionName action
+                json_get_var SectionName section
+                json_select usrinputs > /dev/null 2>&1
+                json_get_var Input1Value input1
+                json_get_var Input2Value input2
+                json_get_var Input3Value input3
+                json_select .. > /dev/null 2>&1
+                
+                case "$UtilityName" in
+				
+				 "Show BGP Summary")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/summary.txt
+								        vtysh -c "show ip bgp summary"  > /tmp/summary.txt  
+								           out=$(cat /tmp/summary.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						
+				   "Show BGP Running Config")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/runningconfig.txt
+								        vtysh -c "show running-config"  > /tmp/runningconfig.txt  
+								           out=$(cat /tmp/runningconfig.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;		
+								
+					"Show IP BGP")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/ipbgp.txt
+								        vtysh -c "show ip bgp"  > /tmp/ipbgp.txt  
+								           out=$(cat /tmp/ipbgp.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;				
+						
+							
+						"Refresh BGP Table")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/clearbgp.txt
+								        vtysh -c "clear ip bgp *"  > /tmp/clearbgp.txt  
+								           out=$(cat /tmp/clearbgp.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;		
+							
+						 "Show BGP Neighbors")
+							if [ "$ActionName" = "RUN" ]
+		                    then
+						     rm /tmp/neighbor.txt
+						        
+						        if [ -n "$Input1Value" ]
+						        then
+                                     vtysh -c "show ip bgp neighbor $Input1Value" > /tmp/neighbor.txt
+                                else 
+                                     vtysh -c "show ip bgp neighbors" > /tmp/neighbor.txt 
+                                fi
+                                         
+                                 out=$(cat /tmp/neighbor.txt) 
+                                 if [ "x$out" = "x" ]
+							     then
+								      echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+						         else
+			                          echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                     fi	
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+				
+					"Show Received Routes")
+							if [ "$ActionName" = "RUN" ]
+		                    then
+		                
+						   rm /tmp/receivedroutes.txt
+                           vtysh -c "show ip bgp neighbor $Input1Value received-routes" > /tmp/receivedroutes.txt
+                            out=$(cat /tmp/receivedroutes.txt) 
+                                 if [ "x$out" = "x" ]
+							     then
+								      echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+						         else
+			                          echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                     fi	
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+				
+			  	"Run Custom BGP Command")
+			
+							if [ "$ActionName" = "RUN" ]
+		                    then
+		                
+						rm -rf /tmp/bgpcommandoutput.txt
+                           vtysh -c "$Input1Value" > /tmp/bgpcommandoutput.txt
+                            command_output=$(cat /tmp/bgpcommandoutput.txt)   
+                             if [[ -z $command_output ]]                                                           
+                                        then                                                                                                 
+                                            echo "{\"code\":1,\"output\":\"empty command output\"}"                              
+                                        else                                                                                                 
+                                            echo -e "{\"code\":0,\"output\":\n\"$command_output\"}" 
+                                                                                         
+                                        fi  
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+							
+							
+				   "Show OSPF Neighbors")
+							if [ "$ActionName" = "RUN" ]
+		                    then
+						     rm /tmp/ospfneighbor.txt
+						        
+						        if [ -n "$Input1Value" ]
+						        then
+                                     vtysh -c "show ip ospf neighbor $Input1Value" > /tmp/ospfneighbor.txt
+                                else 
+                                     vtysh -c "show ip ospf neighbor" > /tmp/ospfneighbor.txt 
+                                fi
+                                         
+                                 out=$(cat /tmp/ospfneighbor.txt) 
+                                 if [ "x$out" = "x" ]
+							     then
+								      echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+						         else
+			                          echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                     fi	
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+				  
+				  
+				  "Show OSPF Route")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/ospfroute.txt
+								        vtysh -c "show ip ospf route"  > /tmp/ospfroute.txt  
+								           out=$(cat /tmp/ospfroute.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+								
+				   "Show OSPF Database")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/ospfdatabase.txt
+								        vtysh -c "show ip ospf database"  > /tmp/ospfdatabase.txt  
+								           out=$(cat /tmp/ospfdatabase.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;				
+									
+				
+			      "Show IP Route")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/iproute.txt
+								        ip route show  > /tmp/iproute.txt  
+								           out=$(cat /tmp/iproute.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;			
+			
+				"Show IP Rule")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/iprule.txt
+								        ip rule show  > /tmp/iprule.txt  
+								           out=$(cat /tmp/iprule.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;				
+								
+				"Show IP Route Table")
+							if [ "$ActionName" = "RUN" ]
+		                    then
+		                
+						   rm /tmp/iproutetable.txt
+                           ip route show table $Input1Value > /tmp/iproutetable.txt
+                           out=$(cat /tmp/iproutetable.txt) 
+                                 if [ "x$out" = "x" ]
+							     then
+								      echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+						         else
+			                          echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                     fi	
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+				
+				"Show IP Route Get")
+							if [ "$ActionName" = "RUN" ]
+		                    then
+		                
+						   rm /tmp/iprouteget.txt
+                           ip route get $Input1Value > /tmp/iprouteget.txt
+                           out=$(cat /tmp/iprouteget.txt) 
+                                 if [ "x$out" = "x" ]
+							     then
+								      echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+						         else
+			                          echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                     fi	
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+				
+				
+				   "Flush IP Routes Cache")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                     rm /tmp/cache.txt
+								        ip route flush cache  > /tmp/cache.txt	
+								         out=$(cat /tmp/cache.txt) 	
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\"command not executed successfully\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;			
+				
+				
+				
+				
+                    
+                esac
+                ;;
+                
+        *)
+            echo '{"code":"1","output":"invalid method"}'
+            exit 1
+            ;;
+            
+    esac #rpc-diagnosticutilities method
+    ;;
+esac # ubus method
+
+exit 0

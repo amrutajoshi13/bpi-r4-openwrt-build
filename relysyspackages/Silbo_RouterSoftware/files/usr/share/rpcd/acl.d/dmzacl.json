@@ -1,0 +1,24 @@
+{
+    "dmzconfig": {
+        "description": "DMZ",
+        "read": {
+			"ubus" : {
+                "rpc-updatedmzconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "dmzconfig",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "dmzconfig",
+                
+            ]
+        }
+    }
+}

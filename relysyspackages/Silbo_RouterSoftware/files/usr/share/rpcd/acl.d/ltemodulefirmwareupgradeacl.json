@@ -1,0 +1,22 @@
+{
+    "ltemodulefirmwareupgrade": {
+        "description": "LTE Module Firmware Upgrade",
+            "read": {
+				"ubus" : {
+                "rpc-ltemodulefirmwareupgrade":[
+                "configure"
+                                   
+                ]
+            },
+                "uci": [
+                    "ltemodulefirmwareupgrade"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "ltemodulefirmwareupgrade"
+                ]
+            }
+    }
+}

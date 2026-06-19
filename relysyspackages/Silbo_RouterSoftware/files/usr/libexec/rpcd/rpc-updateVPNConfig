@@ -1,0 +1,227 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+UpdateConfigScript="/root/InterfaceManager/script/vpn/ipsec/IpSecStart.sh"
+Updatedipsecstatus="/bin/ipsecstatus.sh"
+UpdatedWireguardkey="/root/InterfaceManager/script/vpn/wireguard/wireguardkey.sh"
+UpdateWireguardnetwork="/root/InterfaceManager/script/vpn/wireguard/wireguard_handler.sh"
+ArchiveDLPath="/etc/openvpn"
+Openvpnscript="/etc/init.d/openvpn"
+Openvpnmain="/root/InterfaceManager/script/vpn/openvpn/openvpn_handler.sh"
+zerotiremain="/root/InterfaceManager/script/vpn/zerotier/zerotier_handler.sh"
+wireguardstatus="/root/InterfaceManager/script/vpn/wireguard/wireguardstatus.sh"
+Openvpnscriptstart="/etc/init.d/openvpn start"
+PPTP="/root/InterfaceManager/script/vpn/pptp/pptp_handler.sh"
+Pptp_Status="/root/InterfaceManager/script/vpn/pptp/pptpstatus.sh"
+Xl2tpd_Status="/root/InterfaceManager/script/vpn/l2tp/l2tpstatus.sh"
+Xl2tp="/root/InterfaceManager/script/vpn/l2tp/l2tp_handler.sh"
+Openvpnscriptstop="/etc/init.d/openvpn restart"
+enableopenvpnscript="/bin/enableopenvpnconfig.sh"
+
+case "$1" in
+list)
+	echo '{"configure":{},"pptp":{},"xl2tpd":{},"wireguard":{},"zerotier":{},"wireguarddelete":{"wireguardConfigSectionName":"Name"},"delete":{"openvpnConfigSectionName":"Name"},"genearatefiles":{},"countcertfiles":{"info1":"Name"},"startopenvpn":{},"stopopenvpn":{},"enableopenvpn":{},"testarchive":{"archive":"ArchiveName","info1":"Name"}}'
+	;;
+call)
+	case "$2" in
+	configure)
+		response=$($UpdateConfigScript)
+		response=$($Updatedipsecstatus)
+		if [ "$?" -ne 0 ]; then
+			echo "{\"code\":1,\"output\":\"FAILURE : IPSEC Configuration Update\"}"
+		else
+			echo "{\"code\":0,\"output\":\"SUCCESS : IPSEC Configuration Update\"}"
+		fi
+
+		;;
+	pptp)
+		pptp_status=$(uci get vpnconfig1.general.enablepptpgeneral)
+		if [ "$pptp_status" = "1" ]; then
+			sed -i '/pptpstatus.sh/d' /etc/crontabs/root
+			echo "*/1 * * * * /root/InterfaceManager/script/vpn/pptp/pptpstatus.sh" >>/etc/crontabs/root
+			/etc/init.d/cron restart
+			response=$($PPTP)
+			sleep 3
+			response=$($Pptp_Status)
+			echo "{\"code\":0,\"output\":\"SUCCESS : PPTP Configuration Update\"}"
+
+		else
+			response=$($PPTP)
+			sed -i '/pptpstatus.sh/d' /etc/crontabs/root
+			sleep 3
+			response=$($Pptp_Status)
+			echo "{\"code\":0,\"output\":\"SUCCESS :  PPTP Configuration Update\"}"
+		fi
+
+		;;
+
+	xl2tpd)
+		 xl2tpd_status=$(uci get vpnconfig1.general.enableL2TPgeneral)
+                            if [ "$xl2tpd_status" = "1" ]
+                            then
+                               sed -i '/l2tpstatus.sh/d' /etc/crontabs/root
+                               echo "*/1 * * * * /root/InterfaceManager/script/vpn/l2tp/l2tpstatus.sh" >> /etc/crontabs/root  
+                               /etc/init.d/cron restart  
+                               response=$($Xl2tp)  
+                               sleep 3
+                               response=$($Xl2tpd_Status)
+                               echo "{\"code\":0,\"output\":\"SUCCESS : Xl2tpd Configuration Update\"}"
+ 
+                            else
+                              response=$($Xl2tp)  
+                              sed -i '/l2tpstatus.sh/d' /etc/crontabs/root
+                              sleep 3
+                              response=$($Xl2tpd_Status)
+                              echo "{\"code\":0,\"output\":\"SUCCESS :  Xl2tpd Configuration Update\"}"
+                            fi
+
+		;;
+		
+	wireguard)
+		Enablewireguard=$(uci get vpnconfig1.general.enablewireguardgeneral)
+		if [ "$Enablewireguard" = "1" ]; then
+			sed -i '/wireguardstatus.sh/d' /etc/crontabs/root
+			echo "* * * * * /root/InterfaceManager/script/vpn/wireguard/wireguardstatus.sh" >>/etc/crontabs/root
+			/etc/init.d/cron restart
+			response=$($UpdateWireguardnetwork)
+			sleep 3
+			response=$($wireguardstatus)
+			echo "{\"code\":0,\"output\":\"SUCCESS : Wireguard Configuration Update\"}"
+
+		else
+			response=$($UpdateWireguardnetwork)
+			response=$($wireguardstatus)
+			sed -i '/wireguardstatus.sh/d' /etc/crontabs/root
+			echo "{\"code\":0,\"output\":\"SUCCESS :  Wireguard Configuration Update\"}"
+		fi
+
+		;;
+	zerotier)
+		response=$($zerotiremain)
+		if [ "$?" -ne 0 ]; then
+			echo "{\"code\":1,\"output\":\"FAILURE : Zerotier Configuration Update\"}"
+		else
+			echo "{\"code\":0,\"output\":\"SUCCESS : Zerotier Configuration Update\"}"
+		fi
+
+		;;
+
+	wireguarddelete)
+		read -r input
+		json_load "$input" >/dev/null 2>&1
+		json_get_var Name wireguardConfigSectionName
+		uci delete network.wireguard_$Name
+
+		uci delete network.$Name
+
+		uci commit network
+		;;
+
+	genearatefiles)
+		response=$($UpdatedWireguardkey)
+		if [ "$?" -ne 0 ]; then
+			echo "{\"code\":1,\"output\":\"FAILURE : Configuration Update\"}"
+		else
+			echo "{\"code\":0,\"output\":\"SUCCESS : Configuration Update\"}"
+		fi
+		;;
+
+	startopenvpn)
+		response=$($Openvpnmain)
+		if [ "$?" -ne 0 ]; then
+			echo "{\"code\":1,\"output\":\"FAILURE : Openvpn Configuration Update\"}"
+		else
+			echo "{\"code\":0,\"output\":\"SUCCESS : Openvpn Configuration Update\"}"
+		fi
+		;;
+
+	stopopenvpn)
+		response=$($Openvpnmain)
+		if [ "$?" -ne 0 ]; then
+			echo "{\"code\":1,\"output\":\"FAILURE : Openvpn Configuration Update\"}"
+		else
+
+			echo "{\"code\":0,\"output\":\"SUCCESS : Openvpn Configuration Update\"}"
+		fi
+		;;
+
+	enableopenvpn)
+
+		response=$($enableopenvpnscript)
+		if [ "$?" -ne 0 ]; then
+			echo "{\"code\":1,\"output\":\"Failure : Openvpn Enable\"}"
+		else
+
+			echo "{\"code\":0,\"output\":\"SUCCESS : Openvpn Enable\"}"
+		fi
+		;;
+
+	delete)
+
+		# read the arguments
+		read -r input
+		json_load "$input" >/dev/null 2>&1
+
+		json_get_var Name openvpnConfigSectionName
+		config=$(uci get openvpn.$Name.config)
+
+		rm -rf $config
+
+		;;
+
+	countcertfiles)
+
+		# read the arguments
+		read -r input
+		json_load "$input" >/dev/null 2>&1
+
+		json_get_var Name info1
+		main=$(uci get openvpn.$Name.config)
+		echo "{\"code\":0,\"output\":\"$main\"}"
+
+		;;
+
+	testarchive)
+		# read the arguments
+		read -r input
+
+		json_load "$input" >/dev/null 2>&1
+
+		json_get_var ArchivedFileWithPath archive
+
+		json_get_var Name info1
+
+		if [ "x$ArchivedFileWithPath" = "x" ]; then
+			echo "{\"code\":1,\"output\":\"invalid input arguments\"}" >>"$logfile"
+			exit 1
+		else
+
+			uci set openvpn.$Name.config="$ArchivedFileWithPath"
+
+			uci commit openvpn
+
+		fi
+
+		#extracting tar file in tmp folder
+		RetMsg=$(cp "${ArchivedFileWithPath}" "${ArchiveDLPath}" 2>&1)
+		RetVal=$?
+		if [ "$RetVal" -ne 0 ]; then
+			echo "Failed to copy certificates error-$RetMsg" >>"$logfile"
+			exit 1
+		fi
+		rm -f "$ArchivedFileWithPath"
+
+		;;
+
+	*)
+		echo '{"code":"1","output":"invalid method"}'
+		exit 1
+		;;
+
+	esac #appmanager method
+	;;
+esac # ubus method
+
+exit 0

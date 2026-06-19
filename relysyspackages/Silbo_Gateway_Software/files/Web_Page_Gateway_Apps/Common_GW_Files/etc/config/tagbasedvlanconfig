@@ -1,0 +1,16 @@
+
+config rule
+	option name 'lan2'
+	option type '8021q'
+	option ifname 'eth0.2'
+
+config rule
+	option name 'wan3'
+	option type '8021q'
+	option ifname 'eth0.3'
+
+config rule
+	option name 'wan4'
+	option type '8021q'
+	option ifname 'eth0.4'
+

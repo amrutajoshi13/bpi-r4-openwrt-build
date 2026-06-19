@@ -1,0 +1,4 @@
+check process socat with matching "socat" every 1 cycles
+    start program = "/bin/runsocat.sh > /dev/null 2>1&"
+    stop program = "/usr/bin/killall socat > /dev/null 2>&1"
+

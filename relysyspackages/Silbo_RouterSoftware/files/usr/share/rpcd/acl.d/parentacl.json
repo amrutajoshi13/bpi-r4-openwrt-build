@@ -1,0 +1,24 @@
+{
+    "parentconfig": {
+        "description": "Parental Control Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updatemacconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "parentconfig",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "parentconfig",
+                
+            ]
+        }
+    }
+}

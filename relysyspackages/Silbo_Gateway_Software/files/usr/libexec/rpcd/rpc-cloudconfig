@@ -1,0 +1,239 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+UpdateConfigScript="/bin/cert_upload.sh"
+UpdateNMSConfigScript="/root/InterfaceManager/script/Disable_Nms.sh"
+
+server1="enabledelete_1"
+server2="enabledelete_2"
+server3="enabledelete_3"
+server4="enabledelete_4"
+
+config_file="/root/SenderAppComponent/etc/Config/SenderGeneric.cfg"
+http_cfg="/root/SenderAppComponent/etc/Config/HTTPSenderMosquittoClient.cfg"
+
+# ─── Helper: read a key from a .cfg file ──────────────────────────────────────
+# Usage: read_cfg <file> <key>
+read_cfg() {
+    local file="$1"
+    local key="$2"
+    grep "^${key}=" "$file" 2>/dev/null | cut -d'=' -f2- | tr -d '"' | tr -d ' '
+}
+
+# ─── Helper: map numeric DataMode to protocol string ──────────────────────────
+# 1 → http   3 → mqtt   4 → https   (anything else → unknown)
+datamode_to_proto() {
+    case "$1" in
+        1) echo "http"  ;;
+        3) echo "mqtt"  ;;
+        4) echo "https" ;;
+        *) echo "unknown" ;;
+    esac
+}
+
+# ─── Read values from .cfg files ─────────────────────────
+primary=$(datamode_to_proto "$(read_cfg "$http_cfg" "FirstServerdataMode")")
+secondary=$(datamode_to_proto "$(read_cfg "$http_cfg" "SecondServerDataMode")")
+primaryenablemqtt=$(read_cfg "$config_file" "EnableMQTTCommand")
+secondaryenablemqtt=$(read_cfg "$config_file" "EnableMQTTCommand2")
+
+# ─── read enabledelete values from SenderGeneric.cfg ──────────────────
+get_cfg_value() {
+    local varname="$1"
+    local value
+    if grep -q "^${varname}=" "$config_file" 2>/dev/null; then
+        value=$(grep "^${varname}=" "$config_file" | cut -d'=' -f2)
+    else
+        value="0"
+    fi
+    echo "$value"
+}
+
+case "$1" in
+    list)
+        echo '{"configure":{},"delete":{},"getvalue":{},"countkeyfiles":{},"update":{},"testarchive":{"archive":"ArchiveName"}}'
+        ;;
+
+    call)
+        case "$2" in
+
+            # ── configure ──────────────────────────────────────────────────────
+            configure)
+                response=$($UpdateConfigScript)
+                if [ "$?" -ne 0 ]; then
+                    echo '{"code":1,"output":"FAILURE : NMS Configuration Update"}'
+                else
+                    echo '{"code":0,"output":"SUCCESS : NMS Configuration Update"}'
+                fi
+                ;;
+
+            # ── update ─────────────────────────────────────────────────────────
+            update)
+                response=$($UpdateNMSConfigScript)
+                if [ "$?" -ne 0 ]; then
+                    echo '{"code":1,"output":"FAILURE : NMS Configuration Disable"}'
+                else
+                    echo '{"code":0,"output":"SUCCESS : NMS Configuration Disable"}'
+                fi
+                ;;
+
+            # ── testarchive ────────────────────────────────────────────────────
+            testarchive)
+                read -r input
+                json_load "$input" > /dev/null 2>&1
+                json_get_var ArchivedFileWithPath archive
+                json_get_var serverNumber serverNumber
+
+                echo "$ArchivedFileWithPath" > /root/server.txt
+
+                # Determine ArchiveDLPath based on serverNumber + protocol
+                if [ "$serverNumber" = "server1" ] && [ "$primary" = "https" ]; then
+                    echo "$ArchivedFileWithPath" > /root/server1.txt
+                    ArchiveDLPath="/etc/ssl/certs/"
+
+                elif [ "$serverNumber" = "server2" ] && [ "$secondary" = "https" ]; then
+                    echo "$ArchivedFileWithPath" > /root/server2.txt
+                    ArchiveDLPath="/etc/ssl/certs/"
+
+                elif [ "$serverNumber" = "server1" ] && { [ "$primary" = "mqtt" ] || [ "$primaryenablemqtt" = "1" ]; }; then
+                    ArchiveDLPath="/root/SenderAppComponent/etc/certs"
+
+                elif [ "$serverNumber" = "server2" ] && { [ "$secondary" = "mqtt" ] || [ "$secondaryenablemqtt" = "1" ]; }; then
+                    ArchiveDLPath="/root/SenderAppComponent/etc/certs2"
+
+                else
+                    echo '{"code":1,"output":"Invalid serverNumber"}'
+                    exit 1
+                fi
+
+                # Validate archive file
+                if [ -z "$ArchivedFileWithPath" ] || [ ! -f "$ArchivedFileWithPath" ]; then
+                    echo '{"code":1,"output":"Invalid or missing archive file"}'
+                    exit 1
+                fi
+
+                # Validate ZIP type
+                file_type=$(file -b "$ArchivedFileWithPath")
+                if ! echo "$file_type" | grep -q "Zip archive data"; then
+                    echo '{"code":1,"output":"Invalid ZIP file"}'
+                    exit 1
+                fi
+
+                # Extract
+                mkdir -p "$ArchiveDLPath"
+                unzip -o "$ArchivedFileWithPath" -d "$ArchiveDLPath" > /dev/null 2>&1
+                if [ "$?" -ne 0 ]; then
+                    echo '{"code":1,"output":"Extraction Failed"}'
+                    exit 1
+                fi
+
+                rm -f "$ArchivedFileWithPath"
+                echo '{"code":0,"output":"SUCCESS : TLS extract"}'
+                ;;
+
+            # ── getvalue ───────────────────────────────────────────────────────
+            getvalue)
+                read -r input
+                json_load "$input" > /dev/null 2>&1
+                json_get_var serverNumber serverNumber
+
+                case "$serverNumber" in
+                    server1) varname="$server1" ;;
+                    server2) varname="$server2" ;;
+                    server3) varname="$server3" ;;
+                    server4) varname="$server4" ;;
+                    *)
+                        echo '{"code":1,"output":"Invalid serverNumber"}'
+                        exit 1
+                        ;;
+                esac
+
+                value=$(get_cfg_value "$varname")
+                echo "{\"code\":0,\"output\":\"${value}\"}"
+                ;;
+
+            # ── delete ─────────────────────────────────────────────────────────
+            delete)
+                read -r input
+                json_load "$input" > /dev/null 2>&1
+                json_get_var serverNumber serverNumber
+
+                certsPath=""
+
+                if [ "$serverNumber" = "server1" ] && [ "$primary" = "https" ]; then
+                    rm -f "$(cat /root/server1.txt)"
+                    sed -i "s/^enabledelete_3=.*/enabledelete_3=0/" "$config_file"
+
+                elif [ "$serverNumber" = "server2" ] && [ "$secondary" = "https" ]; then
+                    rm -f "$(cat /root/server2.txt)"
+                    sed -i "s/^enabledelete_4=.*/enabledelete_4=0/" "$config_file"
+
+                elif [ "$serverNumber" = "server1" ] && { [ "$primary" = "mqtt" ] || [ "$primaryenablemqtt" = "1" ]; }; then
+                    certsPath="/root/SenderAppComponent/etc/certs"
+                    sed -i "s/^enabledelete_1=.*/enabledelete_1=0/" "$config_file"
+
+                elif [ "$serverNumber" = "server2" ] && { [ "$secondary" = "mqtt" ] || [ "$secondaryenablemqtt" = "1" ]; }; then
+                    certsPath="/root/SenderAppComponent/etc/certs2"
+                    sed -i "s/^enabledelete_2=.*/enabledelete_2=0/" "$config_file"
+
+                else
+                    echo '{"code":1,"output":"Invalid serverNumber"}'
+                    exit 1
+                fi
+
+                # Remove certs directory contents if applicable
+                if [ -n "$certsPath" ]; then
+                    rm -rf "${certsPath:?}"/*
+                fi
+
+                if [ "$?" -ne 0 ]; then
+                    echo '{"code":1,"output":"Delete Certificates Failure!!"}'
+                else
+                    echo '{"code":0,"output":"Delete Certificates Success!!"}'
+                fi
+                ;;
+
+            # ── countkeyfiles ──────────────────────────────────────────────────
+            countkeyfiles)
+                read -r input
+                json_load "$input" > /dev/null 2>&1
+                json_get_var serverNumber serverNumber
+
+                certsPath=""
+
+                if [ "$serverNumber" = "server1" ] && [ "$primary" = "https" ]; then
+                    rm -f "$(cat /root/server1.txt)"
+                    sed -i "s/^enabledelete_3=.*/enabledelete_3=1/" "$config_file"
+
+                elif [ "$serverNumber" = "server2" ] && [ "$secondary" = "https" ]; then
+                    rm -f "$(cat /root/server2.txt)"
+                    sed -i "s/^enabledelete_4=.*/enabledelete_4=1/" "$config_file"
+
+                elif [ "$serverNumber" = "server1" ] && { [ "$primary" = "mqtt" ] || [ "$primaryenablemqtt" = "1" ]; }; then
+                    certsPath="/root/SenderAppComponent/etc/certs"
+                    sed -i "s/^enabledelete_1=.*/enabledelete_1=1/" "$config_file"
+
+                elif [ "$serverNumber" = "server2" ] && { [ "$secondary" = "mqtt" ] || [ "$secondaryenablemqtt" = "1" ]; }; then
+                    certsPath="/root/SenderAppComponent/etc/certs2"
+                    sed -i "s/^enabledelete_2=.*/enabledelete_2=1/" "$config_file"
+
+                else
+                    echo '{"code":1,"output":"Invalid serverNumber"}'
+                    exit 1
+                fi
+
+                count=$(ls -1 "$certsPath" 2>/dev/null | wc -l)
+                echo "{\"code\":0,\"output\":\"$count\"}"
+                ;;
+
+            *)
+                echo '{"code":"1","output":"invalid method"}'
+                exit 1
+                ;;
+        esac
+        ;;
+esac
+
+exit 0

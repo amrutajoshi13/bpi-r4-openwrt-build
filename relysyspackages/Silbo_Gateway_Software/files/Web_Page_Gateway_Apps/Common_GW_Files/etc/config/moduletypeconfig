@@ -1,0 +1,4 @@
+
+config moduletypeconfig 'moduletypeconfig'
+	option moduletype '3'
+

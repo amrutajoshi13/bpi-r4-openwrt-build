@@ -1,0 +1,26 @@
+#!/bin/sh
+
+if [ "$INTERFACE" != "CWAN1" ] && [ "$INTERFACE" != "CWAN2" ] && [ "$INTERFACE" != "CWAN1_0" ] && [ "$INTERFACE" != "CWAN1_1" ]
+then
+	# Trigger only for the specific interface and action
+	if [ "$ACTION" = "ifup" ]; then
+		logger -t mwan3 "<Mwan3 Recheck> Rechecking $INTERFACE status for $ACTION ."
+		#Check if the interface status is error using mwan3 interfaces
+		status=$(mwan3 interfaces | grep -i "$INTERFACE" | cut -d ' ' -f 5)
+		if [ "$status" = "error" ]; then
+			# If not online, reset the interface
+			logger -t mwan3 "<Mwan3 Recheck> The status of $INTERFACE is error, triggering ifup."
+			mwan3 ifup $INTERFACE
+		fi
+			
+	elif [ "$ACTION" = "ifdown" ]; then
+		logger -t mwan3 "<Mwan3 Recheck> Rechecking $INTERFACE status for $ACTION ."
+		#Check if the interface status is error using mwan3 interfaces
+		status=$(mwan3 interfaces | grep -i "$INTERFACE" | cut -d ' ' -f 5)
+		if [ "$status" = "error" ]; then
+			# If not online, reset the interface
+			logger -t mwan3 "<Mwan3 Recheck> The status of $INTERFACE is error, triggering ifup."
+			mwan3 ifup $INTERFACE
+		fi
+	fi
+fi

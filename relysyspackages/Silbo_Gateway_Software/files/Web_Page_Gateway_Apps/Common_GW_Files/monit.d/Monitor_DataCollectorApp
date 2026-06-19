@@ -1,0 +1,4 @@
+check process DataCollectorApp with matching "DataCollectorApp" every 1 cycles
+    start program = "/bin/sh /bin/RestoreDataCollector.sh"
+    stop program = "/usr/bin/killall DataCollectorApp"
+    start program = "/bin/sh /bin/RestoreDataCollector.sh" with timeout 60 seconds

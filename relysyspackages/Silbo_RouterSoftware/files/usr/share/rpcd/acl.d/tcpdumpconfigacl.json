@@ -1,0 +1,30 @@
+
+{
+    "tcpdumpconfig": {
+        "description": "Tcp dump Configuration",
+        "read": {
+                        "ubus" : {
+                "rpc-tcpdumpupdate":[
+                "configure"
+                ]
+            },
+            "uci": [
+                "tcpdumpconfig"
+
+            ]
+
+        },
+        "write": {
+                        "ubus" : {
+                "rpc-tcpdumpupdate":[
+                "configure"
+
+                ]
+            },
+            "uci": [
+               "tcpdumpconfig"
+
+            ]
+        }
+    }
+}

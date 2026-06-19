@@ -1,0 +1,23 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2015 OpenWrt.org
+
+START=12
+STOP=89
+USE_PROCD=1
+
+BIN="/sbin/logreceiver"
+
+start_service()
+{
+	procd_open_instance
+	procd_set_param command $BIN
+	procd_set_param respawn 2 60 60
+	procd_close_instance
+	
+}
+
+stop_service()
+{
+    pid=$(pgrep -f "/sbin/logreceiver")
+	kill -TERM "$pid" &
+}

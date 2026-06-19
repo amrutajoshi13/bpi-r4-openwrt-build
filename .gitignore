@@ -1,10 +1,8 @@
-openwrt/build_dir/
-openwrt/staging_dir/
-openwrt/dl/
-openwrt/tmp/
-openwrt/logs/
-openwrt/bin/
-openwrt/.config.old
-*.tar.gz
-*.tar.zst
+openwrt/
 build_log*.txt
+*.log
+*.txt
+custom-feeds.conf
+relysyspackages/Modbus_Package/files/etc/config/cloudconfig
+relysyspackages/WithoutPseudo_Gateway_Software/files/etc/config/cloudconfig
+relysyspackages/WithoutPseudo_Gateway_Software/files/root/AzureAppComponent/etc/Config/CloudConnectAzureIOTHubClient.cfg

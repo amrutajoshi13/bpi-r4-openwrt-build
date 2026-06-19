@@ -1,0 +1,38 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2015 OpenWrt.org
+
+START=99
+USE_PROCD=1
+
+BIN="/bin/connectionDiagnostics"
+
+start_service()
+{
+    running=$(uci get connectionDiagnostics.general.running)
+    enable=$(uci get connectionDiagnostics.general.enable)
+    if [ $enable -eq 1 ] && [ $running -eq 1 ]
+    then
+        procd_open_instance
+        procd_set_param command $BIN
+        procd_close_instance
+    fi
+}
+
+# reload_service()
+# {
+#     uci set connectionDiagnostics.general.running="1"
+#     uci commit connectionDiagnostics
+#     enable=$(uci get connectionDiagnostics.general.enable)
+#     if [ $enable -eq 1 ]
+#     then
+#         /bin/connectionDiagnostics &
+#     fi
+# }
+
+stop_service()
+{
+    pid=$(pgrep -f "/bin/connectionDiagnostics")
+	kill -TERM "$pid" &
+    uci set connectionDiagnostics.general.running="0"
+    uci commit connectionDiagnostics
+}

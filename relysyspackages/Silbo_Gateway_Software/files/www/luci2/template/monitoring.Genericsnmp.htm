@@ -1,0 +1,47 @@
+<div style="border-bottom: 1px solid #70707038;">
+    <h1 class="header">Generic SNMP Monitoring</h1>
+</div>
+<div class="pagecontent">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Live SNMP Device Data</h2>
+        </div>
+        <div class="panel-body">
+            <textarea id="deviceInfo" readonly></textarea>
+            <ul class="nav nav-tabs" id="pills-tab" role="tablist">
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <p id="No-SNMPData"></p>
+            </div>
+            <div class="text-right" style="margin: 0px 10px 20px 0px">
+                <button type="button" title="Download SNMP Data" data-action="download" id="downloadData"
+                    class="btn btn-primary">
+                    Download Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #deviceInfo {
+        width: 22%;
+        padding: 6px;
+        border: none;
+        border-bottom: 1px solid #ddd;
+        box-sizing: border-box;
+        background: linear-gradient(to right, #3498db, #2c3e50);
+        color: #fff;
+        font-size: 12px;
+        border-radius: 8px;
+        resize: none;
+        outline: none;
+        float: right;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    td {
+        font-size: 13px !important;
+    }
+</style>

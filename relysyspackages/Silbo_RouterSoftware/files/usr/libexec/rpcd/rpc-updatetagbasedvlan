@@ -1,0 +1,44 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+UpdateTagbasedConfigScript="/root/InterfaceManager/script/ethernet/Tag_based_VLAN.sh"
+DeleteConfigScript="/root/InterfaceManager/script/ethernet/Delete_Tag_Based_VLAN.sh"
+
+case "$1" in
+    list)
+      echo '{"configurevlan":{},"delete":{}}'
+        ;;
+    call)
+        case "$2" in
+                    configurevlan)
+	                         response=$($UpdateTagbasedConfigScript)
+                             if [ "$?" -ne 0 ]
+                             then
+								echo "{\"code\":1,\"output\":\"Failure : Tag based VLAN Config Save\"}"
+                             else
+								echo "{\"code\":0,\"output\":\"Success : Tag based VLAN Config Save\"}"
+                             fi                                                      
+                             ;;   
+                             
+                    delete)
+                            response=$($DeleteConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : Not Deleted\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : Deleted\"}"
+                            fi
+                                                                                 
+                            ;;   
+                           
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+                    ;;
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

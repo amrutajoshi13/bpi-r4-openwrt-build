@@ -1,0 +1,21 @@
+{
+    "snmp": {
+        "title": "SNMP App",
+        "index": 20
+    },
+    
+	"snmp/snmpagent": {
+        "title": "SNMP Agent Configuration",
+        "acls": [ "snmpconfig" ],
+        "view": "snmp/snmpagent",
+        "index": 25         
+    }
+    
+     /*"snmp/snmptrap": {
+        "title": "SNMP Trap Configuration",
+        "acls": [ "snmptrapconfig" ],
+        "view": "snmp/snmptrap",
+        "index": 30
+         
+    }*/
+}

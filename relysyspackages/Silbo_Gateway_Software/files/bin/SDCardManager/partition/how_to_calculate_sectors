@@ -1,0 +1,53 @@
+#convert GB to Bytes
+1MB = 1024kb
+1GB = 1024mb
+1sector = 512bytes
+
+				1024(KB) + 1024(MB) + 1024(GB)
+	1GB(a)	 =	 ____________________________________	=	2097152
+							
+						  512(bytes)
+
+	a = 2097152 [total number of bytes required for 1GB]
+	
+#the above equation is to make both units as bytes 
+
+#the formula to allot space 
+	s = starting sector
+	l = last sector
+	v1 = a + s - 1 [to find first partition]
+	v2 = (v1 + 1) + a -1 [to find 2nd partition]
+	v3 = (v2 + 1) + a -1 [to find 3rd partition]
+	v4 = l - 2 [to find 4th partition]
+
+#assume that the there is a 4GB(3.5) SDCard to do (04) partitions 
+	
+1st disk : 1GB
+		v1 = a + s - 1
+		
+		v1 = 2097152 + 2048 -1 = 2099199
+
+2nd disk : 1GB
+		v2 = (v1 + 1) + a -1
+		
+		v2 = (2099199 + 1) + 2097152 - 1 = 4196351
+
+3rd disk : 1GB
+		v3 = (v2 + 1) + a -1
+		
+		v3 = (4196351 + 1) + 2097152 -1 = 6293503
+
+4th disk : 543MB
+		v4 = l - 2
+		v4 = 7405568 -2 = 7405566
+
+#in case your adding more then 4 partition
+#use the previous disk value -1 and add the total number of bytes(a) minus 1, will give you the next sector value 
+#example ://
+4th disk : 1GB
+		v4 = (v3 + 1) + a -1
+		
+		v4 = (6293503 + 1) + 2097152 -1 = 8390655
+
+
+		

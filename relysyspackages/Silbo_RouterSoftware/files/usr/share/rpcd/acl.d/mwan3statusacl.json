@@ -1,0 +1,22 @@
+{
+    "mwan3statusacl": {
+        "description": "WAN Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updatemwan3status":[
+                "configure"                   
+                ]
+            },
+            "uci": [
+                "mwan3statusconfig",
+                
+            ]
+        },
+        "write": {
+            "uci": [
+               "mwan3statusconfig",
+                
+            ]
+        }
+    }
+}

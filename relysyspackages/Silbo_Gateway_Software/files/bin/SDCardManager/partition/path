@@ -1,0 +1,11 @@
+$(scp /home/shakthi/shakthi_workspace/SDCardManager/SDCardManager.sh root@192.168.0.24:/)
+$(scp /home/shakthi/shakthi_workspace/SDCardManager/partitions_4gb.sfdisk root@192.168.0.24:/)
+$(scp /home/shakthi/shakthi_workspace/SDCardManager/partitions_8gb.sfdisk root@192.168.0.24:/)
+
+
+/home/shakthi/shakthi_workspace/SDCardManager/SDCardManager.sh
+
+5UN1uX@321
+
+
+5UN1uX@321

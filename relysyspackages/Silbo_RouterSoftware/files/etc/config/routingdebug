@@ -1,0 +1,32 @@
+	
+config Debug 'Debug1'
+	option action 'RUN'
+	option inputs '0'
+	option utility 'Show IP Route'				
+	
+config Debug 'Debug2'
+	option action 'RUN'
+	option inputs '0'
+	option utility 'Show IP Rule'
+
+config Debug 'Debug3'
+	option action 'RUN'
+	option input1Element 'text'
+	option input1Name 'Command'
+	option input1Type 'text'
+	option inputs '2'
+	option utility 'Show IP Route Table'	
+
+config Debug 'Debug4'
+	option action 'RUN'
+	option input1Element 'text'
+	option input1Name '10.1.1.10'
+	option input1Type 'text'
+	option inputs '2'
+	option utility 'Show IP Route Get'
+	
+config Debug 'Debug5'
+	option action 'RUN'
+	option inputs '0'
+	option utility 'Flush IP Routes Cache'
+		

@@ -1,0 +1,17 @@
+{
+        "sensorEvents": {
+		"description": "Sensor Events and Actions Configuration",
+		"read": {
+			"uci": [
+				"eventConfig",
+				"alarmconfig"
+			]
+		},
+		"write": {
+			"uci": [
+				"eventConfig",
+				"alarmconfig"
+			]
+		}
+	}
+}

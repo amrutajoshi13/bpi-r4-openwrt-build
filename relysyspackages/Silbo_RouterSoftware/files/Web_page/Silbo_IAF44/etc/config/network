@@ -1,0 +1,56 @@
+
+config interface 'loopback'
+        option ifname 'lo'
+        option proto 'static'
+
+config switch
+        option name 'switch0'
+        option reset '1'
+        option enable_vlan '1'
+
+config switch_vlan 'swlan'
+        option device 'switch0'
+        option vlan '1'
+        option ports '0 1 2 3  6t'
+
+config switch_vlan 'lan4'
+        option device 'switch0'
+        option vlan '5'
+        option ports '4 6t'
+
+config interface 'VPN'
+        option proto 'none'
+        option ifname 'tun0'
+
+config interface 'VPN1'
+        option proto 'none'
+        option ifname 'tun1'
+
+config interface 'VPN2'
+        option proto 'none'
+        option ifname 'tap0'
+
+config interface 'SW_LAN'
+	option ifname 'eth0.1'
+	option proto 'static'
+	option ipaddr '192.168.10.1'
+	option netmask '255.255.255.0'
+	option ip6hint '12a'
+	option metric '121'
+	option delegate '1'
+	option ip6assign '64'
+	option ra_mininterval '30'
+	option ra_maxinterval '60'
+	option ip_int_instance '4'
+
+config interface 'CWAN1'
+		option ifname 'usb0'
+		option proto 'dhcp'
+		option metric '2'
+
+config interface 'ra0'
+        option ipaddr '192.168.100.1'
+        option netmask '255.255.255.0'
+        option proto 'static'
+        option ifname 'ra0'
+

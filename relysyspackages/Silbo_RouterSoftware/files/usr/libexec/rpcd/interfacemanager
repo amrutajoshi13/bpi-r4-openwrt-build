@@ -1,0 +1,556 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+#
+# PKG_RELEASE: 1.01
+#
+
+LogFile="/tmp/usrRPC/Log/InterfaceManagerLog"
+LogrotateConfigFile="/etc/logrotate.d/UbusInterfaceManagerLogConfig"
+
+ModemConfigFile="/etc/config/modem"
+TempInterfaceManagerConfigDir="/tmp/InterfaceManager/config/"
+StatusDir="/tmp/InterfaceManager/status/"
+TempStatusDir="/tmp/InterfaceManager/status/"
+InterfaceAnalyticsDir="/tmp/InterfaceManager/analytics/"
+
+DeleteInterfaceScript="/root/InterfaceManager/script/DeleteInterface.sh"
+AddInterfaceScript="/root/InterfaceManager/script/cellular/AddInterface.sh"
+UpdateHotplugRuleScript="/root/InterfaceManager/script/UpdateHotplugRule.sh"
+QueryModemATAnalytics="/root/InterfaceManager/script/QueryModemATAnalytics.sh"
+
+DeleteSMSCfgScript="/root/InterfaceManager/script/DeleteSMSCfg.sh"
+AddSMSCfgScript="/root/InterfaceManager/script/AddSMSCfg.sh"
+
+#OnboardModemRestart="/root/usrRPC/api/Recycle_3GModule_PWR_Utility 15"
+OnboardModemRestart="/root/usrRPC/script/Recycle_WAN1_PWR_Script.sh"
+WAN2Restart="/root/usrRPC/script/Recycle_WAN2_PWR_Script.sh"
+USB2Restart="/root/usrRPC/script/Recycle_USB2_PWR_Script.sh"
+
+IMInitializerScript="/root/InterfaceManager/script/InterfaceInitializer.sh"
+ReadIfaceStatus()
+{
+        config=$1
+        AddStatus=''
+        DelStatus=''
+        SMSAddStatus=''
+        SMSDelStatus=''
+        DataPort=''
+        ComPort=''
+        SMSPort=''
+
+
+        DelStatFile="$TempStatusDir""$config"".DeleteIfaceStatus"
+        AddStatFile="$TempStatusDir""$config"".AddIfaceStatus"
+        SMSDelStatFile="$TempStatusDir""$config"".DeleteSMSCfgStatus"
+        SMSAddStatFile="$TempStatusDir""$config"".AddSMSCfgStatus"
+        DataComPortsFile="$TempStatusDir""$config"".ports"
+        SMSPortFile="$TempStatusDir""$config"".smsport"
+
+        if [ -f "$AddStatFile" ] && [ -f "$DelStatFile" ]
+        then
+                eval "$config"_"DataStatus"="NA"
+        elif [ -f "$AddStatFile" ]
+        then
+                AddStatus=$(sed -n "/^\<status\>/p" "$AddStatFile" 2>&1 | cut -d "=" -f 2 2>&1| sed 's/^[ \t]*//;s/[ \t]*$//' 2>&1)
+                [ "x$AddStatus" != "x" ] && eval "$config"_"DataStatus"='$AddStatus' || eval "$config"_"DataStatus"='NA'
+        elif [ -f "$DelStatFile" ]
+        then
+                DelStatus=$(sed -n "/^\<status\>/p" "$DelStatFile" 2>&1 | cut -d "=" -f 2 2>&1| sed 's/^[ \t]*//;s/[ \t]*$//' 2>&1)
+                [ "x$DelStatus" != "x" ] && eval "$config"_"DataStatus"='$DelStatus' || eval "$config"_"DataStatus"='NA'
+        else
+                eval "$config"_"DataStatus"='NA'
+        fi
+
+        if [ -f "$SMSAddStatFile" ] && [ -f "$SMSDelStatFile" ]
+        then
+                eval "$config"_"SMSStatus"="NA"
+        elif [ -f "$SMSAddStatFile" ]
+        then
+                SMSAddStatus=$(sed -n "/^\<status\>/p" "$SMSAddStatFile" 2>&1 | cut -d "=" -f 2 2>&1| sed 's/^[ \t]*//;s/[ \t]*$//' 2>&1)
+                [ "x$SMSAddStatus" != "x" ] && eval "$config"_"SMSStatus"='$SMSAddStatus' || eval "$config"_"SMSStatus"='NA'
+        elif [ -f "$SMSDelStatFile" ]
+        then
+                SMSDelStatus=$(sed -n "/^\<status\>/p" "$SMSDelStatFile" 2>&1 | cut -d "=" -f 2 2>&1| sed 's/^[ \t]*//;s/[ \t]*$//' 2>&1)
+                [ "x$SMSDelStatus" != "x" ] && eval "$config"_"SMSStatus"='$SMSDelStatus' || eval "$config"_"SMSStatus"='NA'
+        else
+                eval "$config"_"SMSStatus"='NA'
+        fi
+
+        if [ -f "$DataComPortsFile" ]
+        then
+                DataPort=$(sed -n "/^\<DataPort\>/p" "$DataComPortsFile" 2>&1 | cut -d "=" -f 2 2>&1| sed 's/^[ \t]*//;s/[ \t]*$//' 2>&1)
+                ComPort=$(sed -n "/^\<ComPort\>/p" "$DataComPortsFile" 2>&1 | cut -d "=" -f 2 2>&1| sed 's/^[ \t]*//;s/[ \t]*$//' 2>&1)
+                [ "x$DataPort" != "x" ] && eval "$config"_"DataPort"='$DataPort' || eval "$config"_"DataPort"='NA'
+                [ "x$ComPort" != "x" ] && eval "$config"_"ComPort"='$ComPort' || eval "$config"_"ComPort"='NA'
+        else
+                eval "$config"_"DataPort"='NA'
+                eval "$config"_"ComPort"='NA'
+        fi
+
+        if [ -f "$SMSPortFile" ]
+        then
+                SMSPort=$(sed -n "/^\<SMSPort\>/p" "$SMSPortFile" 2>&1 | cut -d "=" -f 2 2>&1| sed 's/^[ \t]*//;s/[ \t]*$//' 2>&1)
+                [ "x$SMSPort" != "x" ] && eval "$config"_"SMSPort"='$SMSPort' || eval "$config"_"SMSPort"='NA'
+        else
+                eval "$config"_"SMSPort"='NA'
+        fi
+}
+
+RestartModem()
+{
+        InterfaceName="$1"
+        USBBusPath="$2"
+        PortType="$3"
+        DataPort="$4"
+        ComPort="$5"
+        SMSPort="$6"
+        HotplugRuleStatus="$7"
+
+        if [ "$InterfaceName" = "CWAN1" ]
+        then
+             source /tmp/InterfaceManager/status/ports.txt
+			#/root/usrRPC/script/Recycle_WAN1_PWR_Script.sh $ComPort
+                APIUtility="$($OnboardModemRestart $ComPort)"
+ 
+        elif [ "$InterfaceName" = "CWAN1_0" ]                                                                                               
+        then  
+			source /tmp/InterfaceManager/status/ports.txt
+			#/root/usrRPC/script/Recycle_WAN1_PWR_Script.sh $ComPort
+                APIUtility="$($OnboardModemRestart $ComPort)"
+        elif [ "$InterfaceName" = "CWAN1_1" ]                                                                                             
+        then                                                                                                                             
+			source /tmp/InterfaceManager/status/ports.txt
+			#/root/usrRPC/script/Recycle_WAN1_PWR_Script.sh $ComPort
+                APIUtility="$($OnboardModemRestart $ComPort)"
+        elif [ "$InterfaceName" = "CWAN2" ]
+        then
+                APIUtility="$WAN2Restart"
+        elif [ "$InterfaceName" = "CWAN3" ]
+        then
+                APIUtility="$USB2Restart"
+        fi
+
+        if [ "$PortType" = "ttyS" ]
+        then
+                EnmDataPort="/dev/ttyS""$DataPort"
+                EnmComPort="/dev/ttyS""$ComPort"
+                EnmSMSPort="/dev/ttyS""$SMSPort"
+                if [ -c "$EnmDataPort" ] || [ -c "$EnmComPort" ] || [ -c "$EnmSMSPort" ]
+                then
+                        # Restart Modem
+                        output=$($APIUtility 2>&1)
+                        retval=$?
+                        if [ "$retval" = 0 ]
+                        then
+                                echo "{\"code\":0,\"Hotplugstatus\":\"$HotplugRuleStatus\",\"interfacestatus\":\"modem configured and restarted successfully\"}"
+                        else
+                                echo "{\"code\":0,\"Hotplugstatus\":\"$HotplugRuleStatus\",\"interfacestatus\":\"modem configured but failed to restart\"}"
+                        fi
+                else
+                        #if no modem is inserted
+                        echo "{\"code\":0,\"Hotplugstatus\":\"$HotplugRuleStatus\",\"interfacestatus\":\"configuration updated successfully, please insert the modem, and click on restart button\"}"
+                fi
+        else
+                if [ -f "${USBBusPath}/idVendor" ] && [ -f "${USBBusPath}/idProduct" ]
+                then
+                        DetectedVendorID=$(cat "${USBBusPath}/idVendor" 2>&1)
+                        DetectedProductID=$(cat "${USBBusPath}/idProduct" 2>&1)
+                        if echo "$DetectedVendorID" | grep -qi  "$VendorId"  && echo "$DetectedProductID" | grep -qi "$ProductId"
+                        then
+                                # Restart Modem
+                                output=$($APIUtility 2>&1)
+                                retval=$?
+                                if [ "$retval" = 0 ]
+                                then
+                                        echo "{\"code\":0,\"Hotplugstatus\":\"$HotplugRuleStatus\",\"interfacestatus\":\"modem configured and restarted successfully\"}"
+                                else
+                                        echo "{\"code\":0,\"Hotplugstatus\":\"$HotplugRuleStatus\",\"interfacestatus\":\"modem configured but failed to restart\"}"
+                                fi
+                        else
+                                #if modem with different vendor & product id inserted in usb path
+                                echo "{\"code\":0,\"Hotplugstatus\":\"$HotplugRuleStatus\",\"interfacestatus\":\"configuration updated successfully, please insert the modem now\"}"
+                        fi
+                else
+                        #if no modem is inserted
+                        echo "{\"code\":0,\"Hotplugstatus\":\"$HotplugRuleStatus\",\"interfacestatus\":\"configuration updated successfully, please insert the modem now\"}"
+                fi
+        fi
+}
+
+GetAttachedUSB()
+{
+        config=$1
+        config_get ProductID $config productid
+        config_get VendorID $config vendorid
+        config_get PortType $config porttype
+        config_get DataPort $config device
+        config_get ComPort $config comport
+        config_get TempUSBBusPath $config usbbuspath
+
+        # remove trailing / if any
+        USBBusPath=$(echo "$TempUSBBusPath" | sed 's/\/$//')
+
+        if [ "$PortType" = "ttyS" ]
+        then
+                EnmDataPort="/dev/ttyS""$DataPort"
+                EnmComPort="/dev/ttyS""$ComPort"
+                if [ "x$EnmDataPort" != "x" ] && [ "x$EnmComPort" != "x" ]
+                then
+                        if [ -c "$EnmDataPort" ] && [ -c "$EnmComPort" ]
+                        then
+                                eval "$config""ModemStat"="Attached"
+                        else
+                                eval "$config""ModemStat"="Detached"
+                        fi
+                elif [ "x$EnmDataPort" = "x" ] && [ "x$EnmComPort" = "x" ]
+                then
+                        eval "$config""ModemStat"="NA"
+                elif [ "x$EnmDataPort" != "x" ]
+                then
+                        if [ -c "$EnmDataPort" ]
+                        then
+                                eval "$config""ModemStat"="Attached"
+                        else
+                                eval "$config""ModemStat"="Detached"
+                        fi
+                elif [ "x$EnmComPort" != "x" ]
+                then
+                        if [ -c "$EnmComPort" ]
+                        then
+                                eval "$config""ModemStat"="Attached"
+                        else
+                                eval "$config""ModemStat"="Detached"
+                        fi
+                fi
+        else
+                if [ "$USBBusPath" != "none" ] || [ "x$USBBusPath" != "x" ]
+                then
+                        if [ -f "${USBBusPath}/idVendor" ] && [ -f "${USBBusPath}/idProduct" ]
+                        then
+                                DetectedVendorID=$(cat "${USBBusPath}/idVendor" 2>&1)
+                                DetectedProductID=$(cat "${USBBusPath}/idProduct" 2>&1)
+                                if echo "$DetectedVendorID" | grep -qi  "$VendorID"  && echo "$DetectedProductID" | grep -qi "$ProductID"
+                                then
+                                        eval "$config""ModemStat"="Attached"
+                                else
+                                        eval "$config""ModemStat"="Detached"
+                                fi
+                        else
+                                eval "$config""ModemStat"="Detached"
+                        fi
+                fi
+        fi
+}
+
+
+case "$1" in
+    list)
+        echo '{"findusbdev":{},"laststatus":{"interface":"InterfaceName"},"currentstatus":{"interface":"InterfaceName"},"enable":{"interface":"InterfaceName"},"disable":{"interface":"InterfaceName"},"recycle":{"interface":"InterfaceName"},"ifacestatus":{},"update":{"interface":"InterfaceName"}}'
+        ;;
+
+    call)
+        case "$2" in
+            "findusbdev")
+                # called by modem configuration webpage (on load)
+                config_load modem
+                config_foreach GetAttachedUSB interface
+                echo "{\"code\":0,\"output\":{\"CWAN1\":\"$CWAN1ModemStat\",\"CWAN1_0\":\"$CWAN1_0ModemStat\",\"CWAN1_1\":\"$CWAN1_1ModemStat\",\"CWAN2\":\"$CWAN2ModemStat\",\"CWAN3\":\"$CWAN3ModemStat\"}}"
+                ;;
+
+            "laststatus")
+                # called by modem analytics webpage (on load)
+                # read the arguments and log the call
+                read -r input;
+                # currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                # echo "[$currentDate] interfacemanager:laststatus $input" >> "$LogFile"
+                # logrotate "$LogrotateConfigFile"
+
+                # parse the received arguments
+                json_load "$input" > /dev/null 2>&1
+                json_get_var InterfaceName interface
+
+                # validate arguments
+                if ! echo "$InterfaceName" | grep -qE "^CWAN1$|^CWAN1_0$|^CWAN1_1$|^CWAN2$|^CWAN3$"
+                then
+                    echo '{"code":"1","output":"invalid interface"}'
+                    exit 0
+                fi
+
+                # Read Analytics file
+                InterfaceAnalyticsFile="${InterfaceAnalyticsDir}${InterfaceName}.InterfaceAnalytics"
+                ModemATAnalyticsFile="${InterfaceAnalyticsDir}${InterfaceName}.ModemATAnalytics"
+
+                if [ -s "$InterfaceAnalyticsFile" ] && [ -s "$ModemATAnalyticsFile" ]
+                then
+                    InterfaceAnalytics=$(cat "$InterfaceAnalyticsFile")
+                    ModemATAnalytics=$(cat "$ModemATAnalyticsFile")
+                    echo "{\"code\":\"0\",\"interfaceanalytics\":$InterfaceAnalytics,\"modematanalytics\":$ModemATAnalytics}"
+                elif [ -s "$InterfaceAnalyticsFile" ]
+                then
+                    InterfaceAnalytics=$(cat "$InterfaceAnalyticsFile")
+                    echo "{\"code\":\"1\",\"interfaceanalytics\":$InterfaceAnalytics,\"modematanalytics\":\"modem status not available\"}"
+                elif [ -s "$ModemATAnalyticsFile" ]
+                then
+                    ModemATAnalytics=$(cat "$ModemATAnalyticsFile")
+                    echo "{\"code\":\"2\",\"interfaceanalytics\":\"interface status not available\",\"modematanalytics\":$ModemATAnalytics}"
+                else
+                    echo '{"code":"3","interfaceanalytics":"interface status not available", "modematanalytics":"modem status not available"}'
+                fi
+                ;;
+
+            "currentstatus")
+                # called by modem analytics webpage (query modem analytics button)
+                read -r input;
+                # currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                # echo "[$currentDate] interfacemanager:currentstatus $input" >> "$LogFile"
+                # logrotate "$LogrotateConfigFile"
+
+                json_load "$input" > /dev/null 2>&1
+                json_get_var InterfaceName interface
+
+                if ! echo "$InterfaceName" | grep -qE "^CWAN1$|^CWAN1_0$|^CWAN1_1$|^CWAN2$|^CWAN3$"
+                then
+                    echo '{"code":"1","output":"invalid interface"}'
+                    exit 0
+                fi
+
+                # parse values from uci config file
+                config_load "$ModemConfigFile"
+                config_get DataPort "$InterfaceName" device
+                config_get ComPort "$InterfaceName" comport
+                config_get SMSPort "$InterfaceName" smsport
+                config_get ModemManufacturer "$InterfaceName" manufacturer
+                config_get ModemModel "$InterfaceName" model
+
+                if [ "$DataPort" = "$ComPort" ]
+                then
+                    ifdown "$InterfaceName" > /dev/null 2>&1
+                    sleep 2s
+                    "$QueryModemATAnalytics" "$InterfaceName" "$ModemManufacturer" "$ModemModel" > /dev/null 2>&1
+                    ifup "$InterfaceName" > /dev/null 2>&1
+                elif  [ "$SMSPort" = "$ComPort" ]
+                then
+                        #/etc/init.d/smstools3 stop > /dev/null 2>&1
+                        sleep 2s
+                        "$QueryModemATAnalytics" "$InterfaceName" "$ModemManufacturer" "$ModemModel" > /dev/null 2>&1
+                        sleep 2s
+                       # /etc/init.d/smstools3 start > /dev/null 2>&1
+                else
+                        "$QueryModemATAnalytics" "$InterfaceName" "$ModemManufacturer" "$ModemModel" > /dev/null 2>&1
+
+                fi
+
+                InterfaceAnalyticsFile="${InterfaceAnalyticsDir}${InterfaceName}.InterfaceAnalytics"
+                ModemATAnalyticsFile="${InterfaceAnalyticsDir}${InterfaceName}.ModemATAnalytics"
+
+                if [ -s "$InterfaceAnalyticsFile" ] && [ -s "$ModemATAnalyticsFile" ]
+                then
+                    InterfaceAnalytics=$(cat "$InterfaceAnalyticsFile")
+                    ModemATAnalytics=$(cat "$ModemATAnalyticsFile")
+                    echo "{\"code\":\"0\",\"interfaceanalytics\":$InterfaceAnalytics,\"modematanalytics\":$ModemATAnalytics}"
+                elif [ -s "$InterfaceAnalyticsFile" ]
+                then
+                    InterfaceAnalytics=$(cat "$InterfaceAnalyticsFile")
+                    echo "{\"code\":\"1\",\"interfaceanalytics\":$InterfaceAnalytics,\"modematanalytics\":\"modem status not available\"}"
+                elif [ -s "$ModemATAnalyticsFile" ]
+                then
+                    ModemATAnalytics=$(cat "$ModemATAnalyticsFile")
+                    echo "{\"code\":\"2\",\"interfaceanalytics\":\"interface status not available\",\"modematanalytics\":$ModemATAnalytics}"
+                else
+                    echo '{"code":"3","interfaceanalytics":"interface status not available", "modematanalytics":"modem status not available"}'
+                fi
+                ;;
+
+            "enable")
+                # called on hot-plug event
+                read -r input;
+                # currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                # echo "[$currentDate] interfacemanager:enable $input" >> "$LogFile"
+                # logrotate "$LogrotateConfigFile"
+
+                json_load "$input" > /dev/null 2>&1
+                json_get_var InterfaceName "interface"  > /dev/null 2>&1
+
+                "$AddInterfaceScript" "$InterfaceName" > /dev/null 2>&1
+                "$AddSMSCfgScript" "$InterfaceName" > /dev/null 2>&1
+                echo "{\"code\":\"0\",\"output\":\"enabling interface $InterfaceName\"}"
+                ;;
+
+            "disable")
+                # called on hot-plug event
+                read -r input;
+                # currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                # echo "[$currentDate] interfacemanager:disable $input" >> "$LogFile"
+                # logrotate "$LogrotateConfigFile"
+
+                json_load "$input" > /dev/null 2>&1
+                json_get_var InterfaceName "interface"  > /dev/null 2>&1
+
+                "$DeleteInterfaceScript" "$InterfaceName" > /dev/null 2>&1
+                "$DeleteSMSCfgScript" "$InterfaceName" > /dev/null 2>&1
+                echo "{\"code\":\"0\",\"output\":\"interface $InterfaceName disabled\"}"
+                ;;
+
+            "recycle")
+                # called by InterfaceMonitor.sh script and modem configuration web-page (restart button)
+                read -r input;
+                # currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                # echo "[$currentDate] interfacemanager:recycle $input" >> "$LogFile"
+                # logrotate "$LogrotateConfigFile"
+
+                json_load "$input" > /dev/null 2>&1
+                json_get_var InterfaceName "interface"  > /dev/null 2>&1
+
+                # parse uci configuration
+                config_load "$ModemConfigFile"
+                config_get PortType "$InterfaceName"  porttype
+
+                # validate arguments
+                if ! echo "$InterfaceName" | grep -qE "^CWAN1$|^CWAN1_0$|^CWAN1_1$|^CWAN2$|^CWAN3$"
+                then
+                    echo '{"code":"1","output":"invalid interface"}'
+                    exit 0
+                fi
+
+                # make interface down and stop the sms daemon
+                "$DeleteInterfaceScript" "$InterfaceName" > /dev/null 2>&1
+                "$DeleteSMSCfgScript" "$InterfaceName" > /dev/null 2>&1
+
+                # Restart Modem
+                if [ "$InterfaceName" = "CWAN1" ]
+                then
+                    output=$($OnboardModemRestart 2>&1)
+                    retval=$?
+                elif [ "$InterfaceName" = "CWAN1_0" ]                                                                                                
+                then                 
+                    output=$($OnboardModemRestart 2>&1)                                                                                         
+                    retval=$? 
+                elif [ "$InterfaceName" = "CWAN1_1" ]                                                                                                
+                then                                                                                                                            
+                    output=$($OnboardModemRestart 2>&1)                                                                                         
+                    retval=$? 
+                elif [ "$InterfaceName" = "CWAN2" ]
+                then
+                    output=$($WAN2Restart 2>&1)
+                    retval=$?
+                elif [ "$InterfaceName" = "CWAN3" ]
+                then
+                    output=$($USB2Restart 2>&1)
+                    retval=$?
+                fi
+
+                # For Modems with port type 'ttyS' Hotplug rules are not called
+                # call the AddInterfaceScript & AddSMSCfgScript manually
+                if [ "$PortType" = "ttyS" ]
+                then
+                       "$AddInterfaceScript" "$InterfaceName" > /dev/null 2>&1
+                       "$AddSMSCfgScript" "$InterfaceName" > /dev/null 2>&1
+                fi
+
+                if [ "$retval" = 0 ]
+                then
+                    echo "{\"code\":0,\"output\":\"modem restarted successfully\"}"
+                else
+                    echo "{\"code\":1,\"output\":\"failed to restart modem\"}"
+                fi
+                ;;
+
+            "ifacestatus")
+                # called by modem configuration webpage
+                # currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                # echo "[$currentDate] interfacemanager:readsmsstatus" >> "$LogFile"
+                # logrotate "$LogrotateConfigFile"
+                config_load modem
+                config_foreach ReadIfaceStatus interface
+                echo "{\"code\":0,\"output\":{\
+                \"CWAN1\":{\"DataStatus\":\"$CWAN1_DataStatus\",\"SMSStatus\":\"$CWAN1_SMSStatus\",\"DataPort\":\"$CWAN1_DataPort\",\"ComPort\":\"$CWAN1_ComPort\",\"SMSPort\":\"$CWAN1_SMSPort\"},\
+                \"CWAN1_0\":{\"DataStatus\":\"$CWAN1_0_DataStatus\",\"SMSStatus\":\"$CWAN1_0_SMSStatus\",\"DataPort\":\"$CWAN1_0_DataPort\",\"ComPort\":\"$CWAN1_0_ComPort\",\"SMSPort\":\"$CWAN1_0_SMSPort\"},\
+                \"CWAN1_1\":{\"DataStatus\":\"$CWAN1_1_DataStatus\",\"SMSStatus\":\"$CWAN1_1_SMSStatus\",\"DataPort\":\"$CWAN1_1_DataPort\",\"ComPort\":\"$CWAN1_1_ComPort\",\"SMSPort\":\"$CWAN1_1_SMSPort\"},\
+                \"CWAN2\":{\"DataStatus\":\"$CWAN2_DataStatus\",\"SMSStatus\":\"$CWAN2_SMSStatus\",\"DataPort\":\"$CWAN2_DataPort\",\"ComPort\":\"$CWAN2_ComPort\",\"SMSPort\":\"$CWAN2_SMSPort\"},\
+                \"CWAN3\":{\"DataStatus\":\"$CWAN3_DataStatus\",\"SMSStatus\":\"$CWAN3_SMSStatus\",\"DataPort\":\"$CWAN3_DataPort\",\"ComPort\":\"$CWAN3_ComPort\",\"SMSPort\":\"$CWAN3_SMSPort\"},\
+                }}"
+                ;;
+
+            "update")
+                # called by modem configuration web-page (update button)
+                read -r input;
+                currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                echo "[$currentDate] interfacemanager:configure $input" >> "$LogFile"
+                logrotate "$LogrotateConfigFile"
+
+                json_load "$input" > /dev/null 2>&1
+                json_get_var InterfaceName "interface"  > /dev/null 2>&1
+
+                # parse uci configuration
+                config_load "$ModemConfigFile"
+                config_get ModemEnable "$InterfaceName" modemenable
+                config_get DataEnable "$InterfaceName" dataenable
+                config_get SMSEnable "$InterfaceName" smsenable
+                config_get VendorId "$InterfaceName" vendorid
+                config_get ProductId "$InterfaceName" productid
+                config_get PortType "$InterfaceName"  porttype
+                config_get DataPort "$InterfaceName" device
+                config_get ComPort "$InterfaceName" comport
+                config_get TempUSBBusPath "$InterfaceName" usbbuspath
+
+                # remove trailing / if any
+                USBBusPath=$(echo "$TempUSBBusPath" | sed 's/\/$//')
+
+                if [ "x$VendorId" = "x" ] || [ "x$ProductId" = "x" ]
+                then
+                    echo '{"code":1,"Hotplugstatus":"vendor/product id error"}'
+                    exit 0
+                fi
+
+# commented as on march 28
+                # update Hotplug rule for current interface
+                #if [ "$PortType" != "ttyS" ]
+                #then
+                    #HotplugUSBBusPath=$(echo "$USBBusPath" | awk -F'/' '{print $NF}')
+                    #"$UpdateHotplugRuleScript" "$InterfaceName" "$VendorId" "$ProductId" "$PortType" "$HotplugUSBBusPath" > /dev/null 2>&1
+
+                    ## Read updated Hotplug status
+                    #HotplugRuleStatFile="$StatusDir""$InterfaceName"".HotplugRuleStatus"
+                    #HotplugRuleStatus=$(sed -n "/^\<status\>/p" "$HotplugRuleStatFile"  | cut -d "=" -f 2 | sed 's/^[ \t]*//;s/[ \t]*$//')
+                    #if ! echo "$HotplugRuleStatus" | grep -qi "success"
+                    #then
+                        #echo "{\"code\":1,\"Hotplugstatus\":\"$HotplugRuleStatus, Please reconfigure again\",\"interfacestatus\":\"NA\"}"
+                        #exit 0
+                    #fi
+                #else
+                    #HotplugRuleStatus="NA"
+                #fi 
+
+                # Delete old configuration, make interface down & stop smsd
+                "$DeleteInterfaceScript" "$InterfaceName" > /dev/null 2>&1
+                "$DeleteSMSCfgScript" "$InterfaceName" > /dev/null 2>&1
+
+                # Update Interface Monitor configuration
+                "$IMInitializerScript" "stop" "$InterfaceName" > /dev/null 2>&1
+                "$IMInitializerScript" "start" "$InterfaceName" > /dev/null 2>&1
+
+                # delete ipdown status file used by NotifyIPChange script
+                IPDownSMSNotifyFile="/tmp/InterfaceManager/""$InterfaceName"".IPDown"
+                rm -f "$IPDownSMSNotifyFile"
+
+                if [ "$ModemEnable" -eq 0 ]
+                then
+                        echo "{\"code\":0,\"Hotplugstatus\":\"$HotplugRuleStatus\",\"interfacestatus\":\"interface is disabled\"}"
+                else
+                        ModemRestartOutput=$(RestartModem "$InterfaceName" "$USBBusPath" "$PortType" "$DataPort" "$ComPort" "$SMSPort" "$HotplugRuleStatus" 2>&1)
+                        if [ "$PortType" = "ttyS" ]
+                        then
+                                "$AddInterfaceScript" "$InterfaceName" > /dev/null 2>&1
+                                "$AddSMSCfgScript" "$InterfaceName" > /dev/null 2>&1
+                        fi
+                        echo "$ModemRestartOutput"
+                fi
+                ;;
+        esac #interfacemanager method
+        ;;
+esac # ubus method
+
+exit 0

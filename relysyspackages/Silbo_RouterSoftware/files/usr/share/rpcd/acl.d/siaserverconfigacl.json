@@ -1,0 +1,21 @@
+{
+    "siaserverconfig": {
+        "description": "SIA Server Configuration",
+            "read": {
+				"ubus" : {
+                "rpc-siaserverConfig":[
+                "configure"        
+               ]
+            },
+                "uci": [
+                    "siaserverconfig"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "siaserverconfig"
+                ]
+            }
+    }
+}

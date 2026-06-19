@@ -1,0 +1,76 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+
+ArchiveDLPath="/tmp"
+UpdateConfigScript="/root/InterfaceManager/script/Update_Nms.sh"
+UpdateNMSConfigScript="/root/InterfaceManager/script/Disable_Nms.sh"
+case "$1" in
+    list)
+        echo '{"configure":{},"update":{},"testarchive":{"archive":"ArchiveName"}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+                            response=$($UpdateConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : NMS Configuration Update\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : NMS Configuration Update\"}"
+                            fi
+                                                                                 
+                            ;;
+                            
+                        update)
+                            response=$($UpdateNMSConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : NMS Configuration Disable\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : NMS Configuration Disable\"}"
+                            fi
+                                                                                 
+                            ;;                                
+                                                                                        
+		             testarchive)
+		                # read the arguments
+		                read -r input;
+		                json_load "$input" > /dev/null 2>&1
+		                json_get_var ArchivedFileWithPath archive
+		                
+		                if [ "x$ArchivedFileWithPath" = "x" ]
+		                then
+		                    echo "{\"code\":1,\"output\":\"invalid input arguments\"}" >> "$logfile"
+		                    exit 1
+		                fi
+		               
+		                #extracting tar file in tmp folder
+		                RetMsg=$(cp "${ArchivedFileWithPath}" "${ArchiveDLPath}" 2>&1)
+			            RetVal=$?
+						if [ "$RetVal" -ne 0 ]
+						then
+							echo "Failed to copy key file error-$RetMsg" >> "$logfile"
+						exit 1
+						else
+							response=$($nmsscript)
+
+						fi
+						
+						
+						rm -f "$ArchivedFileWithPath"
+						   
+		                ;;
+                
+		             *)
+		                    echo '{"code":"1","output":"invalid method"}'
+		                    exit 1
+		                    ;;
+     
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

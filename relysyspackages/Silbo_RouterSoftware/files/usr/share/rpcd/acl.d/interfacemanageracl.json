@@ -1,0 +1,31 @@
+{
+    "interfacemanager": {
+        "description": "interface manager configuration",
+        "read": {                                                       
+            "ubus": {
+                "interfacemanager": [
+                    "findusbdev",
+                    "laststatus",
+                    "currentstatus",
+                    "enable",
+                    "disable",
+                    "recycle",
+                    "ifacestatus",
+                    "update"
+                ],                
+                "rpc-querymodemstatus":[
+                "configure",
+                "check"                  
+                ]
+            },
+            "uci": [                                          
+                "modem"
+            ]                     
+        },
+        "write": {                              
+            "uci": [
+                "modem"
+            ]
+        }
+    }
+}

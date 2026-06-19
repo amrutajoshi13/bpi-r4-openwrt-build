@@ -1,0 +1,26 @@
+{
+    "cellularconfig": {
+        "description": "Cellular Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updatecellularconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "sysconfig",
+                "smsconfig"
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "sysconfig",
+               "smsconfig"
+                
+            ]
+        }
+    }
+}

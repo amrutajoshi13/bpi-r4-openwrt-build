@@ -1,0 +1,93 @@
+{
+    "appconfig": {
+     "title": "Configuration",
+        "index": 72
+    },
+    
+     "appconfig/sourceconfiguration": {
+	"title": "Source Configuration",
+	"acls": [ "sourceconfig" ],
+	"view": "appconfig/sourceconfiguration",
+	"index": 20
+    },
+    
+   "appconfig/sendconfiguration": {
+    "title": "Send Configuration",
+    "acls": [ "sendconfig" ],
+    "view": "appconfig/sendconfiguration",
+	"index": 25
+    },
+        
+     "appconfig/cloudconfiguration": {
+         "title": "Cloud Configuration",
+         "acls": [ "cloudconfig" ],
+         "view": "appconfig/cloudconfiguration",
+         "index": 35
+     },
+     
+   /*    "appconfig/portconfiguration": {
+         "title": "Port Configuration",
+         "acls": [ "applicationmanager" ],
+         "view": "appconfig/portconfiguration",
+         "index": 32
+     }, */ 
+
+    "appconfig/deviceconfiguration": {
+        "title": "Modbus Configuration",
+        "acls": [ "deviceconfig" ],
+        "view": "appconfig/deviceconfiguration",
+         "index": 40
+     },     
+     
+   /*  "appconfig/rs232configuration": {
+         "title": "RS232 Configuration",
+         "acls": [ "rs232config" ],
+         "view": "appconfig/rs232configuration",
+         "index": 45
+     },
+     
+     "appconfig/digitalinputconfiguration": {
+        "title": "Digital Input Output Configuration",
+        "acls": [ "digitalinputconfig" ],
+        "view": "appconfig/digitalinputconfiguration",
+        "index": 50
+    }, 
+    
+      "appconfig/analoginputconfiguration": {
+        "title": "Analog Input Configuration",
+        "acls": [ "analoginputconfig" ],
+        "view": "appconfig/analoginputconfiguration",
+        "index": 70
+    },
+      
+       "appconfig/sensorEvents": {
+        "title": "Sensor Events",
+        "acls": [ "sensorevents" ],
+        "view": "appconfig/sensorEvents",
+        "index": 80
+    } */   
+    
+    
+   /* "appconfig/temperatureconfiguration": {
+         "title": "Temperature Sensors Configuration",
+         "acls": [ "temperatureconfig" ],
+         "view": "appconfig/temperatureconfiguration",
+         "index": 60
+     } 
+   
+
+	 "appconfig/sendpacketconfiguration": {
+	 "title": "SendPacket Configuration",
+	 "acls": [ "sendpacketconfig" ],
+	 "view": "appconfig/sendpacketconfiguration",
+	 "index": 60
+     },*/
+    
+     /* "appconfig/mqttserverconfiguration": {
+         "title": "MQTT Server Configuration",
+         "acls": [ "mqttconfig" ],
+         "view": "appconfig/mqttserverconfiguration",
+         "index": 70
+     },*/
+     
+}

@@ -1,0 +1,43 @@
+{
+    "greconfig": {
+        "description": "Tunnel Configuration",
+            "read": {
+				"ubus" : {
+                "rpc-updateGREConfig":[
+                 "configure",
+                 "update",
+                 "testarchive",
+                "delete",
+                "countkeyfiles"          
+               ],
+               "rpc-updateIPIPConfig":[
+                 "configure",
+                 "update",
+                 "testarchive",
+                "delete",
+                "countkeyfiles"          
+               ],
+                "rpc-updateEOIPConfig":[
+                 "configure",
+                 "update",
+                 "testarchive",
+                "delete",
+                "countkeyfiles"          
+               ],
+            },
+                "uci": [
+                    "greconfig",
+                    "ipipconfig",
+                    "eoipconfig"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "greconfig",
+                    "ipipconfig",
+                    "eoipconfig"
+                ]
+            }
+    }
+}

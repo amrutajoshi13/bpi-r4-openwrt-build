@@ -1,0 +1,144 @@
+<div id="portContentWrapper">
+    <div style="border-bottom: 1px solid #70707038;">
+        <h1 class="header">Port Configuration</h1>
+    </div>
+    <div class="pagecontent">
+        <div class="tab-content" id="tabs">
+            <ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+
+                <li class="TabC TabCel active">
+                    <a id="sectiontab_port1" href="#tab_Port1" data-toggle="tab">Port 1
+                        <span class="badge"></span>
+                    </a>
+                </li>
+
+                <!--
+        <li class="TabC TabBand">
+            <a id="sectiontab_port2" href="#tab_Port2" data-toggle="tab">Port 2
+                <span class="badge"></span>
+            </a>
+        </li>
+-->
+            </ul>
+
+
+
+
+
+            <div class="tab-pane TabC TabCel active" id="tab_Port1">
+                <div id="section_port1"></div>
+            </div>
+
+
+            <!--
+    <div class="tab-pane TabC TabBand" id="tab_Port2">
+        <div id="section_port2"></div>
+    </div>
+-->
+        </div>
+    </div>
+</div>
+<div id="portDisabledOverlay" style="display:none;">
+    <div class="port-overlay-content">
+        <h2>Port Configuration is Disabled</h2>
+        <p>
+            Please go to <b>Device Application</b> page and start the
+            <b>Port</b> application to enable this configuration.
+        </p>
+    </div>
+</div>
+<style>
+    /* Wrapper must be positioning context */
+    #portContentWrapper {
+        position: relative;
+    }
+
+    #deviceDisabledOverlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .device-overlay-content {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 14px;
+        max-width: 520px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .device-overlay-content h2 {
+        color: #dc3545;
+        margin-bottom: 10px;
+    }
+
+    #portContentWrapper {
+        position: relative;
+    }
+
+    /* Page-scoped overlay */
+    #portDisabledOverlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Overlay card */
+    .port-overlay-content {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 14px;
+        max-width: 520px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .port-overlay-content h2 {
+        color: #dc3545;
+        margin-bottom: 10px;
+    }
+
+    .port-overlay-content p {
+        color: #444;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .port-blurred {
+        filter: blur(4px);
+        pointer-events: none;
+        user-select: none;
+    }
+
+
+
+    .btn-danger {
+        margin-top: -17px !important;
+    }
+
+    #maincontent {
+        overflow-anchor: none !important;
+    }
+</style>
+
+<!-- <script>
+    $('#maincontent').on('click', 'a[data-toggle="tab"]', function (e) {
+        e.preventDefault();
+
+        // manually activate tab WITHOUT hash jump
+        $(this).tab('show');
+    });
+
+
+
+
+</script> -->

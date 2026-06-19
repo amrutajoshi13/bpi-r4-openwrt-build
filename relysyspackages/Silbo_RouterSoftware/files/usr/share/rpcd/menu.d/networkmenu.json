@@ -1,0 +1,48 @@
+{
+    "network": {
+        "title": "Network",
+        "index": 20
+    },
+ 
+    "network/vlanconfig": {
+        "title": "VLAN",
+        "acls": [ "vlanconfig" ],
+        "view": "network/vlanconfig",
+        "index": 10     
+    }, 
+
+    "network/ethernet": {
+        "title": "Ethernet",
+        "acls": [ "sysconfig" ],
+        "view": "network/ethernet",
+        "index": 15
+    },
+
+    "network/cellular": {
+        "title": "Cellular",
+        "acls": [ "cellularconfig" ],
+        "view": "network/cellular",
+        "index": 20     
+    },
+
+    "network/wireless": {
+        "title": "Wireless",
+        "acls": [ "wirelessconfig" ],
+        "view": "network/wireless",
+        "index": 25
+    },
+
+    "network/internetconnection": {
+        "title": "Multi-WAN",
+        "acls": [ "internetconnection" ],
+        "view": "network/internetconnection",
+        "index": 30
+    },
+  
+    "network/vpnconfig1": {
+        "title": "VPN and Tunnel",
+        "acls": [ "vpnconfig1" ],
+        "view": "network/vpnconfig1",
+        "index": 35       
+    }
+}

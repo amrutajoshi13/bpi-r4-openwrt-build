@@ -1,0 +1,13 @@
+config applicationdeletedatabaseconfig                          
+        option utility 'Delete Database'
+        option action 'DELETE'                
+        option inputs '1'               
+        option input1Element 'selection'
+        option input1Name 'Database/File'               
+        option input1Type 'string'   
+        list input1Values 'EnergyMeterRS485'
+        list input1Values "DIO"
+        list input1Values "AIO"
+	list input1Values "EnergyMeterRS232"
+	list input1Values "SNMP"
+	list input1Values "Temperature"

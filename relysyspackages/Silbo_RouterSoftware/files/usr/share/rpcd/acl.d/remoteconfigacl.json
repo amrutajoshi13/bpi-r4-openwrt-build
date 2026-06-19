@@ -1,0 +1,29 @@
+{
+    "remoteconfig": {
+        "description": "Remote Monitoring",
+        "read": {
+			"ubus" : {
+                "rpc-updateremoteconfig":[
+                "configure",
+		"configurestatus",
+                "update",
+                 "trconfigure"
+                   
+                ]
+            },
+            "uci": [
+                "remoteconfig",
+		"remoteconfigstatus",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "remoteconfig",
+		"remoteconfigstatus",
+                
+            ]
+        }
+    }
+}

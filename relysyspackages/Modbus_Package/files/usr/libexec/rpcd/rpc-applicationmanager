@@ -1,0 +1,201 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+mkdir -p /reap/disk/AppData/GD44
+mkdir -p /reap/disk/AppData/GD44/Upgrade
+
+UpdateConfigScript="/bin/UpdateConfigurationsGateway"
+ApplicationUpgrade="/bin/ManualUpgradeAppGateway.sh"
+
+ArchiveDLPath="/tmp"
+UpgradeLogDir="/reap/disk/AppData/GD44"
+UpgradeLogDirCheck="/reap/disk/AppData/GD44/Upgrade"
+logfile="${UpgradeLogDirCheck}/UpgradeManagerLog"
+
+if [ -d "$UpgradeLogDir" ]
+then
+	if [ ! -d "$UpgradeLogDirCheck" ]
+	then
+		mkdir -p "$UpgradeLogDirCheck"
+	fi
+fi
+
+
+case "$1" in
+    list)
+        echo '{"testarchive":{"archive":"ArchiveName"},"UpgradeApp":{"application":"ApplicationName","action":"ActionName"},"configure":{"application":"ApplicationName","action":"ActionName"},"init":{"application":"ApplicationName","action":"ActionName"}}'
+        ;;
+    call)
+        case "$2" in
+            testarchive)
+                # read the arguments
+                read -r input;
+                json_load "$input" > /dev/null 2>&1
+                json_get_var ArchivedFileWithPath archive
+                
+                if [ "x$ArchivedFileWithPath" = "x" ]
+                then
+                    echo "{\"code\":1,\"output\":\"invalid input arguments\"}" >> "$logfile"
+                    exit 1
+                fi
+               
+                AutoUpgradeRunStatus=$(ps | grep -i AutoUpgradeApp | grep -v grep)
+                if [ "x$AutoUpgradeRunStatus" != "x" ]
+                then
+                    echo "{\"code\":\"1\",\"output\":\"Auto upgrade is on progress\"}"  >> "$logfile" 
+                    exit 1
+                fi 
+                
+                ##extracting tar file in tmp folder
+                #RetMsg=$(tar -zxv -f "${ArchivedFileWithPath}" -C "${ArchiveDLPath}" 2>&1)
+	            #RetVal=$?
+				#if [ "$RetVal" -ne 0 ]
+				#then
+					#echo "TestArchiveStatus=failed extract archive error-$RetMsg" >> "$logfile"
+				#exit 1
+				#fi
+				#rm -f "$ArchivedFileWithPath"
+				   
+                ;;
+     
+                UpgradeApp)
+                # read the arguments
+                read -r input;
+                json_load "$input" > /dev/null 2>&1
+                json_get_var ApplicationName application
+                json_get_var ActionName action
+
+                    case "$ApplicationName" in
+                        "ReAPapps")
+                            case "$ActionName" in
+                             "upgrade")
+									response=$($ApplicationUpgrade)
+                                    file="$(cat /reap/disk/AppData/GD44/Upgrade/ManualUpgradeLog/WebInfoFile)"
+                                    echo "{\"code\":\"0\",\"output\":\"$file\"}"  
+                                    ;;
+                                 *)
+                                    echo '{"code":"1","output":"invalid action"}'
+                                    exit 1
+                                    ;;
+                            esac #application action
+                            ;;
+                    esac #application name
+                    ;;
+                    
+            configure)
+                # read the arguments
+                read -r input;
+                json_load "$input" > /dev/null 2>&1
+                json_get_var ApplicationName application
+                json_get_var ActionName action
+                    case "$ApplicationName" in
+                        "ReAPapps")
+                            case "$ActionName" in
+                                "updateconfig")
+                                    response=$($UpdateConfigScript "ucitoappcfg")
+                                                                      
+                                    #if [ "$?" -eq 0 ]
+                                    #then
+	                                    #out=$(cat /tmp/updateconfigoutput.txt)
+	                                    #echo "{\"code\":\"1\",\"output\":\"$out\"}" 
+	                               #else
+	                                     #echo "{\"code\":\"0\",\"output\":\"Success : Update Configurations\"}"     
+                                    #fi 
+                                    
+                                    
+                                    if [ ! -s "/tmp/updateconfigoutput.txt" ]; then
+                                        echo "{\"code\":\"0\",\"output\":\"Success : Update Configurations\"}"     
+                                    else
+                                         out=$(cat /tmp/updateconfigoutput.txt)
+	                                    echo "{\"code\":\"1\",\"output\":\"$out\"}" 
+                                    fi
+                                     ;;
+        
+                                "defaultconfig")
+                                    response="This feature is not enabled"
+                                    echo "{\"code\":\"0\",\"output\":\"$response\"}"
+                                    ;;
+                                    
+                                 *)
+                                    echo '{"code":"1","output":"invalid action"}'
+                                    exit 1
+                                    ;;
+                            esac #application action
+                            ;;
+                    esac #application name
+                    ;;
+            init)
+                # read the arguments
+                read -r input;
+                currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                echo "[$currentDate] rpc-applicationmanager:init $input" >> "$logfile"
+                logrotate "$LogrotateConfigFile"
+
+                # parse the received arguments  and log
+                json_load "$input" > /dev/null 2>&1
+                json_get_var ApplicationName application
+                json_get_var ActionName action
+
+                case "$ApplicationName" in
+                    "ReAPapps")
+                        case "$ActionName" in
+                            "start")
+                                config_load "applist_config"
+                                config_get running "appconfig" running
+                                if [ "$running" = 0 ]
+                                then
+                                    #AppInstalledStatus=$(echo $(/legato/systems/current/bin/app info FlowMeterProjectUtilities) | cut -d "[" -f2 | cut -d "]" -f1)
+                                    #if [ "$AppInstalledStatus" == "not installed" ]
+                                    #then
+                                        ##uci set applist_config.appconfig.running="0"
+                                        ##uci commit applist_config
+                                        #echo "{\"code\":\"1\",\"output\":\"FlowmeterProjectUtilities application is not installed\"}"
+                                    #else
+                                        uci set applist_config.appconfig.running="1"
+                                        uci commit applist_config
+                                        response=$(sh -x /etc/init.d/GD44AppManager start 2>&1)
+                                        echo "{\"code\":\"0\",\"output\":\"$response\"}"
+                                    #fi
+                                elif  [ "$running" = 1 ]
+                                then
+                                    echo "{\"code\":\"0\",\"output\":\"applications are already running\"}"
+                                else
+                                    echo "{\"code\":\"0\",\"output\":\"applications status not available\"}"
+                                fi
+                                ;;
+
+                            "stop")
+                                config_load "applist_config"
+                                config_get running "appconfig" running
+                                if [ "$running" = 1 ]
+                                then
+                                    response=$(sh -x /etc/init.d/GD44AppManager stop 2>&1)
+                                    uci set applist_config.appconfig.running="0"
+                                    uci commit applist_config
+                                    echo "{\"code\":\"0\",\"output\":\"$response\"}"
+                                elif [ "$running" = 0 ]
+                                then
+                                    echo "{\"code\":\"0\",\"output\":\"applications are not running\"}"
+                                else
+                                    echo "{\"code\":\"0\",\"output\":\"applications status not available\"}"
+                                fi
+                                ;;
+                            *)
+                                echo '{"code":"1","output":"invalid action"}'
+                                exit 1
+                                ;;
+                        esac #application action
+                        ;;
+                esac #application name
+                ;;
+
+            *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+            ;;
+esac # ubus method
+
+exit 0

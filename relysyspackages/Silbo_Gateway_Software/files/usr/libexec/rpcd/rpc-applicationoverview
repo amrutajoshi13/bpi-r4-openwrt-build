@@ -1,0 +1,918 @@
+#!/bin/sh
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+IOUtilitiesCfg="/etc/config/DiagnosticIOUtilities"
+MISCUtilitiesCfg="/etc/config/DiagnosticMiscUtilities"
+APIPath="/legato/systems/current/apps/FlowMeterProjectUtilities/read-only/bin"
+EMeterRS485APIPath="/root/RS485UtilityComponent"
+EMeterRS232APIPath="/root/RS232UtilityComponent"
+DIIndividualAPIPath="/root/DIUtilityIndividualTestComponent"
+DOIndividualAPIPath="/root/DOUtilityIndvidualTestComponent"
+ReadAllTemperatureSensorsAPIPath="/root/ReadAllTemperatureSensorsUtilityComponent"
+ReadSingleTemperatureSensorsAPIPath="/root/ReadSingleTemperatureSensorUtilityComponent"
+DataBaseScriptPath="/legato/systems/current/apps/FlowMeterProjectUtilities/read-only/bin/Consolidator"
+CM="/mnt/legato/system/bin/cm"
+LIST="/bin/ls"
+DIR="/reap/disk/SDCard_Src1/FTPSender/FTPSent"
+HartDevadFile="/home/root/.hartdevad"
+PrepareSDCardPath="/reap/bin/SDcardPreparation/SDCardPreparation.sh"
+
+case "$1" in
+    list)
+        echo '{"run":{"utility":"UtilityName","action":"ActionName","section":"sectionName","usrinputs":{"input1":"Input1Values","input2":"Input2Value","input3":"Input3Value"}}}'
+        ;;
+
+    call)
+        case "$2" in
+            run)
+                # read the arguments
+                read -r input;
+
+                # parse the received arguments
+                json_load "$input" > /dev/null 2>&1
+                json_get_var UtilityName utility
+                json_get_var ActionName action
+                json_get_var SectionName section
+                json_select usrinputs > /dev/null 2>&1
+                json_get_var Input1Value input1
+                json_get_var Input2Value input2
+                json_get_var Input3Value input3
+                json_select .. > /dev/null 2>&1
+#Digital Input
+                case "$UtilityName" in
+                    "Digital Input")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if echo "$Input1Value" | grep -qE '^[0-9]+$'
+                            then
+                                #ReadDIOutput=$(${DIIndividualAPIPath}/DIUtilityIndividual "$Input1Value" 2>&1)
+                                ReadDIOutput=$(/root/DIUtilityIndividualTestComponent/DIUtilityIndividual "$Input1Value" 2>&1)
+                                #ReadDIRetVal=$?
+                                #if [ "$ReadDIRetVal" != 0 ]
+                                #then
+                                   # echo "{\"code\":1,\"output\":\"Failed to read Digital input $Input1Value\"}"
+                                #else
+                                    echo "{\"code\":0,\"output\":\"$ReadDIOutput\"}"
+                               # fi
+                             fi   
+
+                            else
+                                echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                         "Digital Output")
+                        if [ "$ActionName" = "WRITE" ]
+                        then
+                            if echo "$Input1Value" | grep -qE '^[0-9]+$'
+                            then
+								if echo "$Input2Value"  | grep -qE '^[0-9]+$'
+								then
+	                                #ReadDIOutput=$(${DIIndividualAPIPath}/DIUtilityIndividual "$Input1Value" 2>&1)
+	                                WriteDOutput=$(/root/DOUtilityIndividualTestComponent/DOUtilityIndividual "$Input1Value" "$Input2Value" 2>&1)
+	                                WriteDORetVal=$?
+	                                if [ "$WriteDORetVal" != 0 ]
+	                                then
+	                                    echo "{\"code\":1,\"output\":\"Failed to Write Digital Output $Input1Value\"}"
+	                                else
+	                                    echo "{\"code\":0,\"output\":\"$WriteDOutput\"}"
+	                                fi
+								fi
+                          fi   
+
+                               
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                     fi
+                     ;;
+                     
+                         "Analog Input")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if echo "$Input1Value" | grep -qE '^[0-9]+$'
+                            then
+								if echo "$Input2Value"  | grep -qE '^[0-9]+$'
+								then
+	                                #ReadDIOutput=$(${DIIndividualAPIPath}/DIUtilityIndividual "$Input1Value" 2>&1)
+	                                ReadAIOutput=$(/root/ADCUtilityComponent/ADCUtility "$Input1Value" "$Input2Value" 2>&1)
+	                                ReadAIRetVal=$?
+	                                if [ "$ReadAIRetVal" != 0 ]
+	                                then
+	                                    echo "{\"code\":1,\"output\":\"Failed to read Analog input $Input1Value\"}"
+	                                else
+	                                    echo "{\"code\":0,\"output\":\"$ReadAIOutput\"}"
+	                                fi
+								fi
+                          fi   
+
+                               
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                     fi
+                     ;;
+# RS485 flowmeter
+                    "RS485 FlowMeter")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if echo "$Input1Value"  | grep -qE '^[0-9]+$'
+                            then
+                                if echo "$Input2Value"  | grep -qE '^[0-9]+$'
+                                then
+                                    ReadRS485Output=$(${APIPath}/ReadMODBUSRS485Test "$Input1Value" "$Input2Value" 2>&1)
+                                    ReadRS485RetVal=$?
+                                    if [ "$ReadRS485RetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read Digital input $Input1Value\"}"
+                                    else
+                                        echo "{\"code\":0,\"output\":\"ReadRS485Output=$ReadRS485Output\"}"
+                                    fi
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+#RS485 energymeter
+                    "RS485 EnergyMeter")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if echo "$Input1Value"  | grep -qE '^[0-9]+$'
+                            then
+                                    ReadRS485Output=$(${EMeterRS485APIPath}/RS485Utility "$Input1Value" 2>&1)
+                                    ReadRS485RetVal=$?
+                                    if [ "$ReadRS485RetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read RS485 Energymeter with Slave ID : $Input1Value\"}"
+                                    else
+                                        echo "{\"code\":0,\"output\":\"$ReadRS485Output\"}"
+                                    fi                               
+                            fi
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+#RS232 energymeter
+                    "RS232 Device")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if echo "$Input1Value"  | grep -qE '^[0-9]+$'
+                            then
+                                    ReadRS232Output=$(${EMeterRS232APIPath}/RS232UtilityGD44 "$Input1Value" 2>&1)
+                                    ReadRS232RetVal=$?
+                                    if [ "$ReadRS232RetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read RS232 Device with Slave ID : $Input1Value\"}"
+                                    else
+                                        echo "{\"code\":0,\"output\":\"$ReadRS232Output\"}"
+                                    fi                               
+                            fi
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+# All Temperature Sensors                       
+                        
+"All Temperature Sensors")
+                    if [ "$ActionName" = "READ" ]
+                    then
+                       
+						if [ -d "/reap/1wire" ]
+						then
+							owfs --i2c=/dev/i2c-0 --allow_other /reap/1wire/ --timeout_volatile=0
+						else
+							mkdir /reap/1wire
+							owfs --i2c=/dev/i2c-0 --allow_other /reap/1wire/ --timeout_volatile=0
+						fi
+                       sleep 2
+                        TemperatureAllOutput=$(${ReadAllTemperatureSensorsAPIPath}/ReadAllTemperatureSensorsUtility 2>&1)
+                        ReadTemperatureAllRetVal=$?
+                                    if [ "$ReadTemperatureAllRetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read Temperature Sensors\"}"
+                                    else
+                                        echo "{\"code\":0,\"output\":\"$TemperatureAllOutput\"}"
+                                    fi       
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+                    
+#Single Temperature Sensor
+                    "Single Temperature Sensor")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                                    # /Web_Page_Gateway_Apps/Common_GW_Files/initOWFS.sh start 2>&1
+                                   #  sleep 2
+                                    TemperatureSingleOutput=$(/root/ReadSingleTemperatureSensorUtilityComponent/ReadSingleTemperatureSensorsUtility "$Input1Value" 2>&1)
+                                    ReadTemperatureSingleRetVal=$?
+                                    if [ "$ReadTemperatureSingleRetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read Temperature Sensor with Address : $Input1Value\"}"
+                                    else
+                                        echo "{\"code\":0,\"output\":\"$TemperatureSingleOutput\"}"
+                                    fi                               
+                            
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;                   
+                                                                    
+#Krohne Hart flowmeter 
+                    "Krohne HART FlowMeter")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if [ "$Input1Value" = "Read Device ID" ]
+                            then
+                                ReadCommandZero=$(mosquitto_pub -t "IOCard1/P500/H/ReadKrohneHARTCommandZero" -m "krohne" )
+                                if [ "$ReadCommandZero" -ne 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Failed to read the device ID\"}"
+                                else
+                                    sleep 5
+                                        DisplayHARTOutput=$(cat /tmp/ReadKrohneHARTCommandZero)
+                                    echo "{\"code\":0,\"output\":\"Read Device ID Output:-\n$DisplayHARTOutput\"}"
+                                fi
+                            elif [ "$Input1Value" = "Read Flow Parameter Set1" ]
+                            then
+                                ReadKrohneCommand3Output=$(${APIPath}/KrohneHARTTestC3 2>&1)
+                                ReadKrohneCommand3RetVal=$?
+                                if [ "$ReadKrohneCommand3RetVal" != 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Failed to run the $Input1Value\"}"
+                                else
+                                    echo "{\"code\":0,\"output\":\"Read Flow Parameter Set1 Output:-\n$ReadKrohneCommand3Output\"}"
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+#Siemens hart flowmeter 
+                    "Siemens HART FlowMeter")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if [ "$Input1Value" = "Read Device ID" ]
+                            then
+                                ReadCommandZero=$(mosquitto_pub -t "IOCard1/P500/H/ReadSiemensHARTCommand" -m "siemenszero" )
+                                if [ "$ReadCommandZero" -ne 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Failed to read the device ID\"}"
+                                else
+                                    sleep 5
+                                    DisplayHARTOutput=$(cat /tmp/ReadSiemensHARTCommandZero)
+                                    echo "{\"code\":0,\"output\":\"Command 0 Output:-\n$DisplayHARTOutput\"}"
+                                    rm -rf /tmp/ReadSiemensHARTCommandZero
+                                fi
+                            elif [ "$Input1Value" = "Read Flow Parameter Set1" ]
+                            then
+                                ReadCommandThree=$(mosquitto_pub -t "IOCard1/P500/H/ReadSiemensHARTCommand" -m "siemensthree" )
+                                if [ "$ReadCommandThree" -ne 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Failed to read the flow parameter set1\"}"
+                                else
+                                    sleep 5
+                                    DisplayHARTOutput=$(cat /tmp/ReadSiemensHARTCommandThree)
+                                    echo "{\"code\":0,\"output\":\"Read Flow Parameter Set1 Output:-\n$DisplayHARTOutput\"}"
+                                    rm -rf /tmp/ReadSiemensHARTCommandThree
+                                fi
+                            elif [ "$Input1Value" = "Read Flow Parameter Set2" ]
+                            then
+                                ReadCommandOneThirty=$(mosquitto_pub -t "IOCard1/P500/H/ReadSiemensHARTCommand" -m "siemensonethirty" )
+                                if [ "$ReadCommandOneThirty" -ne 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Failed to read the flow parameter set2\"}"
+                                else
+                                    sleep 5
+                                    DisplayHARTOutput=$(cat /tmp/ReadSiemensHARTCommandOneThirty)
+                                    echo "{\"code\":0,\"output\":\"Read Flow Parameter Set2 Output:-\n$DisplayHARTOutput\"}"
+                                    rm -rf /tmp/ReadSiemensHARTCommandOneThirty
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+#E&H Hart flowmeter
+                    "E&H HART FlowMeter")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if [ "$Input1Value" = "Read Device ID" ]
+                            then
+                                ReadCommandZero=$(mosquitto_pub -t "IOCard1/P500/H/ReadEandHHARTCommandZero" -m "EandH" )
+                                if [ "$ReadCommandZero" -ne 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Failed to read the device ID\"}"
+                                else
+                                    sleep 5
+                                    DisplayHARTOutput=$(cat /tmp/ReadEandHHARTCommandZero)
+                                    echo "{\"code\":0,\"output\":\"Command 0 Output:-\n$DisplayHARTOutput\"}"
+                                fi
+                            elif [ "$Input1Value" = "Read Flow Parameter Set1" ]
+                            then
+                                ReadEandHCommand3Output=$(${APIPath}/EandHHARTTestC3 2>&1)
+                                ReadEandHCommand3OutputRetVal=$?
+                                if [ "$ReadEandHCommand3OutputRetVal" != 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Failed to run the $Input1Value\"}"
+                                else
+                                    echo "{\"code\":0,\"output\":\"Read Flow Parameter Set1 Output:-\n$ReadEandHCommand3Output\"}"
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+#sd card
+                    "Prepare SD card")
+                        if [ "$ActionName" = "PREPARE" ]
+                        then
+                            SDcardPreparation=$($PrepareSDCardPath)
+                            SDcardPreparationRetval=$?
+                            if [ "$SDcardPreparationRetval" != 0 ]
+                            then
+                                echo "{\"code\":1,\"output\":\"Failed to prepare SDcard\n\n\n$SDcardPreparation\"}"
+                            else
+                                echo "{\"code\":0,\"output\":\"Successfully created SD card\"}"
+                            fi
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+      "View Database Table")
+                    config_load "$MISCUtilitiesCfg"
+                    config_get DatabasePath "$SectionName" "${Input1Value}DatabasePath"
+                    config_get DatabaseName "$SectionName" "${Input1Value}Database"
+                    config_get TableName "$SectionName" "${Input1Value}Table"
+                    DatabaseWithPath="${DatabasePath}/${DatabaseName}"
+
+                    [ "x$DatabasePath" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database path '$DatabasePath'\"}" && exit 1
+                    [ "x$DatabaseName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database '$DatabaseName'\"}" && exit 1
+
+                    [ "x$TableName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid table '$TableName'\"}" && exit 1
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "$DatabaseWithPath" "select * from $TableName order by rowid DESC limit 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+                    
+                    
+  "Energymeter Last Data Produced Time")
+                    config_load "$MISCUtilitiesCfg"
+					#ReadTableOutput=$(/usr/bin/sqlite3 -separator $'\t' -list -nullvalue NULL "/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db" "select * from EnergyMeter_RS485_table order by rowid DESC limit 1;" | awk -F'\t' '{print $15}' 2>&1)
+
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db" "select SiteID,ReadTimeStamp,RecordType,RequestID,ResponseCode,EMeterRS485RecordNumber,EMeterRS485SrcId,EMeterRS485RecordType,EMeterRS485RequestId,EMeterRS485InterfaceId,EMeterRS485MeterID,EMeterRS485SlaveID,EMeterRS485CommIP,EMeterRS485ResponseCode,StartingRS485RegisterAddress,FunctionCodeUsed,NoOfRegisters,EMeterRS485ReadTimestamp,EMeterRS485TxStatus,EMeterRS485TxTimestamp from EnergyMeter_RS485_table order by rowid DESC limit 5;" 2>&1)
+                    #ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db" "select SiteID,EMeterRS485RecordNumber from EnergyMeter_RS485_table order by rowid DESC limit 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+                    
+                    
+                    
+  "Energymeter Last Data Sent Time")
+                    config_load "$MISCUtilitiesCfg"
+					#ReadTableOutput=$(/usr/bin/sqlite3 -separator $'\t' -list -nullvalue NULL "/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db" "select * from EnergyMeter_RS485_table order by rowid DESC limit 1;" | awk -F'\t' '{print $15}' 2>&1)
+
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db" "select SiteID,ReadTimeStamp,RecordType,RequestID,ResponseCode,EMeterRS485RecordNumber,EMeterRS485SrcId,EMeterRS485RecordType,EMeterRS485RequestId,EMeterRS485InterfaceId,EMeterRS485MeterID,EMeterRS485SlaveID,EMeterRS485CommIP,EMeterRS485ResponseCode,StartingRS485RegisterAddress,FunctionCodeUsed,NoOfRegisters,EMeterRS485ReadTimestamp,EMeterRS485TxStatus,EMeterRS485TxTimestamp from EnergyMeter_RS485_table WHERE EMeterRS485TxStatus = 255 ORDER BY rowid DESC LIMIT 5;" 2>&1)
+                    #ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db" "select SiteID,EMeterRS485RecordNumber from EnergyMeter_RS485_table order by rowid DESC limit 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+
+
+
+ "DIO Last Data Produced Time")
+                    config_load "$MISCUtilitiesCfg"
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/DIODataCollectorDB.db" "select SiteID,ReadTimeStamp,RecordType,RequestId,ResponseCode,DIRecordNumber,DIRecordType,DIRequestId,DIResponseCode,DIReadTimestamp,DITxStatus,DITxTimestamp from DIO_table order by rowid DESC limit 5;" 2>&1)
+                    #ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/DIODataCollectorDB.db" "select * from DIO_table order by rowid DESC limit 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+
+
+ "DIO Last Data Sent Time")
+                    config_load "$MISCUtilitiesCfg"
+                    #ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/DIODataCollectorDB.db" "select SiteID,ReadTimeStamp,RecordType,RequestId,ResponseCode,DIRecordNumber,DIRecordType,DIRequestId,DIResponseCode,DIReadTimestamp,DITxStatus,DITxTimestamp from DIO_table order by rowid DESC limit 5 where DITxStatus = 255;" 2>&1)
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/DIODataCollectorDB.db" "SELECT SiteID, ReadTimeStamp, RecordType, RequestId, ResponseCode, DIRecordNumber, DIRecordType, DIRequestId, DIResponseCode, DIReadTimestamp, DITxStatus, DITxTimestamp FROM DIO_table WHERE DITxStatus = 255 ORDER BY rowid DESC LIMIT 5;" 2>&1)
+
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+
+
+ "AI Last Data Produced time")
+                    config_load "$MISCUtilitiesCfg"
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/AIODataCollectorDB.db" "select SiteID,ReadTimeStamp,RecordType,RequestId,ResponseCode,AIRecordNumber,AIRecordType,AIRequestId,AIResponseCode,AIReadTimestamp,AITxStatus,AITxTimestamp from AIO_table order by rowid DESC limit 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    
+                    ;;
+
+
+
+
+
+ "AI Last Data Sent Time")
+                    config_load "$MISCUtilitiesCfg"
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/AIODataCollectorDB.db" "select SiteID,ReadTimeStamp,RecordType,RequestId,ResponseCode,AIRecordNumber,AIRecordType,AIRequestId,AIResponseCode,AIReadTimestamp,AITxStatus,AITxTimestamp from AIO_table WHERE AITxStatus = 255 ORDER BY rowid DESC LIMIT 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+
+
+
+
+
+ "RS232 Last Data Produced Time")
+                    config_load "$MISCUtilitiesCfg"
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/RS232DataCollectorDb.db" "select SiteID,ReadTimeStamp,RecordType,RequestID,ResponseCode,EMeterRS232RecordNumber,EMeterRS232SrcId,EMeterRS232RecordType,EMeterRS232RequestId,EMeterRS232InterfaceId,EMeterRS232SlaveID,EMeterRS232ResponseCode,StartingRS232RegisterAddress,FunctionCodeUsed,NoOfRegisters,EMeterRS232ReadTimestamp,EMeterRS232TxStatus,EMeterRS232TxTimestamp from RS232_table order by rowid DESC limit 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+
+
+
+
+ "RS232 Last Data Sent Time")
+                    config_load "$MISCUtilitiesCfg"
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/RS232DataCollectorDb.db" "select SiteID,ReadTimeStamp,RecordType,RequestID,ResponseCode,EMeterRS232RecordNumber,EMeterRS232SrcId,EMeterRS232RecordType,EMeterRS232RequestId,EMeterRS232InterfaceId,EMeterRS232SlaveID,EMeterRS232ResponseCode,StartingRS232RegisterAddress,FunctionCodeUsed,NoOfRegisters,EMeterRS232ReadTimestamp,EMeterRS232TxStatus,EMeterRS232TxTimestamp from RS232_table WHERE EMeterRS232TxStatus = 255 ORDER BY rowid DESC LIMIT 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+
+
+
+
+ "App Running Status")
+                    config_load "$MISCUtilitiesCfg"
+                    ReadAppRunningOutput=$(ps -eo pid,etime,cmd | grep 'AppComponent' 2>&1)
+                    ReadTableRetVal=$?
+                    ReadAppRunningOutput=$(echo "$ReadAppRunningOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadAppRunningOutput\"}"
+                    ;;
+
+
+
+
+
+
+ #"Temperature Database Table")
+                    #config_load "$MISCUtilitiesCfg"
+                    #ReadTableOutput=$(/usr/bin/sqlite3 -column -header "/reap/disk/AppData/P500/DataCollector/Db/TemperatureDataCollectorDB.db" "select * from Temperature_table order by rowid DESC limit 5;" 2>&1)
+
+                    #ReadTableRetVal=$?
+                    #ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    #echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    #;;
+
+
+
+
+#clear Database Table
+                    "Clear Database Table")
+                        config_load "$MISCUtilitiesCfg"
+                        config_get DatabasePath "$SectionName" "${Input1Value}DatabasePath"
+                        config_get DatabaseName "$SectionName" "${Input1Value}Database"
+                        config_get TableName "$SectionName" "${Input1Value}Table"
+                        config_get ConfigFile "$SectionName" "${Input1Value}ConfigFile"
+
+                        if [ ! -s "$ConfigFile" ]
+                        then
+                            [ "x$DatabasePath" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database path '$DatabasePath'\"}" && exit 1
+                            [ "x$DatabaseName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database '$DatabaseName'\"}" && exit 1
+                            [ "x$TableName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid table '$TableName'\"}" && exit 1
+                        fi
+
+                        ClearTableStatus=$(${DataBaseScriptPath}/DatabaseInterface.sh --command "clear_table" --databasepath "$DatabasePath" --database "$DatabaseName" --table "$TableName" 2>&1)
+                        ClearTableRetVal=$?
+                        echo "{\"code\":\"$ClearTableRetVal\",\"output\":\"$ClearTableStatus\"}"
+                        ;;
+#reboot Divece
+                    "Reboot Device")
+                        if [ "$ActionName" = "REBOOT" ]
+                        then
+                            if ! echo "$Input1Value" | grep -qE '^Software$|^Hardware$'
+                            then
+                                echo '{"code":"1","output":"invalid reboot type"}'
+                            else
+                                if [ "$Input1Value" = "Software" ]
+                                then
+                                    echo '{"code":"0","output":"soft reboot command received"}'
+                                    /sbin/reboot > /dev/null 2>&1
+                                else
+                                    echo '{"code":"0","output":"hard reboot command received"}'
+                                    echo "1" > /sys/class/gpio/gpio6/value
+
+                                    PSOutput=$(ps x)
+                                    if echo "$PSOutput" | grep -q "$Microcom"
+                                    then
+                                        killall microcom
+                                    fi
+
+                                    ATCOMMANDVALUE=$(echo -ne "at!powerdown\r\n" | microcom /dev/ttyAT)
+                                    case $ATCOMMANDVALUE
+                                          in
+                                            "OK")
+                                                echo "modem is up and running and Powering Down the module :)"
+                                             ;;
+                                             *)
+                                                echo -ne "at!powerdown\r\n" | microcom /dev/ttyAT
+                                             ;;
+                                    esac
+                                 fi
+                             fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                    ;;
+#get date
+                "Get Date")
+                    if [ "$ActionName" = "GET" ]
+                    then
+                        if ! echo "$Input1Value" | grep -qE '^RTC$|^SYSTEM$'
+                        then
+                           echo '{"code":0,"output":"invalid command arguments"}'
+                        else
+                            if [ "$Input1Value" = "SYSTEM" ]
+                            then
+                                SysTime=$(date +"%F %T")
+                                echo "{\"code\":0,\"output\":\"System date and time: $SysTime\"}"
+                            else
+                                ${CM} rtc read 2>&1 > /tmp/RTCFile.txt
+                                if [ -s "/tmp/RTCFile.txt" ]
+                                then
+                                    Day=$(cat /tmp/RTCFile.txt | awk -F' ' '{ print $1 }')
+                                    Month=$(cat /tmp/RTCFile.txt | awk -F' ' '{ print $2 }')
+                                    Year=$(cat /tmp/RTCFile.txt | awk -F' ' '{ print $3 }')
+                                    HWTime=$(cat /tmp/RTCFile.txt | awk -F' ' '{ print $4 }')
+
+                                    [ "x$Day" = "x" ] && echo "{\"code\":1,\"output\":\"invalid Day '$Day'\"}" && exit 1
+                                    [ "x$Month" = "x" ] && echo "{\"code\":1,\"output\":\"invalid Month '$Month'\"}" && exit 1
+                                    [ "x$Year" = "x" ] && echo "{\"code\":1,\"output\":\"invalid Year '$Year'\"}" && exit 1
+                                    [ "x$HWTime" = "x" ] && echo "{\"code\":1,\"output\":\"invalid RTCTime '$HWTime'\"}" && exit 1
+
+                                    case $Month in
+                                         Jan )
+                                                Month="01"
+                                                ;;
+                                         Feb )
+                                                Month="02"
+                                                ;;
+                                         Mar )
+                                                Month="03"
+                                                ;;
+                                         Apr )
+                                                Month="04"
+                                                ;;
+                                         May )
+                                                Month="05"
+                                                ;;
+                                         Jun )
+                                                Month="06"
+                                                ;;
+                                         Jul )
+                                                Month="07"
+                                                ;;
+                                         Aug )
+                                                Month="08"
+                                                ;;
+                                         Sep )
+                                                Month="09"
+                                                ;;
+                                         Oct )
+                                                Month="10"
+                                                ;;
+                                         Nov )
+                                                Month="11"
+                                                ;;
+                                         Dec )
+                                                Month="12"
+                                                ;;
+
+                                    esac
+                                    ModifiedHWTime="${Year}-${Month}-${Day} ${HWTime}"
+                                    echo "{\"code\":0,\"output\":\"RTC date and time: $ModifiedHWTime\"}"
+                                else
+                                    echo "{\"code\":1,\"output\":\"invalid response of RTC Read\"}"
+                            fi
+                        fi
+                     fi
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+#ntp sync
+                "NTP Sync")
+                    if [ "$ActionName" = "SYNC" ]
+                    then
+                        NTPSync=$(/etc/init.d/ntpsync start 2>&1)
+                        NTPSyncStatus=$(awk -F'=' '/SyncStatus/{print $2}' /tmp/ntpsyncstatus.cfg)
+                        NTPSyncTime=$(awk -F'=' '/SyncTime/{print $2}' /tmp/ntpsyncstatus.cfg)
+                        NTPSyncTime=$(echo "$NTPSyncTime" | sed "s/\"//g" )
+                        if [ "$NTPSyncStatus" = "0" ]
+                        then
+                            echo "{\"code\":0,\"output\":\"status : success, Sync Time: $NTPSyncTime\"}"
+                        else
+                            echo "{\"code\":0,\"output\":\"NTP sync failure\"}"
+                        fi
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+                    
+
+                                        
+#set Date
+                "Set Date")
+                    if [ "$ActionName" = "SET" ]
+                    then
+                        SetSystemDateOutput=$(date -s "$Input1Value" 2>&1)
+                        SetSystemDateRetVal=$?
+                        if [ "$SetSystemDateRetVal" != 0 ]
+                        then
+                            echo "{\"code\":1,\"output\":\"$SetSystemDateOutput\"}"
+                        else
+                            crDateForRTC=$(date +"%d %b %Y %H:%M:%S")
+                            SetHardwareDateRetVal=$(${CM} rtc set "$crDateForRTC" start 2>&1)
+                            #SetHardwareDateRetVal=$(${RTCSetScript} start 2>&1)
+                            SetHardwareDateRetVal=$?
+                            if [ "$SetHardwareDateRetVal" != 0 ]
+                            then
+                                echo "{\"code\":1,\"output\":\"$SetHardwareDateOutput\"}"
+                            else
+                                echo "{\"code\":0,\"output\":\"System and RTC Date set successfully\"}"
+                            fi
+                        fi
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+                    
+ "Ping")
+			
+							if [ "$ActionName" = "PING" ]
+		                    then
+		                        pinginfo=$(/bin/ping -c 5 "$Input1Value"  2>&1)
+		                        
+		                        if [ "x$pinginfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty pinginfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$pinginfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						                   
+#view Database table
+                "View Database Table")
+                    config_load "$MISCUtilitiesCfg"
+                    config_get DatabasePath "$SectionName" "${Input1Value}DatabasePath"
+                    config_get DatabaseName "$SectionName" "${Input1Value}Database"
+                    config_get TableName "$SectionName" "${Input1Value}Table"
+                    DatabaseWithPath="${DatabasePath}/${DatabaseName}"
+
+                    [ "x$DatabasePath" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database path '$DatabasePath'\"}" && exit 1
+                    [ "x$DatabaseName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database '$DatabaseName'\"}" && exit 1
+
+                    [ "x$TableName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid table '$TableName'\"}" && exit 1
+                    ReadTableOutput=$(/usr/bin/sqlite3 -column -header "$DatabaseWithPath" "select * from $TableName order by rowid DESC limit 5;" 2>&1)
+                    ReadTableRetVal=$?
+                    ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                    echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                    ;;
+#Signal strength
+                "Signal Strength")
+                    if [ "$ActionName" = "READ" ]
+                    then
+                        if [ "$Input1Value" = "per" ]
+                        then
+                            CMradStat=$(${CM} radio status 2>&1)
+                            CSQ=$(echo "$CMradStat" | awk -F'[()]' '/Signal/ {print $2}')
+                            if [ "x$CSQ" = "x" ]
+                            then
+                                echo "{\"code\":1,\"output\":\"empty CSQ \"}"
+                            else
+                                if [ $CSQ -ge 0 -a $CSQ -le 5 ]
+                                then
+                                        CSQ_PER=$(($CSQ * 100/5))
+                                        CSQ_PER=$CSQ_PER"%"
+                                        echo "{\"code\":0,\"output\":\"Signal strength in %: $CSQ_PER\"}"
+                                else
+                                        echo "{\"code\":1,\"output\":\"invalid signal strength in %\"}"
+                                fi
+                             fi
+                          elif [ "$Input1Value" = "dBm" ]
+                          then
+                            echo 'AT+CSQ' | /reap/bin/atinout - /dev/ttyAT  - > /tmp/TempATCmndRes1.txt &
+                            sleep 2
+                            sed 's/+//' /tmp/TempATCmndRes1.txt > /tmp/ATCmndRes1.txt
+                            ATCMD=$( cat '/tmp/ATCmndRes1.txt')
+                            RESULTWITERR=$(echo "$ATCMD" | awk -F':' '/CSQ/ {print $2}' | sed -e 's/^[ \t]*//')
+                            RESULT=$(echo $RESULTWITERR | sed 's/,.*//')
+                            rm /tmp/ATCmndRes1.txt
+                            if [ $RESULT -ge 0 -a $RESULT -le 31 ]
+                            then
+                                    CSQ_RSSI=$(($RESULT*2-113))
+                                    echo "{\"code\":0,\"output\":\"Signal strength in dB: $CSQ_RSSI\"}"
+                            else
+                                    echo "{\"code\":1,\"output\":\"invalid signal strength in dB\"}"
+
+                            fi
+                         fi
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+##network mode
+                "Network Mode")
+                    if [ "$ActionName" = "READ" ]
+                    then
+                        CMradStat=$(${CM} radio status 2>&1)
+                        TMODE=$(echo "$CMradStat" | awk -F'[()]' '/RAT/ {print $2}')
+                        if [ "x$TMODE" = "x" ]
+                        then
+                            echo "{\"code\":1,\"output\":\"empty Network Mode \"}"
+                        else
+                            case $TMODE in
+                                "LE_MRC_RAT_GSM") MODE="GSM";;
+                                "LE_MRC_RAT_UMTS") MODE="UMTS";;
+                                "LE_MRC_RAT_LTE") MODE="LTE";;
+                                "LE_MRC_RAT_CDMA") MODE="CDMA";;
+                                "LE_MRC_RAT_UNKNOWN") MODE="UNKNOWN";;
+                            esac
+                            echo "{\"code\":0,\"output\":\"NetworkMode: $TMODE\"}"
+                        fi
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+#read 12v in
+                "Read 12V in")
+                   if [ "$ActionName" = "READ" ]
+                   then
+                        ADCMulFactor=9.8495
+                        ConversionDivFactor=1000
+                        calc() { awk "BEGIN{print $*}"; }
+
+                        echo 'AT!MADC?10' | /reap/bin/atinout - /dev/ttyAT  - > /tmp/TempSupplyCmndRes.txt &
+                        sleep 2
+                        sed 's/\r$//' /tmp/TempSupplyCmndRes.txt > /tmp/SupplyCmndRes.txt
+                        VSupply=$( cat '/tmp/SupplyCmndRes.txt' | awk -F':' '{ if(NR==2) print $2 }' | sed -e 's/ (mV)/ /g' )
+                        if [ $VSupply -eq 0 ]
+                        then
+                            echo "{\"code\":1,\"output\":\"invalid supply voltage\"}"
+                        else
+                            SupplyVoltageValue=$(calc $VSupply*$ADCMulFactor)
+                            SupplyVoltageValue=$(calc $SupplyVoltageValue/$ConversionDivFactor)
+                            echo "{\"code\":0,\"output\":\"SupplyVoltage:$SupplyVoltageValue\"}"
+                        fi
+                        rm /tmp/SupplyCmndRes.txt
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+#Power Amplifier Temperature
+                "Power Amplifier Temperature")
+                    if [ "$ActionName" = "READ" ]
+                    then
+                        echo 'AT!PATEMP?' | /reap/bin/atinout - /dev/ttyAT  - > /tmp/TempPATempCmndRes.txt &
+                        sleep 2
+                        sed 's/\r$//' /tmp/TempPATempCmndRes.txt > /tmp/PATempCmndRes.txt
+                        PATemp=$( cat '/tmp/PATempCmndRes.txt' | awk -F':' '{ if(NR==3) print $2 }' | sed -e 's/ degC/ /g' | sed -e 's/ //g' )
+                        if [ $PATemp -eq 0 ]
+                        then
+                            echo "{\"code\":1,\"output\":\"invalid PA Temperature\"}"
+                        else
+                            echo "{\"code\":0,\"output\":\"PATemperature:$PATemp degC\"}"
+                        fi
+                            rm /tmp/PATempCmndRes.txt
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+#CM INFO
+                "CM INFO")
+                    if [ "$ActionName" = "READ" ]
+                    then
+                        CMInfo=$(${CM} info 2>&1)
+                        if [ "x$CMInfo" = "x" ]
+                        then
+                            echo "{\"code\":1,\"output\":\"empty CMInfo \"}"
+                        else
+                            echo -e "{\"code\":0,\"output\":\n\"$CMInfo\"}"
+                        fi
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+#CM SIM INFO
+                "CM SIM INFO")
+                    if [ "$ActionName" = "READ" ]
+                    then
+                        CMSimInfo=$(${CM} sim info 2>&1)
+                        if [ "x$CMSimInfo" = "x" ]
+                        then
+                            echo "{\"code\":1,\"output\":\"empty CMSimInfo \"}"
+                        else
+                            echo -e "{\"code\":0,\"output\":\n\"$CMSimInfo\"}"
+
+                        fi
+                    else
+                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    fi
+                    ;;
+##Read Hart Device Address
+                #"Read Hart Device Address")
+                    #if [ "$ActionName" = "READ" ]
+                    #then
+                        #HartDevdOutput=$(hexdump -C ${HartDevadFile})
+                        #if [ "x$HartDevdOutput" = "x" ]
+                        #then
+                            #echo "{\"code\":0,\"output\":\n\"Empty HartDevd File\"}"
+                        #else
+                            #HartDevdOutput=$(echo "$HartDevdOutput" | awk -F' ' '{ for (i=2;i<=NF;i++) {printf "\n %s",$i} }' | awk -F '|' '{ print $1 }')
+                            #echo -e "{\"code\":0,\"output\":\" File created on $(date -r /home/root/.hartdevad)\n Hart device Address in Hexadecimal\n$HartDevdOutput\"}"
+                        #fi
+                    #else
+                            #echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    #fi
+                    #;;
+##Module Input Voltage
+                #"Module Input Voltage")
+                   #if [ "$ActionName" = "READ" ]
+                   #then
+                        #echo 'AT!MADC?0' | /reap/bin/atinout - /dev/ttyAT  - > /tmp/ReadModuleVoltage.txt &
+                        #sleep 2
+                        #ModuleVoltage=$(cat '/tmp/ReadModuleVoltage.txt' | awk -F': ' '{ if(NR==2) print $2 }' | sed -e 's/ (mV)/ /g' )
+                        #if [ "x$ModuleVoltage" = "x" ]
+                        #then
+                            #echo "{\"code\":1,\"output\":\"Invalid Module Input Voltage\"}"
+                        #else
+                            #echo "{\"code\":0,\"output\":\"Module Input Voltage : ${ModuleVoltage}V\"}"
+                        #fi
+                        #rm -rf /tmp/ReadModuleVoltage.txt
+                    #else
+                        #echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    #fi
+                    #;;
+##List FTP Files
+                #"List FTP Files")
+                    #if [ "$ActionName" = "READ" ]
+                    #then
+                        #ListOfFTPFiles=$(${LIST} ${DIR} 2>&1)
+                        #if [ "xListOfFTPFiles" = "x" ]
+                        #then
+                            #echo "{\"code\":1,\"output\":\"empty List Of FTP Files in directory:$DIR\"}"
+                        #else
+                            #echo -e "{\"code\":0,\"output\":\n\"$ListOfFTPFiles\"}"
+                        #fi
+                    #else
+                        #echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    #fi
+                    #;;
+##SDCard Test
+               #"SDCard Test")
+                    #if [ "$ActionName" = "TEST" ]
+                    #then
+                        #SDCardStatus=$(/reap/bin/SDCardTest.sh 2>&1)
+                        #echo $SDCardStatus > /tmp/test.txt
+                        #SDCardStatusRetVal=$?
+                        #if [ "$SDCardStatusRetVal" != "0" ]
+                        #then
+                            #echo "{\"code\":0,\"output\":\"$SDCardStatus\"}"
+                        #else
+                            #echo "{\"code\":0,\"output\":\"$SDCardStatus\"}"
+                        #fi
+                    #else
+                        #echo "{\"code\":1,\"output\":\"invalid action\"}"
+                    #fi
+                    #;;
+
+                *)
+                echo "{\"code\":1,\"output\":\"utility $UtilityName not supported\"}"
+                ;;
+            esac
+            ;;
+
+        *)
+            echo '{"code":"1","output":"invalid method"}'
+            exit 1
+        ;;
+    esac #rpc-diagnosticutilities method
+    ;;
+esac # ubus method
+
+exit 0

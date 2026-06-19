@@ -1,0 +1,44 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+routingconfig="/root/InterfaceManager/script/features/routing/routing.sh"
+Deleteconfig="/root/InterfaceManager/script/features/routing/Delete_routing.sh"
+
+case "$1" in
+    list)
+        echo '{ "configure":{},"delete":{} }'
+        ;;
+    call)
+        case "$2" in
+                   configure)        
+			     response=$($routingconfig)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : Routing Configuration Update\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : Routing Configuration Update\"}"
+                            fi                                   
+							 ;;
+                    
+                     delete)
+                            response=$($Deleteconfig)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : Routing Configuration Update\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : Routing Configuration Update\"}"
+                            fi
+                            ;;
+                                                                                                                                         
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+                    ;;
+        esac #appmanager method
+            ;;
+esac # ubus method
+
+exit 0
+

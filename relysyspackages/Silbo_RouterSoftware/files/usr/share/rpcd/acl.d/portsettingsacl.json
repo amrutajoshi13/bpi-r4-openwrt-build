@@ -1,0 +1,23 @@
+{
+    "portsettings": {
+        "description": "Port Settings",
+        "read": {
+			"ubus" : {
+                "rpc-validatepriority":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "portsettings",
+                
+            ]
+        },
+        "write": {
+            "uci": [
+               "portsettings",
+                
+            ]
+        }
+    }
+}

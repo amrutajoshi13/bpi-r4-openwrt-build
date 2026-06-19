@@ -1,0 +1,49 @@
+ 
+config AdditionalCommands
+    option utility "Run ps x"
+    option action "RUN"
+    option inputs "0"      
+ 
+config AdditionalCommands
+    option utility "Enable ssh"
+    option action "RUN"
+    option inputs "0"  
+    
+config AdditionalCommands
+    option utility "Disable ssh"
+    option action "RUN"
+    option inputs "0"  
+       
+config AdditionalCommands
+    option utility "ReadGPIO"
+    option action "READ"
+    option inputs "1"
+    option input1Name "Type"
+    option input1Element "selection"
+    option input1Type "string"
+    list input1Values "SIM1PRESENCE"
+    list input1Values "SIM2PRESENCE"
+	list input1Values "SIMSELECTION"
+
+config AdditionalCommands
+    option utility "Restart mwan3"
+    option action "RESTART"
+    option inputs "0"
+
+config AdditionalCommands
+    option utility "Model"
+    option action "CHANGE"
+    option inputs "2"
+    option input1Name "model"
+    option input1Element "text"
+    option input1Type "text" 
+
+
+config AdditionalCommands
+	option action 'DOWNLOAD'
+	option input1Element 'selection'
+	option input1Name 'File/Database'
+	option input1Type 'string'
+	list input1Values 'AddInterfaceLog'
+	option inputs '2'
+	option utility 'Download Files' 

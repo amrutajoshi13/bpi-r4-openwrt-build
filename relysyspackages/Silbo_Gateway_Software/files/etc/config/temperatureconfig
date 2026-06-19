@@ -1,0 +1,16 @@
+
+config TemperatureConfig 'TemperatureSensor1'
+	option EEnable '0'
+	option TemperatureID '1'
+	option Address '28.AD28F9080000'
+
+config TemperatureConfig 'TemperatureSensor2'
+	option EEnable '0'
+	option TemperatureID '2'
+	option Address '28.FF621614198A'
+
+config TemperatureConfig 'TemperatureSensor3'
+	option EEnable '0'
+	option TemperatureID '3'
+	option Address '28.E380FB1B2001'
+

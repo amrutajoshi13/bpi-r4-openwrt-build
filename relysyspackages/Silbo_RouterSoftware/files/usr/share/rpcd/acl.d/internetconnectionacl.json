@@ -1,0 +1,28 @@
+{
+    "internetconnection": {
+        "description": "WAN Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-mwan3config":[
+                "configure",
+                 "configurefailover",
+                 "deletefailover",
+                 "configureloadbalancing",
+                 "deleteloadbalancing"
+                ],
+            },
+            "uci": [
+                "mwan3config",
+                "loadbalancingconfig"
+                
+            ]
+        },
+        "write": {
+            "uci": [
+               "mwan3config",
+               "loadbalancingconfig"
+                
+            ]
+        }
+    }
+}

@@ -1,0 +1,1060 @@
+#!/bin/sh
+
+. /lib/functions.sh
+sleep 5
+
+
+#board_name=$(cat /tmp/sysinfo/board_name)
+touch /Web_Page_Gateway_Apps/Board_info.txt
+echo "board_name=$board_name" > /Web_Page_Gateway_Apps/Board_info.txt
+source /Web_Page_Gateway_Apps/Board_info.txt
+productid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idProduct)
+vendorid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idVendor)
+gpioConfig="/etc/gpioconfig.cfg"
+gwretainconfigflag=$(uci get applist_config.appconfig.gwretainconfigflag)
+applicationSwVer=$(uci set boardconfig.board.ApplicationSwVer)
+
+#Software version Configuration
+SoftwareVerCfgDirPath="/root/SoftwareVersionComponent/etc/Config"
+SoftwareVerCfgPath="${SoftwareVerCfgDirPath}/SoftwareVersion"
+SoftwareVerconfigureFile="boardconfig"
+SoftwareVerconfigureEventSection="board"
+
+
+## Read 1 byte from flash offset 0xF020
+#flash_val_f020=$(dd if=/dev/mtd2 bs=1 skip=$((0xF020)) count=1 2>/dev/null | hexdump -v -e '1/1 "%02X"')
+ 
+## Read 1 byte from flash offset 0xF021 as decimal
+#flash_val_f021=$(dd if=/dev/mtd2 bs=1 skip=$((0xF021)) count=1 2>/dev/null | od -An -tu1 | tr -d ' ')
+ 
+## If nothing read, treat as FF
+#[ -z "$flash_val_f020" ] && flash_val_f020="FF"
+#[ -z "$flash_val_f021" ] && flash_val_f021="255"
+ 
+#case "$flash_val_f020" in
+    #0B)
+        #board_name="IDB54-C-GW"
+        #;;
+    #0F)
+        #board_name="IDF54-C-GW"
+        #;;
+    #47)
+        ## Additional board decision based on 0xF021
+        #case "$flash_val_f021" in
+            #99)
+                #board_name="silbo-RVWG05-B-GW"
+                #;;
+            #88)
+                #board_name="silbo-IDG05-B-GW"
+                #;;
+            #*)
+                ## Existing behavior
+                #board_name="silbo-RVWG05-B-GW"
+                #;;
+        #esac
+        #;;
+    #FF)
+        #board_name=$(cat /tmp/sysinfo/board_name)
+        #;;
+    #*)
+        # Safety fallback
+        board_name=$(cat /tmp/sysinfo/board_name)
+        #;;
+#esac
+UpdateSSID()
+{
+	board_name=$(cat /tmp/sysinfo/board_name)
+	serial_number=$(uci get boardconfig.board.serialnum)
+	board_name=$(echo "$board_name" | tr "-" "_")
+    wifi_ssid="${board_name}_$serial_number"
+    wifi_guest_ssid="S{board_name}_GUEST_$serial_number"
+    uci set sysconfig.sysconfig.wifi1ssid=$wifi_ssid
+    uci commit sysconfig
+    
+     sleep 1
+
+   uci set wireless.ap.ssid=$wifi_ssid
+   uci commit wireless
+   sleep 1
+
+	#Update SSID in mt7628.dat file.
+	wirelessdatfile="/etc/wireless/mt7628/mt7628.dat"
+	ssid=$(grep -w "SSID1" ${wirelessdatfile})        
+	ssid_replace="SSID1=$wifi_ssid"
+	sed -i "s/${ssid}/${ssid_replace}/" "$wirelessdatfile"
+	
+	ssid_guest=$(grep -w "SSID2" ${wirelessdatfile})        
+	ssid_guest_replace="SSID2=$wifi_guest_ssid"
+	sed -i "s/${ssid_guest}/${ssid_guest_replace}/" "$wirelessdatfile"
+	
+	cp  /etc/config/system  /root/InterfaceManager/config/
+	cp /etc/wireless/mt7628/mt7628.dat /root/InterfaceManager/mt7628/
+}
+
+UpdateSiteID()
+{
+	serialnum=$(uci get boardconfig.board.serialnum)
+	topicPrefix=$(uci get cloudconfig.cloudconfig.topicPrefix)
+	uci set cloudconfig.cloudconfig.commandrequesttopic="$topicPrefix/$serialnum"
+	uci set cloudconfig.cloudconfig.SiteID="$serialnum"
+	uci commit cloudconfig
+}
+
+
+UpdateSoftwareVersionCfg()
+{
+	rm "${SoftwareVerCfgPath}.cfg"           
+    config_load "$SoftwareVerconfigureFile"
+    config_get GWFirmwareVer          "$SoftwareVerconfigureEventSection"   GWFirmwareVer
+    config_get GWApplicationSwVer     "$SoftwareVerconfigureEventSection"   GWApplicationSwVer 
+    {
+		echo "SoftwareVer=\"$GWApplicationSwVer\""
+		echo "CweVer=\"$GWFirmwareVer\""
+		
+	} >> "${SoftwareVerCfgPath}.cfg"
+} 
+
+UpdateExternalMQTTTopicCfg()
+{
+	MQTTEventfile="cloudconfig"
+    MQTTconfigureEventSection="cloudconfig"
+	MQTTEnable=$(uci get cloudconfig.cloudconfig.cloudprotocol)
+	#SiteID=$(uci get FixedPacketConfigGeneric.fixedpacketconfig.SiteID)
+	config_load "$FixedPacketconfigureFile"
+	config_get SiteID     "$FixedPacketconfigureEventSection"   SiteID 
+	SerialNumber=$(uci get boardconfig.board.serialnum)
+	EnablePrefixtopic=$(uci get cloudconfig.cloudconfig.EnablePrefixtopic)
+	topicPrefix=$(uci get cloudconfig.cloudconfig.topicPrefix)
+	uci set cloudconfig.cloudconfig.commandrequesttopic=''
+	uci set cloudconfig.cloudconfig.SiteID="$SerialNumber"
+	uci commit cloudconfig
+
+    SiteID=$(uci get cloudconfig.cloudconfig.SiteID)
+	#echo "SiteID=$SerialNumber"
+	
+	if [ $MQTTEnable = "mqtt" ]  || [ $MQTTEnable = "http" ] && [ "$EnableMQTTCommand = 1" ]
+	then 
+	    
+	    rm -rf "{$MQTTconfigureCfgPath}.cfg"
+	     
+	    echo "Updating MQTT application configuration "
+	    echo "Updating '${MQTTExternalPath}.cfg' configuration"
+	    echo "siteID"="$siteID"
+	    config_load "$MQTTEventfile"
+	     config_get  RS485Enable        "$MQTTconfigureEventSection"  RS485Enable
+	    config_get  rs485topic         "$MQTTconfigureEventSection"   rs485topic 	    
+	    config_get  rs232topic         "$MQTTconfigureEventSection"   rs232topic  
+	    config_get  diotopic           "$MQTTconfigureEventSection"   diotopic 
+	    config_get  aiotopic           "$MQTTconfigureEventSection"   aiotopic 
+	    config_get  temperaturetopic   "$MQTTconfigureEventSection"   temperaturetopic 
+	    config_get  commandrequesttopic   "$MQTTconfigureEventSection"   commandrequesttopic 
+	    config_get  commandresponsetopic   "$MQTTconfigureEventSection"   commandresponsetopic 
+	    { 
+			
+		if [ "$EnablePrefixtopic" = "1" ]
+	    then
+			
+			        if [[ -z "$rs485topic" ]]; then
+			             #echo "rs485 is blank"
+			             echo "externalBrokerPubTopic_0=\"$topicPrefix/$SerialNumber/RS485Data\""
+			        else
+			            #echo "rs485 is not blank"
+				        echo "externalBrokerPubTopic_0=\"$rs485topic\""
+			        fi	
+			        if [[ -z "$rs232topic" ]]; then
+			             #echo "rs232 is blank"
+			             echo "externalBrokerPubTopic_2=\"$topicPrefix/$SerialNumber/RS232Data\""
+			        else
+				        echo "externalBrokerPubTopic_2=\"$rs232topic\""
+			        fi	        
+			        if [[ -z "$diotopic" ]]; then
+			             #echo "diotopic is blank"
+			             echo "externalBrokerPubTopic_1=\"$topicPrefix/$SerialNumber/DIOData\""
+			        else
+				        echo "externalBrokerPubTopic_1=\"$diotopic\""
+			        fi	     
+			        
+			         if [[ -z "$aiotopic" ]]; then
+			             #echo "aiodata is blank"
+			             echo "externalBrokerPubTopic_4=\"$topicPrefix/$SerialNumber/AIOData\""
+			        else
+				        echo "externalBrokerPubTopic_4=\"$aiotopic\""
+			        fi	    
+			        if [[ -z "$temperaturetopic" ]]; then
+			             #echo "temperaturetopic is blank"
+			             echo "externalBrokerPubTopic_3=\"$topicPrefix/$SerialNumber/TemperatureData\""
+			        else
+				        echo "externalBrokerPubTopic_3=\"$temperaturetopic\""
+			        fi	
+			        
+			         if [[ -z "$commandrequesttopic" ]]; then
+			             #echo "temperaturetopic is blank"
+			             echo "externalBrokerSubTopic_0=\"$topicPrefix/$SerialNumber/IOcommandRequest\""
+			        else
+				        echo "externalBrokerSubTopic_0=\"$commandrequesttopic\""
+			        fi	
+			        
+			         if [[ -z "$commandresponsetopic" ]]; then
+			             #echo "temperaturetopic is blank"
+			             echo "externalBrokerPubTopic_5=\"$topicPrefix/$SerialNumber/IOcommandResponse\""
+			        else
+				        echo "externalBrokerPubTopic_5=\"$commandresponsetopic\""
+			        fi
+			else
+			        if [[ -z "$rs485topic" ]]; then
+			             #echo "rs485 is blank"
+			             echo "externalBrokerPubTopic_0=\"$SerialNumber/RS485Data\""
+			        else
+			            #echo "rs485 is not blank"
+				        echo "externalBrokerPubTopic_0=\"$rs485topic\""
+			        fi	
+			        if [[ -z "$rs232topic" ]]; then
+			             #echo "rs232 is blank"
+			             echo "externalBrokerPubTopic_2=\"$SerialNumber/RS232Data\""
+			        else
+				        echo "externalBrokerPubTopic_2=\"$rs232topic\""
+			        fi	        
+			        if [[ -z "$diotopic" ]]; then
+			             #echo "diotopic is blank"
+			             echo "externalBrokerPubTopic_1=\"$SerialNumber/DIOData\""
+			        else
+				        echo "externalBrokerPubTopic_1=\"$diotopic\""
+			        fi	     
+			        
+			         if [[ -z "$aiotopic" ]]; then
+			             #echo "aiodata is blank"
+			             echo "externalBrokerPubTopic_4=\"$SerialNumber/AIOData\""
+			        else
+				        echo "externalBrokerPubTopic_4=\"$aiotopic\""
+			        fi	    
+			        if [[ -z "$temperaturetopic" ]]; then
+			             #echo "temperaturetopic is blank"
+			             echo "externalBrokerPubTopic_3=\"$SerialNumber/TemperatureData\""
+			        else
+				        echo "externalBrokerPubTopic_3=\"$temperaturetopic\""
+			        fi	
+			        
+			         if [[ -z "$commandrequesttopic" ]]; then
+			             #echo "temperaturetopic is blank"
+			             echo "externalBrokerSubTopic_0=\"$SerialNumber/IOcommandRequest\""
+			        else
+				        echo "externalBrokerSubTopic_0=\"$commandrequesttopic\""
+			        fi	
+			        
+			         if [[ -z "$commandresponsetopic" ]]; then
+			             #echo "temperaturetopic is blank"
+			             echo "externalBrokerPubTopic_5=\"$SerialNumber/IOcommandResponse\""
+			        else
+				        echo "externalBrokerPubTopic_5=\"$commandresponsetopic\""
+			        fi        
+			        
+	        fi
+	        echo "NoOfSubscribeTopics=1"	        	  
+	        echo "NoOfPublishTopics=6"	        	  
+	        } > "${MQTTExternalPath}.cfg"
+	 fi
+} 
+
+UpdateGpioConfigCfg()
+{
+	{
+		numberOfDidoGpio=$(uci get digitalinputconfig.didogpioconfig.numberOfDido)
+		echo "numberOfDidoGpio=$numberOfDidoGpio"
+		
+		for i in $(seq 1 $numberOfDidoGpio)
+		do
+			#gpio pins for i'th di and do
+			di=$(uci get digitalinputconfig.didogpioconfig.di${i})
+			do=$(uci get digitalinputconfig.didogpioconfig.do${i})
+			
+			echo "di${i}=$di" 
+			echo "do${i}=$do"
+		done
+		
+		numberOfAiGpio=$(uci get analoginputconfig.aigpio.numberOfAiGpio)
+		echo "numberOfAiGpio=$numberOfAiGpio"
+		
+		for i in $(seq 1 $numberOfAiGpio)
+		do
+			ai=$(uci get analoginputconfig.aigpio.ai${i})
+			echo "ai${i}=$ai" 
+		done    
+	} > "$gpioConfig"
+}
+
+UpdateDidoAlarmConfigCfg()
+{
+	{
+		numberOfDidoGpio=$(uci get digitalinputconfig.didogpioconfig.numberOfDido)
+		echo "#No of DI Inputs"
+		echo "NoOfDInput=$numberOfDidoGpio"
+		echo ""
+		echo "#No Of Holidays"
+		echo "NoOfHolidays = 0"
+		echo ""
+		
+		for i in $(seq 1 $numberOfDidoGpio)
+		do
+			di=$(uci get digitalinputconfig.didogpioconfig.di${i})
+			dInputMaskValue=$(uci get digitalinputconfig.digitalinputconfig.DInput${i}MaskValue)
+			dInputAlarmSetNotifyVal=$(uci get digitalinputconfig.digitalinputconfig.DInput${i}AlarmSetNotifyVal)
+			dInputAlarmResetNotifyVal=$(uci get digitalinputconfig.digitalinputconfig.DInput${i}AlarmResetNotifyVal)
+
+			echo "DInput${i}PinNo=$di"
+			echo "DInput${i}DayDependency=0"
+			echo "DInput${i}AlarmIgnoreDay=\"01-05-2000\""
+			echo "DInput${i}MaskValue =$dInputMaskValue"
+			echo "#Possible Value for Alarm Set 6/1"
+			echo "DInput${i}AlarmSetNotifyVal=$dInputAlarmSetNotifyVal"
+			echo "#Possible Value for Alarm ReSet 3/0"
+			echo "DInput${i}AlarmResetNotifyVal=$dInputAlarmResetNotifyVal"
+			echo ""
+			echo ""
+		done
+	} > "/root/ReadDIAppComponent/etc/Config/ReadDIAppConfigParameters.cfg"
+	
+}
+
+#UpdateDefaultConfigGateway()
+#{
+	##cp /etc/config/ADCUtilityConfigGeneric /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/DiagnosticIOUtilities /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/portconfig /Web_Page_Gateway_Apps/Default_Gateway/config              
+	##cp /etc/config/RS485UtilityConfigGeneric /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/analoginputconfig /Web_Page_Gateway_Apps/Default_Gateway/config       
+	##cp /etc/config/digitalinputconfig /Web_Page_Gateway_Apps/Default_Gateway/config        
+	#cp /etc/config/RS232DeviceConfigGeneric /Web_Page_Gateway_Apps/Default_Gateway/config  
+	##cp /etc/config/softwareversion /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/cloudconfig /Web_Page_Gateway_Apps/Default_Gateway/config           
+	##cp /etc/config/FixedPacketConfigGeneric /Web_Page_Gateway_Apps/Default_Gateway/config 
+	#cp /etc/config/RS232UtilityConfigGeneric /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/sourceconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/command /Web_Page_Gateway_Apps/Default_Gateway/config               
+	##cp /etc/config/applist_config /Web_Page_Gateway_Apps/Default_Gateway/config               
+	##cp /etc/config/importexportgatewayconfig /Web_Page_Gateway_Apps/Default_Gateway/config  
+	###cp /etc/config/RS485DeviceConfigGeneric /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/temperatureconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/UpgradeManagerGeneric /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/BLControlSensorEventsActions /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/DeviceConfigGeneric /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/Jsonconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/registerconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/blockconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/alarmconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/cloudconfigGeneric /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/PseudoCloudconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/pseudoParamconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/PseudoRegisterconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/Storageconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/applicationoverviewconfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/watchdogconfigsw /Web_Page_Gateway_Apps/Default_Gateway/config
+	##cp /etc/config/eventConfig /Web_Page_Gateway_Apps/Default_Gateway/config
+	#cp /etc/mbusdconfig.conf /Web_Page_Gateway_Apps/Default_Gateway/etc/
+	#cp /etc/mbusdconfig2.conf /Web_Page_Gateway_Apps/Default_Gateway/etc/
+	#cp /etc/ser2net.conf /Web_Page_Gateway_Apps/Default_Gateway/etc/
+	#cp /etc/crontabs/root /Web_Page_Gateway_Apps/Default_Gateway/etc/crontabs
+	
+	#cp /root/ADCUtilityComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/ADCUtilityComponent/etc/Config
+	#cp /root/ApaasAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/ApaasAppComponent/etc/Config
+	#cp /root/AzureAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/AzureAppComponent/etc/Config
+	#cp /root/BLControlAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/BLControlAppComponent/etc/Config
+	#cp /root/CmdProcessorAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/CmdProcessorAppComponent/etc/Config
+	#cp /root/DIUtilityIndividualTestComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DIUtilityIndividualTestComponent/etc/Config
+	#cp /root/DOUtilityIndividualTestComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/DataCollectorAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/EnergyMeterAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/FixedPacketAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/JSONParametersAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/RS232ReadAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/RS232UtilityComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/RS485UtilityComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/ReadAIAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/ReadAllTemperatureSensorsUtilityComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/ReadDIAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/ReadSingleTemperatureSensorUtilityComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/ReadTemperatureSensorAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/RequestGeneratorAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/SenderAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/SoftwareVersionComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/SourceAppComponent/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+	#cp /root/rtumd/etc/Config/* /Web_Page_Gateway_Apps/Default_Gateway/root/DOUtilityIndividualTestComponent/etc/Config
+
+#}
+
+#Update_old_openwisp
+#{
+	#mkdir -p /usr/lib/lua/openwisp
+	#mkdir -p /usr/lib/lua/openwisp-monitoring
+	
+	#cp -r /Web_Page_Gateway_Apps/Common_GW_Files/openwisp/etc /
+	#cp -r /Web_Page_Gateway_Apps/Common_GW_Files/openwisp/usr /
+	
+#}
+
+
+## Read 1 byte from flash offset 0xF020
+#flash_val_f020=$(dd if=/dev/mtd2 bs=1 skip=$((0xF020)) count=1 2>/dev/null | hexdump -v -e '1/1 "%02X"')
+ 
+## Read 1 byte from flash offset 0xF021 as decimal
+#flash_val_f021=$(dd if=/dev/mtd2 bs=1 skip=$((0xF021)) count=1 2>/dev/null | od -An -tu1 | tr -d ' ')
+ 
+## If nothing read, treat as FF
+#[ -z "$flash_val_f020" ] && flash_val_f020="FF"
+#[ -z "$flash_val_f021" ] && flash_val_f021="255"
+ 
+#case "$flash_val_f020" in
+    #0B)
+        #board_name="IDB54-C-GW"
+        #;;
+    #0F)
+        #board_name="IDF54-C-GW"
+        #;;
+    #47)
+        ## Additional board decision based on 0xF021
+        #case "$flash_val_f021" in
+            #99)
+                #board_name="silbo-RVWG05-B-GW"
+                #;;
+            #88)
+                #board_name="silbo-IDG05-B-GW"
+                #;;
+            #*)
+                ## Existing behavior
+                #board_name="silbo-RVWG05-B-GW"
+                #;;
+        #esac
+        #;;
+    #FF)
+        #board_name=$(cat /tmp/sysinfo/board_name)
+        #;;
+    #*)
+        ## Safety fallback
+        board_name=$(cat /tmp/sysinfo/board_name)
+        #;;
+#esac
+
+
+if echo "$board_name" | grep -qE "(_GW|-GW)";
+then
+	cp /Web_Page_Gateway_Apps/Common_GW_Files/status.overview.js /www/luci2/view/	
+    uci set boardconfig.board.GWFirmwareVer="1.04"
+	uci set boardconfig.board.GWApplicationSwVer="1.20_RC2"
+	uci set boardconfig.board.TCPSlaveApplicationSwVer="1.00"
+fi
+
+
+#if [ "$board_name" != "invendis_silbo-ID5X-C_GW" ] || [ "$board_name" != "invendis_silbo-IDB5X-C_GW" ] || [ "$board_name" != "invendis_silbo-IDF5X-C_GW" ]
+#then
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/Restore.sh /root/InterfaceManager/script/Restore.sh
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/SystemBoot.sh /root/InterfaceManager/script/SystemBoot.sh
+		#cp /Web_Page_Gateway_Apps/Common_GW_Files/cbi.js /www/luci2
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/ui.js /www/luci2/
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/session.js /www/luci2/
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/luci2.json /usr/share/rpcd/acl.d
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/appmanagerIOutilitiesmenu.json /usr/share/rpcd/menu.d
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/status.json /usr/share/rpcd/menu.d
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/exclude.txt /root 
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/include.txt /root
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/GD44AppManager /etc/init.d
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/openvpn /etc/init.d
+		#cp /Web_Page_Gateway_Apps/Common_GW_Files/S99GD44AppManager /etc/rc.d
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/ManualUpgradeAppGateway.sh /bin
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/ManualUpgradeAppGateway.sh /bin
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/rc.local /etc
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/file-download /www/cgi-bin
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/file1 /www/cgi-bin
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/root /etc/crontabs/
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/sysupgrade.conf /etc/
+		#cp /Web_Page_Gateway_Apps/Common_GW_Files/uhttpd /etc/config
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/01-CWAN1 /etc/hotplug.d/tty
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/openwisp/etc/config/openwisp /etc/config
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/applist_config /etc/config
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/luci2.js /www/luci2/
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/libconfig.so.11 /usr/lib
+		cp /Web_Page_Gateway_Apps/Common_GW_Files/bootstrap.css /www/luci2/css
+
+#fi
+
+#Update_old_openwisp
+
+if echo "$board_name" | grep -qE "(RF44|GD44|RF04)";
+then 
+
+	cp /Web_Page_Gateway_Apps/Common_GW_Files/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+	#cp /Web_Page_Gateway_Apps/Common_GW_Files/etc/uci-defaults/* /etc/uci-defaults/
+fi
+
+
+#UpdateExternalMQTTTopicCfg
+
+if echo "$board_name" | grep -qE "(RF44-A|RF04-A|RB44-A|IA44-B|IA44-C|PC312|PC310|PC311|GRD44B-5R|GRD44B-3R|RFN44-C1|RD44-B|RFN44-B|RFN44-B-EX1)";
+then
+    #cp /Web_Page_Gateway_Apps/RF44-A_GW/etc/config/* /etc/config
+    #cp /Web_Page_Gateway_Apps/RF44-A_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+    #cp /Web_Page_Gateway_Apps/RF44-A_GW/www/luci2/view/* /www/luci2/view 
+    #cp /Web_Page_Gateway_Apps/RF44-A_GW/www/luci2/template/* /www/luci2/template 
+    cp -r /Web_Page_Gateway_Apps/RF44-A_GW/root/ /
+    
+		if [ "$gwretainconfigflag" = "0" ]
+		then
+			cp /Web_Page_Gateway_Apps/RF44-A_GW/etc/config/* /etc/config
+			
+		fi
+
+	
+    
+    if echo "$board_name" | grep -qE "(IA44-C)";
+    then
+          cp /Web_Page_Gateway_Apps/IA44-C_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    fi
+    
+    if echo "$board_name" | grep -qE "(GRD44B-5R|RD44-B)";
+    then
+          cp /Web_Page_Gateway_Apps/GRD44B-5R_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    fi    
+     
+    if echo "$board_name" | grep -qE "(GRD44B-3R)";
+    then
+          cp /Web_Page_Gateway_Apps/GRD44B-3R_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    fi
+   
+    if echo "$board_name" | grep -qE "(RFN44-C1|RFN44-B|RFN44-B-EX1)";
+    then
+          cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C1/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    fi
+    
+    if [ "$board_name" = "Silbo_IA44-B_GW" ]
+    then
+          cp /Web_Page_Gateway_Apps/IA44-B/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+          #cp /Web_Page_Gateway_Apps/IA44-B/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+#          cp /Web_Page_Gateway_Apps/IA44-B/etc/config/* /etc/config
+          #cp /Web_Page_Gateway_Apps/IA44-B/www/luci2/view/* /www/luci2/view 
+          #cp /Web_Page_Gateway_Apps/IA44-B/www/luci2/template/* /www/luci2/template 
+          cp -r /Web_Page_Gateway_Apps/IA44-B/root/ /
+		  if [ "$gwretainconfigflag" = "0" ]
+		  then
+				cp /Web_Page_Gateway_Apps/IA44-B/etc/config/* /etc/config
+		  fi
+    fi
+    
+    if [ "$board_name" = "Silbo_RF44-A_GW" ]
+    then
+    
+        cp /Web_Page_Gateway_Apps/RF44-A_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+        cp -r /Web_Page_Gateway_Apps/RF44-A_GW/root/ / 
+        if [ "2c7c" = "$vendorid" ] && [ "6005" = "$productid" ] 
+		then
+			uci set system.system.model="Silbo_RF44R-A-EC200A"
+			uci set boardconfig.board.model="Silbo_RF44R-A-EC200A"
+        elif [ "2c7c" = "$vendorid" ] && [ "030e" = "$productid" ] 
+		then
+		
+			uci set system.system.model="Silbo_RF44R-A-EM05G"
+			uci set boardconfig.board.model="Silbo_RF44R-A-EM05G"
+		elif [ "2c7c" = "$vendorid" ] && [ "0125" = "$productid" ] 
+		then
+			uci set system.system.model="Silbo_RF44R-A-EC25E"
+			uci set boardconfig.board.model="Silbo_RF44R-A-EC25E"
+			cp /Web_page/EC25E/* /www/luci2/
+		elif [ "2c7c" = "${vendorid}" ] && [ "0900" = "${productid}" ]   
+		then  
+			uci set system.system.model="Silbo_RF44R-A-RM500U"
+			uci set boardconfig.board.model="Silbo_RF44R-A-RM500U"
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+		elif [ "2c7c" = "${vendorid}" ] && [ "0800" = "${productid}" ]
+		then     
+			uci set system.system.model="Silbo_RF44R-A-RM500Q"
+			uci set boardconfig.board.model="Silbo_RF44R-A-RM500Q"
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+			cp /Web_page/EC25E/* /www/luci2/
+		fi
+		   #rmmod ext4;rmmod exfat;rmmod mmc_core;rmmod hid_generic;rmmod hid;rmmod ext4;rmmod exfat;rmmod mmc_core;rmmod hid_generic;rmmod hid;rmmod fuse;rmmod usb_storage;rmmod scsi_mod;rmmod sd_mod;rmmod scsi_mod;rmmod wireguard;rmmod mmc_block;rmmod mmc_core;rmmod mtk_s;rmmod mmc_core;rmmod sdhci_pltfm;rmmod sdhci;rmmod mmc_core	
+				
+    fi
+    
+    if [ "$board_name" = "Silbo_RF04-A_GW" ]
+    then
+        cp /Web_Page_Gateway_Apps/RF44-A_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+        cp -r /Web_Page_Gateway_Apps/RF44-A_GW/root/ / 
+        if [ "2c7c" = "$vendorid" ] && [ "6005" = "$productid" ] 
+		then
+			uci set system.system.model="Silbo_RF04R-A-EC200A"
+			uci set boardconfig.board.model="Silbo_RF04R-A-EC200A"
+        elif [ "2c7c" = "$vendorid" ] && [ "030e" = "$productid" ] 
+		then
+		
+			uci set system.system.model="Silbo_RF04R-A-EM05G"
+			uci set boardconfig.board.model="Silbo_RF04R-A-EM05G"
+		elif [ "2c7c" = "$vendorid" ] && [ "0125" = "$productid" ] 
+		then
+			uci set system.system.model="Silbo_RF04R-A-EC25E"
+			uci set boardconfig.board.model="Silbo_RF04R-A-EC25E"
+			cp /Web_page/EC25E/* /www/luci2/
+		elif [ "2c7c" = "${vendorid}" ] && [ "0900" = "${productid}" ]   
+		then  
+			uci set system.system.model="Silbo_RF04R-A-RM500U"
+			uci set boardconfig.board.model="Silbo_RF04R-A-RM500U"
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+		elif [ "2c7c" = "${vendorid}" ] && [ "0800" = "${productid}" ]
+		then     
+			uci set system.system.model="Silbo_RF04R-A-RM500Q"
+			uci set boardconfig.board.model="Silbo_RF04R-A-RM500Q"
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+			cp /Web_page/EC25E/* /www/luci2/
+		fi	
+    fi
+    	    
+        
+    if echo "$board_name" | grep -qE "(PC312|PC310)";
+    then
+	    cp  /Web_Page_Gateway_Apps/PC312_GW/etc/* /etc/
+#	    cp  /Web_Page_Gateway_Apps/PC312_GW/etc/config/* /etc/config/
+	    #cp /Web_Page_Gateway_Apps/PC312_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+	    #cp /Web_Page_Gateway_Apps/PC312_GW/www/luci2/view/* /www/luci2/view  
+	    #cp /Web_Page_Gateway_Apps/PC312_GW/www/luci2/template/* /www/luci2/template  
+	   cp /Web_Page_Gateway_Apps/PC312_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts 
+	   
+	  if [ "$gwretainconfigflag" = "0" ]
+	  then
+			cp /Web_Page_Gateway_Apps/PC312_GW/etc/config/* /etc/config
+	  fi 
+	   if [ "$board_name" = "Silbo_PC312_GW" ]
+       then
+		    uci set system.system.model="PC312"
+			uci set boardconfig.board.model="PC312"
+	   else	
+	        cp  /Web_Page_Gateway_Apps/PC312_GW/PC310/etc/config/portconfig /etc/config/
+			#uci set boardconfig.board.model="Silbo_PC310"
+			#uci set boardconfig.board.model="Silbo_PC310"
+		fi
+    fi
+    
+    if echo "$board_name" | grep -qE "(PC311)";
+    then
+#   		    cp /Web_Page_Gateway_Apps/PC312_GW/PC311/etc/config/* /etc/config
+		    #cp /Web_Page_Gateway_Apps/PC312_GW/PC311/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+		    #cp /Web_Page_Gateway_Apps/PC312_GW/PC311/www/luci2/view/* /www/luci2/view 
+		    #cp /Web_Page_Gateway_Apps/PC312_GW/PC311/www/luci2/template/* /www/luci2/template 
+    	    cp /Web_Page_Gateway_Apps/PC312_GW/PC311/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    	    
+    	  if [ "$gwretainconfigflag" = "0" ]
+		  then
+				cp /Web_Page_Gateway_Apps/PC312_GW/PC311/etc/config/* /etc/config
+		  fi   
+    fi
+     #  rm -rf /usr/share/rpcd/menu.d/appmanagerIOutilitiesmenu.json
+    
+elif echo "$board_name" | grep -qE "(IAC44|IE44|RFN44-C2|RFN44-C_GW|RFN44-C-EX1)";
+then
+		#cp -rf /Web_Page_Gateway_Apps/IAC44_GW/root/ /
+	    #cp /Web_Page_Gateway_Apps/IAC44_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+	    #cp /Web_Page_Gateway_Apps/IAC44_GW/www/luci2/view/* /www/luci2/view
+	    #cp /Web_Page_Gateway_Apps/IAC44_GW/www/luci2/template/* /www/luci2/template
+	    cp /Web_Page_Gateway_Apps/IAC44_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts 
+	    if [ "$board_name" != "Silbo_IE44-B_GW" ] || [ "$board_name" != "Silbo_IE44-C_GW" ] || [ "$board_name" != "Silbo_RFN4444-C2_GW" ] || [ "$board_name" != "Silbo_RFN4444-C_GW" ] || [ "$board_name" != "Silbo_RFN4444-C-EX1_GW" ]
+	    then
+#		        cp /Web_Page_Gateway_Apps/IAC44_GW/etc/config/* /etc/config
+			    #cp /Web_Page_Gateway_Apps/IAC44_GW/root/ReadDIAppComponent/* /root/ReadDIAppComponent/etc/Config/
+			    #cp /Web_Page_Gateway_Apps/IAC44_GW/root/DIUtilityIndividualTestComponent/etc/Config/* /root/DIUtilityIndividualTestComponent/etc/Config
+			    #cp /Web_Page_Gateway_Apps/IAC44_GW/root/DOUtilityIndividualTestComponent/etc/Config/* /root/DOUtilityIndividualTestComponent/etc/Config
+			    cp -rf /Web_Page_Gateway_Apps/IAC44_GW/root/ / 
+			      if [ "$gwretainconfigflag" = "0" ]
+				  then
+						cp /Web_Page_Gateway_Apps/IAC44_GW/etc/config/* /etc/config
+				  fi
+				  
+		fi
+		if echo "$board_name" | grep -qE "(IAC44-B)";
+	    then
+		    #cp /Web_Page_Gateway_Apps/IAC44_GW/IAC44-B/www/luci2/view/* /www/luci2/view
+		    #cp /Web_Page_Gateway_Apps/IAC44_GW/IAC44-B/www/luci2/template/* /www/luci2/template
+		    #cp /Web_Page_Gateway_Apps/IAC44_GW/IAC44-B/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+		    cp /Web_Page_Gateway_Apps/IAC44_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+	    fi
+			
+	    if echo "$board_name" | grep -qE "(IE44)";
+	    then
+	       # cp /Web_Page_Gateway_Apps/IE44_GW/etc/config/* /etc/config
+	        #cp /Web_Page_Gateway_Apps/IE44_GW/etc/init.d/* /etc/init.d
+	        #cp /Web_Page_Gateway_Apps/IE44_GW/bin/* /bin
+		    cp -rf /Web_Page_Gateway_Apps/IE44_GW/root/ / 
+		    cp /Web_Page_Gateway_Apps/IE44_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts 
+		   
+		    
+		    if [ "$gwretainconfigflag" = "0" ]
+		    then
+				cp /Web_Page_Gateway_Apps/IE44_GW/etc/config/* /etc/config
+		    fi  
+		    if [ "$board_name" = "Silbo_IE44-B_GW" ]
+		    then
+			    #cp /Web_Page_Gateway_Apps/IE44_GW/IE44-B_GW/etc/config/* /etc/config
+			   # cp /Web_Page_Gateway_Apps/IE44_GW/IE44-B_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+			    cp /Web_Page_Gateway_Apps/IE44_GW/IE44-B_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts 
+			    cp -r /Web_Page_Gateway_Apps/IE44_GW/IE44-B_GW/root/ /
+			    if [ "$gwretainconfigflag" = "0" ]
+			    then
+					cp /Web_Page_Gateway_Apps/IE44_GW/IE44-B_GW/etc/config/* /etc/config
+			    fi  
+		    fi
+		    
+		fi
+	  if [ "$board_name" = "Silbo_RFN44-C2_GW" ] || [ "$board_name" = "Silbo_RFN44-C_GW" ] || [ "$board_name" = "Silbo_RFN44-C-EX1_GW" ]
+	  then
+		    if [ "$gwretainconfigflag" = "0" ]
+		    then
+				cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/etc/config/* /etc/config
+		    fi
+		        #cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/etc/config/* /root/InterfaceManager/config/
+			    #cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/etc/config/* /etc/config
+			    #cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/etc/init.d/* /etc/init.d
+                #cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+			    #cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/www/luci2/view/* /www/luci2/view
+			    #cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/www/luci2/template/* /www/luci2/template
+			    #cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/bin/* /bin
+			    cp /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts 
+			    cp -rf /Web_Page_Gateway_Apps/RFN44_GW/RFN44-C2/root/ /
+			    
+			   # rm -rf /usr/share/rpcd/menu.d/appmanagerrs485utilitiesmenu.json
+	  fi  
+	elif echo "$board_name" | grep -qE "(IAB44-B|IAB44-C)";
+	then
+	    #cp /Web_Page_Gateway_Apps/IAB44_GW/etc/config/* /etc/config
+        #cp /Web_Page_Gateway_Apps/IAB44_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+        cp /Web_Page_Gateway_Apps/IAB44_GW/etc/mbusdconfig.conf /etc
+        cp /Web_Page_Gateway_Apps/IAB44_GW/etc/mbusdconfig2.conf /etc
+        cp -rf /Web_Page_Gateway_Apps/IAB44_GW/root/ /
+	    
+		    if [ "$gwretainconfigflag" = "0" ]
+		    then
+				cp /Web_Page_Gateway_Apps/IAB44_GW/etc/config/* /etc/config
+		    fi  
+			
+					#if [ "$gwretainconfigflag" = "0" ]
+				    #then
+						#cp /Web_Page_Gateway_Apps/Silbo_IDXX/Silbo_IDBXX/etc/config/* /etc/config
+				    #fi 	    
+			if echo "$board_name" | grep -qE "(IAB44-B|IAB44-C)";
+			then
+				cp -rf /Web_Page_Gateway_Apps/IAB44_GW/root/ /
+				#cp /Web_Page_Gateway_Apps/IAB44_GW/etc/hotplug.d/tty/* /etc/hotplug.d/tty/
+				#cp /Web_Page_Gateway_Apps/IAB44_GW/www/luci2/view/* /www/luci2/view
+				#cp /Web_Page_Gateway_Apps/IAB44_GW/www/luci2/template/* /www/luci2/template
+			
+				if [ "$gwretainconfigflag" = "0" ]
+			    then
+					cp /Web_Page_Gateway_Apps/IAB44_GW/etc/config/* /etc/config
+			    fi 
+		#fi
+			     if [ "$board_name" != "Silbo_IAB44-C_GW" ]
+			     then
+				      
+				     cp /Web_Page_Gateway_Apps/IAB44_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+			     fi
+			     if [ "$board_name" = "Silbo_IAB44-C_GW" ]
+			     then
+			         cp /Web_Page_Gateway_Apps/IAB44_GW/IAB44-C/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts 
+			         #cp /Web_Page_Gateway_Apps/IAB44_GW/IAB44-C/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+			         #cp /Web_Page_Gateway_Apps/IAB44_GW/IAB44-C/etc/config/* /etc/config
+			     fi
+	     fi
+	    elif echo "$board_name" | grep -qE "(IDB|IDF|RVWG|IDG)";
+		then
+		   
+		    if [ -d /Web_Page_Gateway_Apps/Silbo_IDXX/Common_Files/root ]; then
+		        cp -rf /Web_Page_Gateway_Apps/Silbo_IDXX/Common_Files/root/ /
+		        cp /Web_Page_Gateway_Apps/Silbo_IDXX/Common_Files/rc.local /etc
+		        cp /Web_Page_Gateway_Apps/Silbo_IDXX/Common_Files/sqlite3 /usr/bin
+		    fi
+		
+		     cp /Web_Page_Gateway_Apps/Silbo_IDXX/Common_Files/rc.local /etc 2>/dev/null
+		     case "$board_name" in
+		        *IDB54-C-GW*)
+		                       cp -rf /Web_Page_Gateway_Apps/Silbo_IDXX/IDB5X-C_GW/root/ /
+		            ;;
+		        *IDF54-C-GW*)
+		                       cp -rf /Web_Page_Gateway_Apps/Silbo_IDXX/IDF5X-C_GW/root/ /
+		                       ;;
+		        *RVWG*)
+		                       cp -rf /Web_Page_Gateway_Apps/Silbo_IGXX/Silbo_RVWG5X_GW/root/ /
+		                       cp /Web_Page_Gateway_Apps/Silbo_IGXX/Silbo_RVWG5X_GW/etc/init.d/GD44AppManager /etc/init.d/
+		                       sh /bin/UpdateRS485Port.sh
+		                       ;;
+		        *IDG*)
+		                       cp -rf /Web_Page_Gateway_Apps/Silbo_IGXX/Silbo_RVWG5X_GW/root/ /
+		                       sh /bin/UpdateRS485Port.sh
+		                        ;;
+		    esac
+	    
+		 
+		#fi
+		
+elif echo "$board_name" | grep -qE "(IAB44-DIO)";
+then
+	 cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/etc/config/* /etc/config
+	 cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/bin/* /bin/
+	 cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/root/DIUtilityIndividualTestComponent/etc/Config/* /root/DIUtilityIndividualTestComponent/etc/Config
+     cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/root/DOUtilityIndividualTestComponent/etc/Config/* /root/DOUtilityIndividualTestComponent/etc/Config
+	 cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/root/ReadDIAppComponent/* /root/ReadDIAppComponent/etc/Config/
+	 cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/root/FixedPacketAppComponent/* /root/FixedPacketAppComponent/etc/Config/
+     cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+     cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/www/luci2/view/* /www/luci2/view    
+     cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/www/luci2/template/* /www/luci2/template 
+     
+        if [ "$gwretainconfigflag" = "0" ]
+	    then
+			cp /Web_Page_Gateway_Apps/IAB44-DIO_GW/etc/config/* /etc/config
+	    fi 
+ 
+ 
+elif echo "$board_name" | grep -qE "(IAF44-C1)";
+then
+    
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/etc/config/* /etc/config
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/bin/* /bin/
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/usr/share/rpcd/acl.d/* /usr/share/rpcd/acl.d
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/usr/libexec/rpcd/* /usr/libexec/rpcd/
+     #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/www/luci2/view/* /www/luci2/view    
+     #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/www/luci2/template/* /www/luci2/template    
+    #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/root/ADCUtilityComponent/ADCUtility /root/ADCUtilityComponent/
+     cp -rf /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/root/ /
+     cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    # rm -rf /usr/share/rpcd/menu.d/appmanagerrs485utilitiesmenu.json
+    if [ "$gwretainconfigflag" = "0" ]
+    then
+	     cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C1/etc/config/* /etc/config
+	fi
+     
+elif echo "$board_name" | grep -qE "(IAF44-C2)";
+then
+    if [ "$gwretainconfigflag" = "0" ]
+    then
+	 cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C2/etc/config/* /etc/config
+	fi
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C2/etc/config/* /etc/config
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C2/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C2/www/luci2/view/* /www/luci2/view    
+     cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C2/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+     
+elif echo "$board_name" | grep -qE "(IAF44-C_GW)";
+then
+    if [ "$gwretainconfigflag" = "0" ]
+    then
+	  cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C/etc/config/* /etc/config
+	fi
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C/etc/config/* /etc/config
+	 cp -rf /Web_Page_Gateway_Apps/Silbo_IDXX/IDF5X-C_GW/root/ /
+	 cp -rf /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C/root/ /
+	 cp /Web_Page_Gateway_Apps/Silbo_IDXX/IDF5X-C_GW/www/luci2/template/* /www/luci2/template
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C/www/luci2/view/* /www/luci2/view    
+	 #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C/www/luci2/template/* /www/luci2/template    
+     #cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C/bin/* /bin     
+     cp /Web_Page_Gateway_Apps/IAF44_GW/IAF44-C/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts     
+     
+elif [ "$board_name" = "Silbo_RF44-B_GW" ]
+then
+    cp /Web_Page_Gateway_Apps/RF44-B_GW/etc/config/* /etc/config
+    cp /Web_Page_Gateway_Apps/RF44-B_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+    cp /Web_Page_Gateway_Apps/RF44-B_GW/www/luci2/view/* /www/luci2/view 
+    cp /Web_Page_Gateway_Apps/RF44-B_GW/www/luci2/template/* /www/luci2/template 
+    cp /Web_Page_Gateway_Apps/RF44-B_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    
+	    if [ "$gwretainconfigflag" = "0" ]
+	    then
+			 cp /Web_Page_Gateway_Apps/RF44-B_GW/etc/config/* /etc/config
+		fi
+    if [ "2c7c" = "$vendorid" ] && [ "6005" = "$productid" ] 
+		then
+			uci set system.system.model="Silbo_RF44R-B-EC200A"
+			uci set boardconfig.board.model="Silbo_RF44R-B-EC200A"
+		elif [ "2c7c" = "$vendorid" ] && [ "030e" = "$productid" ] 
+		then
+			uci set system.system.model="Silbo_RF44R-B-EM05G"
+			uci set boardconfig.board.model="Silbo_RF44R-B-EM05G"	
+		elif [ "2c7c" = "$vendorid" ] && [ "0125" = "$productid" ] 
+		then
+			uci set system.system.model="Silbo_RF44R-B-EC25E"
+			uci set boardconfig.board.model="Silbo_RF44R-B-EC25E"
+			cp /Web_page/EC25E/* /www/luci2/
+		elif [ "2c7c" = "${vendorid}" ] && [ "0900" = "${productid}" ]   
+		then  
+			uci set system.system.model="Silbo_RF44R-B-RM500U"
+			uci set boardconfig.board.model="Silbo_RF44R-B-RM500U"
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+		elif [ "2c7c" = "${vendorid}" ] && [ "0800" = "${productid}" ]
+		then     
+			uci set system.system.model="Silbo_RF44R-B-RM500Q"
+			uci set boardconfig.board.model="Silbo_RF44R-B-RM500Q"
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+			cp /Web_page/EC25E/* /www/luci2/
+		fi
+    
+    
+elif echo "$board_name" | grep -qE "(RF44-C|GRD44C-5R|GRD44C-3R)";
+then
+    #cp /Web_Page_Gateway_Apps/RF44-C_GW/etc/config/* /etc/config
+    #cp /Web_Page_Gateway_Apps/RF44-C_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+    #cp /Web_Page_Gateway_Apps/RF44-C_GW/www/luci2/view/* /www/luci2/view
+    #cp /Web_Page_Gateway_Apps/RF44-C_GW/www/luci2/template/* /www/luci2/template
+    cp /Web_Page_Gateway_Apps/RF44-C_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+	    if [ "$gwretainconfigflag" = "0" ]
+	    then
+	    
+			 cp /Web_Page_Gateway_Apps/RF44-C_GW/etc/config/* /etc/config
+		fi
+    
+    if echo "$board_name" | grep -qE "(GRD44C-5R)";
+    then
+          cp /Web_Page_Gateway_Apps/GRD44C-5R_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    fi    
+     
+    if echo "$board_name" | grep -qE "(GRD44C-3R)";
+    then
+          cp /Web_Page_Gateway_Apps/GRD44C-3R_GW/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts
+    fi
+    if echo "$board_name" | grep -qE "(PC311)";
+    then
+            cp /Web_Page_Gateway_Apps/PC312_GW/PC311/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts  	
+			#uci set boardconfig.board.model="PC311"
+			#uci set boardconfig.board.model="PC311"
+    fi
+   
+	    if [ "$board_name" = "Silbo_RF44-C_GW" ]
+	    then
+			    productid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idProduct)
+			    vendorid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idVendor)
+		    
+		       if [ "2c7c" = "$vendorid" ] && [ "6005" = "$productid" ] 
+				then
+					uci set system.system.model="Silbo_RF44R-C-EC200A"
+					uci set boardconfig.board.model="Silbo_RF44R-C-EC200A"
+				elif [ "2c7c" = "$vendorid" ] && [ "030e" = "$productid" ] 
+				then
+					uci set system.system.model="Silbo_RF44R-C-EM05G"
+					uci set boardconfig.board.model="Silbo_RF44R-C-EM05G"	
+				elif [ "2c7c" = "$vendorid" ] && [ "0125" = "$productid" ] 
+				then
+					uci set system.system.model="Silbo_RF44R-C-EC25E"
+					uci set boardconfig.board.model="Silbo_RF44R-C-EC25E"
+					cp /Web_page/EC25E/* /www/luci2/
+				elif [ "2c7c" = "${vendorid}" ] && [ "0900" = "${productid}" ]   
+				then  
+					uci set system.system.model="Silbo_RF44R-C-RM500U"
+					uci set boardconfig.board.model="Silbo_RF44R-C-RM500U"
+					uci set signalstrength.modem1.highestNetworkMode="5g"
+				elif [ "2c7c" = "${vendorid}" ] && [ "0800" = "${productid}" ]
+				then     
+					uci set system.system.model="Silbo_RF44R-C-RM500Q"
+					uci set boardconfig.board.model="Silbo_RF44R-C-RM500Q"
+					uci set signalstrength.modem1.highestNetworkMode="5g"
+					cp /Web_page/EC25E/* /www/luci2/
+			   fi		
+	    fi
+     
+elif echo "$board_name" | grep -qE "(GD44-A|GD44-B)";
+then
+	
+     cp /Web_Page_Gateway_Apps/GD44-B_GW/etc/config/* /etc/config
+     cp /Web_Page_Gateway_Apps/GD44-B_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+     cp /Web_Page_Gateway_Apps/GD44-B_GW/www/luci2/view/* /www/luci2/view  
+     cp /Web_Page_Gateway_Apps/GD44-B_GW/www/luci2/template/* /www/luci2/template 
+     
+		if [ "$gwretainconfigflag" = "0" ]
+	    then
+			 cp /Web_Page_Gateway_Apps/GD44-B_GW/etc/config/* /etc/config
+		fi 
+     if [ "$board_name" = "Silbo_GD44-A_GW" ]
+     then
+         cp /Web_Page_Gateway_Apps/GD44-A_GW/www/luci2/view/* /www/luci2/view 
+         cp /Web_Page_Gateway_Apps/GD44-A_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+         cp /Web_Page_Gateway_Apps/GD44-A_GW/www/luci2/template/* /www/luci2/template 
+         cp /Web_Page_Gateway_Apps/GD44-A_GW/bin/* /bin 
+     fi
+
+elif [ "$board_name" = "Silbo_GD44-C_GW" ]
+then
+		 cp /Web_Page_Gateway_Apps/GD44-C_GW/etc/config/* /etc/config
+		 cp /Web_Page_Gateway_Apps/GD44-C_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+	     cp /Web_Page_Gateway_Apps/GD44-C_GW/www/luci2/view/* /www/luci2/view 
+	     cp /Web_Page_Gateway_Apps/GD44-C_GW/www/luci2/template/* /www/luci2/template 
+	     
+	    if [ "$gwretainconfigflag" = "0" ]
+	    then
+			 cp /Web_Page_Gateway_Apps/GD44-C_GW/etc/config/* /etc/config
+		fi 
+	     	     
+elif [ "$board_name" = "Silbo_GD44-D_GW" ]
+then
+		 cp /Web_Page_Gateway_Apps/GD44-D_GW/etc/config/* /etc/config
+		 cp /Web_Page_Gateway_Apps/GD44-D_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+	     cp /Web_Page_Gateway_Apps/GD44-D_GW/www/luci2/view/* /www/luci2/view 
+	      cp /Web_Page_Gateway_Apps/GD44-D_GW/www/luci2/template/* /www/luci2/template 
+	      
+	    if [ "$gwretainconfigflag" = "0" ]
+	    then
+			 cp /Web_Page_Gateway_Apps/GD44-D_GW/etc/config/* /etc/config
+		fi 
+	
+elif [ "$board_name" = "Silbo_GD44-E_GW" ]
+then
+		 cp /Web_Page_Gateway_Apps/GD44-E_GW/etc/config/* /etc/config
+		 cp /Web_Page_Gateway_Apps/GD44-E_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d
+	     cp /Web_Page_Gateway_Apps/GD44-E_GW/www/luci2/view/* /www/luci2/view
+	     cp /Web_Page_Gateway_Apps/GD44-E_GW/www/luci2/template/* /www/luci2/template
+	    if [ "$gwretainconfigflag" = "0" ]
+	    then
+			 cp /Web_Page_Gateway_Apps/GD44-E_GW/etc/config/* /etc/config
+		fi 
+	     
+fi
+
+#DeviceID=$(cat /tmp/sysinfo/board_name | cut -d "_" -f2)
+#uci set FixedPacketConfigGeneric.fixedpacketconfig.DeviceID="$DeviceID"
+
+uci commit FixedPacketConfigGeneric
+uci commit DiagnosticIOUtilities
+uci commit sourceconfig
+uci commit boardconfig
+uci commit system
+
+
+#uci commit sysconfig
+ #to update to cfg files according to board configurations
+#UpdateSSID
+UpdateSiteID
+#UpdateDefaultConfigGateway
+
+sh /bin/UpdateRS485Port.sh
+
+sh /bin/defaultbackupRestoreGateway.sh 0
+
+
+#/usr/local/bin/Testscripts/ReadMACAddr.sh
+#if [ "$gwretainconfigflag" = "0" ]
+#then
+     #UpdateExternalMQTTTopicCfg
+	 #cp /Web_Page_Gateway_Apps/Default_Gateway/config/* /etc/config/
+#fi
+UpdateSoftwareVersionCfg
+
+
+#UpdateGpioConfigCfg
+#UpdateDidoAlarmConfigCfg
+#sh /usr/local/bin/Testscripts/read_calib.sh
+#sh /bin/UpdateCalibValues.sh
+#sh /bin/read_calib.sh
+#sh /bin/UpdateADCUtilityConfig.sh
+#sh /bin/UpdateAIO.sh
+
+cp -r /root /Web_Page_Gateway_Apps/Default_Gateway/
+
+#/bin/UpdateDefaultConfigGateway ucitoappcfg
+chmod 0777 /www/luci2/view/*
+chmod 0777 /www/luci2/template/*
+chmod 0777 /www/luci2/*
+#/bin/set_version_overviewpage.sh
+uci set applist_config.appconfig.gwretainconfigflag=0
+uci commit applist_config
+
+exit 0

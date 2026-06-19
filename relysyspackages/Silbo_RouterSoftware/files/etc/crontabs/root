@@ -1,0 +1,9 @@
+*/1 * * * * /root/InterfaceManager/script/Update_Analytics_data.sh
+*/15 * * * * /root/InterfaceManager/script/TimeSync.sh
+*/10 * * * * /root/InterfaceManager/script/Test_Ifconfig.sh
+*/2 * * * * /root/InterfaceManager/script/Check_Monitoring.sh
+*/2 * * * * /bin/LogrotateRebootlogs.sh
+*/1 * * * * /bin/modem.sh
+*/60 * * * * /bin/DeleteSMSFiles.sh
+*/10 * * * * /bin/RouterlocalPingApp.sh
+*/2 * * * * /root/InterfaceManager/script/features/data_consumption/Data_Consumption.sh

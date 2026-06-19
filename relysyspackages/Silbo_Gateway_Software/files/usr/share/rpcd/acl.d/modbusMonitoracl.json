@@ -1,0 +1,20 @@
+{
+    "modbusMonitorConfig": {
+        "description": "Modbus Monitoring",
+        "read": {
+            "uci": [
+                "modbusMonitorConfig"
+            ],
+            "ubus": {
+                "rpc-uploadSNMPmib": [
+                    "configure"
+                ]
+            }
+        },
+        "write": {
+            "uci": [
+                "modbusMonitorConfig"
+            ]
+        }
+    }
+}

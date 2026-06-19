@@ -1,0 +1,27 @@
+
+config portconfig 'portconfig1'
+	option Ser2netEnable1 '2'
+	option portmode1 'raw'
+	option timeout1 '0'
+	option tcpport1 '501'
+	option Baudrate1 '115200'
+	option NoOfStopbits1 '1'
+	option Databits1 '8'
+	option Parity1 'NONE'
+	option Flowcontrol1 'RTSCTS'
+
+config portconfig 'portconfig2'
+	option Ser2netEnable2 '2'
+	option portmode2 'raw'
+	option timeout2 '0'
+	option tcpport2 '23'
+	option Baudrate2 '115200'
+	option NoOfStopbits2 '1'
+	option Databits2 '8'
+	option Parity2 'NONE'
+	option Flowcontrol2 'RTSCTS'
+
+config portconfig 'tcpClient_1'
+
+config portconfig 'tcpClient_2'
+

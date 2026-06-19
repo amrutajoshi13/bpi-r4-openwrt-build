@@ -1,0 +1,30 @@
+{
+    "monitoring": {
+        "title": "Monitoring",
+        "index": 95
+    },
+ "monitoring/overviewPage": {
+        "title": "Dashboard",
+        "acls": [ "status" ],
+        "view": "monitoring/overviewPage",
+        "index": 5
+    },
+    "monitoring/BACnet": {
+        "title": "BACnet Monitoring",
+        "acls": [ "BACnetConfig" ],
+        "view": "monitoring/BACnet",
+        "index": 10
+    },
+      "monitoring/Genericsnmp": {
+        "title": "Generic SNMP Monitoring",
+       "acls": [ "SnmpMasterConfig" ],
+        "view": "monitoring/Genericsnmp",
+        "index": 15
+   },
+    "monitoring/modbusMonitoring": {
+        "title": "Modbus Monitoring",
+        "acls": [ "deviceconfigV2" ],
+        "view": "monitoring/modbusMonitoring",
+        "index": 20
+    }                       
+}

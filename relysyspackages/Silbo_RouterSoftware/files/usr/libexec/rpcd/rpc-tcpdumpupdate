@@ -1,0 +1,32 @@
+#!/bin/sh
+ 
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+ 
+UpdateConfigScript="/root/InterfaceManager/script/features/tcpdebug/tcpdump.sh"
+ 
+case "$1" in
+    list)
+        echo '{"configure":{}}'
+        ;;
+    call)
+        case "$2" in
+            configure)
+                response=$($UpdateConfigScript 2>&1) # Capture both stdout and stderr
+                exit_code=$?
+                if [ "$exit_code" -ne 0 ]; then
+                    # Include the actual error message in the response
+                    echo "{\"code\":1,\"output\":\"FAILURE: $response\"}"
+                else
+                    echo "{\"code\":0,\"output\":\"SUCCESS: $response\"}"
+                fi
+                ;;
+            *)
+                echo '{"code":1,"output":"Invalid method"}'
+                exit 1
+                ;;
+        esac
+        ;;
+esac
+ 
+exit 0

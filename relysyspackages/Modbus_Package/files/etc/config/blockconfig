@@ -1,0 +1,6 @@
+
+config blockconfig 'Device1'
+	option functionCode_0 '1'
+	option startRegister_0 '00001'
+	option countRegister_0 '1'
+

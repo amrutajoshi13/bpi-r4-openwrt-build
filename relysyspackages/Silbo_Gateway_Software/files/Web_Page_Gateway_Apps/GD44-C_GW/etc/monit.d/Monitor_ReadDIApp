@@ -1,0 +1,3 @@
+check process ReadDIApp with matching "ReadDIApp" every 1 cycles
+    start program = "/root/ReadDIAppComponent/ReadDIApp > /dev/null 2>&1 &"
+    stop program = "/usr/bin/killall ReadDIApp > /dev/null 2>&1"

@@ -1,0 +1,38 @@
+#!/usr/bin/haserl
+
+<?
+# Send HTTP status header
+/usr/bin/printf "Status: 200 OK\r\n"
+
+# File to be downloaded
+FilePath="/tmp/tcpdebug.pcap"
+FileName="tcpdebug.pcap"
+
+# Check if the file exists
+if [ ! -f "$FilePath" ]; then
+    /usr/bin/printf "Content-Type: text/plain\r\n"
+    /usr/bin/printf "Content-Disposition: inline\r\n\n"
+    /bin/echo "Error: File $FileName not found!"
+    exit 1
+fi
+
+# Validate session permissions (optional, for secure environments)
+SessionAccess=$(/bin/ubus call session access "{\"ubus_rpc_session\":\"$FORM_sessionid\",\"scope\":\"cgi-file\",\"object\":\"download\",\"function\":\"read\"}" 2>&1)
+Permission=$(/bin/echo "$SessionAccess" | /usr/bin/awk -F":" '/access/{print $2}')
+if ! /bin/echo "$Permission" | /bin/grep -qw "true"; then
+    /usr/bin/printf "Content-Type: text/plain\r\n"
+    /usr/bin/printf "Content-Disposition: inline\r\n\n"
+    /bin/echo "Error: Download permission denied!"
+    exit 1
+fi
+
+# Send file headers
+/usr/bin/printf "Content-Type: application/octet-stream; name=\"$FileName\"\r\n"
+/usr/bin/printf "Content-Disposition: attachment; filename=\"$FileName\"\r\n\n"
+
+# Stream the file content
+/bin/cat "$FilePath"
+
+exit 0
+?>
+

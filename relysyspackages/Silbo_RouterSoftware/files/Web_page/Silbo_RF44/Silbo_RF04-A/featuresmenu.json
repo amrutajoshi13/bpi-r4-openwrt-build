@@ -1,0 +1,57 @@
+{
+    "features": {
+        "title": "Features",
+        "index": 70
+    },
+    
+    "features/macbinding": {
+        "title": "Mac Address Binding",
+        "acls": [ "macconfig" ],
+        "view": "features/macbinding",
+        "index": 5
+         
+    },
+    
+    "features/urlfilterip": {
+        "title": "URL Filtering",
+        "acls": [ "urlipconfig" ],
+        "view": "features/urlfilterip",
+        "index": 10
+         
+    },
+    
+     
+     "features/webserverconfig": {
+        "title": "WebServer",
+        "acls": [ "webserverconfig" ],
+        "view": "features/webserverconfig",
+        "index": 15
+         
+    },
+  
+   /* "features/wirelessmacidfiltering": {
+        "title": "Wifi MacID Filtering",
+        "acls": [ "macidconfig" ],
+        "view": "features/wirelessmacidfiltering",
+        "index": 20
+    },*/
+    
+    
+    "features/routing": {
+        "title": "Routing",
+        "acls": [ "routingconfig" ],
+        "view": "features/routing",
+        "index": 21
+    }, 
+  
+  
+      "features/miscUtilities": {
+        "title": "Others",
+        "acls": [ "miscutilities" ],
+        "view": "features/miscUtilities",
+        "index": 25
+    },
+    
+       
+
+}

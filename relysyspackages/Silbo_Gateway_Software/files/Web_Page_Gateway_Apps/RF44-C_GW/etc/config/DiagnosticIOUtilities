@@ -1,0 +1,8 @@
+config IOUtilities
+    option utility "RS232 Device"
+    option action "READ"
+    option inputs "1"
+    option input1Name "Slave ID"
+    option input1Element "text"
+    option input1Type "text"    
+

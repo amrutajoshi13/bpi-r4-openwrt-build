@@ -1,0 +1,29 @@
+{
+    "snmptrapconfig": {
+        "description": "SNMP Trap Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-snmptrapupdate":[
+                "configure" 
+                ]
+            },
+            "uci": [
+                "snmptrapconfig",
+                
+            ]
+            
+        },
+        "write": {
+			"ubus" : {
+                "rpc-snmptrapupdate":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+               "snmptrapconfig",
+                
+            ]
+        }
+    }
+}

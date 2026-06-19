@@ -1,0 +1,130 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Custom Logo Configuration</h1>
+</div>
+
+<div class="pagecontent">
+    <div id="map"> </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Upload Custom Logo</h3>
+        </div>
+        <div class="panel-body">
+            <div class="cards" role="region" aria-label="Certificate cards">
+
+                <div class="card export" id="cutsom-card">
+
+                    <div>
+                        <div class="icon blue-circle">
+                            <img src="/luci2/icons/cloud-arrow-up.svg" alt="Upload" class="svg-white">
+                        </div>
+
+                        <!-- <h3 id="export-title">Upload NMS Certificate and Key</h3> -->
+
+                        <p>
+                            Click <strong>Upload</strong> to select and upload your custom logo.
+                            Please make sure that logo should be renamed as <strong>custom_logo.svg</strong> before
+                            uploading the logo
+                        </p>
+                    </div>
+
+
+                    <div>
+                        <div class="controls">
+                            <button class="btn btn-primary" type="button" id="btn_upload"
+                                aria-label="Custom configuration">
+                                Upload
+                            </button>
+                        </div>
+                        <div class="meta">Last Upload: <span id="last-upload-logo">No backups yet</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        width: 100%;
+        height: auto;
+        border: none !important;
+        box-shadow: none !important;
+        background-color: none !important;
+    }
+
+    .card {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), #fff);
+        border-radius: 14px;
+        padding: 22px;
+        border: 1px solid rgba(11, 63, 150, 0.06);
+        /* box-shadow: 0 18px 40px rgba(11, 38, 85, 0.06); */
+        box-shadow: none !important;
+        min-height: 240px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform .22s cubic-bezier(.2, .9, .2, 1), box-shadow .22s ease;
+    }
+
+
+
+
+    .icon.blue-circle {
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        margin: 0 auto 12px auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0b63d1 0%, #2fb3ff 100%);
+        /* box-shadow: 0 10px 30px rgba(11, 63, 209, 0.12); */
+    }
+
+
+    .icon.blue-circle img.svg-white {
+        width: 46px;
+        height: 46px;
+        filter: brightness(0) invert(1);
+    }
+
+
+    .card h3 {
+        text-align: left;
+        font-size: 16px;
+        margin: 11px 0px 20px 5px !important;
+        color: #071032;
+        font-weight: 800;
+        border-bottom: 1px solid rgba(16, 32, 52, 0.04)
+    }
+
+    .card p {
+        text-align: center;
+        color: #55607a;
+        font-size: 13px;
+        margin: 0 0 14px;
+        padding: 0 4px
+    }
+
+    .controls {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 8px
+    }
+
+
+    .meta {
+        margin-top: 14px;
+        font-size: 12px;
+        color: #6b7280;
+        text-align: center;
+    }
+</style>

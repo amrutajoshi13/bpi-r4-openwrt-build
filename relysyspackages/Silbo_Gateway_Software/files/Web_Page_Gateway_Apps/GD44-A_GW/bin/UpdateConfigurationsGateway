@@ -1,0 +1,3513 @@
+#!/bin/sh
+. /lib/functions.sh
+
+InterfaceCfgDirPath="/reap/etc"
+InterfaceEth0="/etc/network/eth0.cfg"
+InterfaceEth1="/etc/network/eth1.cfg"
+InterfaceFile="/etc/network/interfaces"
+ConfigBridgeInterface="/etc/init.d/BridgeConfiguration"
+EnableDefaultGateway="/etc/init.d/EnableDefaultGateway"
+IPTablesMode="/etc/init.d/IPTablesMode"
+InitEthernet="/etc/init.d/initethernet"
+EthernetDefaultGateway="/reap/etc/EthernetDefaultGateway.cfg"
+
+#Interfaces  Configuration 
+EthernetEth0ConfigureCfgPath="${InterfaceCfgDirPath}/EthernetEth0Setting"
+EthernetEth1ConfigureCfgPath="${InterfaceCfgDirPath}/EthernetEth1Setting"
+EthernetEth2ConfigureCfgPath="${InterfaceCfgDirPath}/EthernetEth2Setting"
+BridgeConfigureCfgPath="${InterfaceCfgDirPath}/BridgeConfiguration"
+BridgeConfigureCfgPathMode2="${InterfaceCfgDirPath}/BridgeConfigurationMode2"
+ModeOneConfigureCfgPath="${InterfaceCfgDirPath}/ModeOneConfig"
+ModeTwoConfigureCfgPath="${InterfaceCfgDirPath}/ModeTwoConfig"
+ModeSettingConfigureCfgPath="${InterfaceCfgDirPath}/ModeSetting"
+EthernetDefaultCfgPath="${InterfaceCfgDirPath}/EthernetDefaultGateway"
+RmnetDefaultCfgPath="${InterfaceCfgDirPath}/RmnetDefaultGateway"
+NetworkInterfaceEventfile="Mode"
+NetworkInterfaceConfigureEventSection="generalsettings"
+ConnectionManagerApp="/legato/systems/current/apps/RelCellularManagerApp/read-only/bin/RelCellularManagerAppComponentExe"
+App="RelCellularManagerAppComponentExe"
+App2="SIMTestAppComponentExe"
+
+#Upgrade Manager
+UpgradeManagerGenericFile="UpgradeManagerGeneric"
+UpgradeManagerGenericSection="global"
+
+UpgradeManagerMaintenaceRebootGenericFile="MaintenanceRebootAction"
+UpgradeManagerMaintenaceRebootGenericSection="event"
+
+
+
+#Json Key Parameters Rs485 Index Configuration
+JsonKeyParamsRs485IndexCfgDirPath="/root/JSONParametersAppComponent/etc/Config"
+JsonKeyParamsRs485IndexconfigureCfgPath="${JsonKeyParamsRs485IndexCfgDirPath}/JsonKeyParametersRS485Index"
+JsonKeyParamsRs485IndexconfigureCfgPath2="${JsonKeyParamsRs485IndexCfgDirPath}/JsonKeyParametersRS485"
+JsonKeyParamsRs485IndexconfigureFile="/etc/config/Jsonconfig"
+
+#Dio Key Parameters Rs485 Index Configuration
+JsonKeyParamsDioIndexCfgDirPath="/root/JSONParametersAppComponent/etc/Config"
+JsonKeyParamsDioIndexconfigureCfgPath="${JsonKeyParamsDioIndexCfgDirPath}/JsonKeyParametersDIOIndex"
+JsonKeyParamsDioIndexconfigureCfgPath2="${JsonKeyParamsDioIndexCfgDirPath}/JsonKeyParametersDIO"
+JsonKeyParamsDioIndexconfigureFile="/etc/config/Jsonconfig"
+
+#Ai Key Parameters Rs485 Index Configuration
+JsonKeyParamsAiIndexCfgDirPath="/root/JSONParametersAppComponent/etc/Config"
+JsonKeyParamsAiIndexconfigureCfgPath="${JsonKeyParamsAiIndexCfgDirPath}/JsonKeyParametersAIOIndex"
+JsonKeyParamsAiIndexconfigureCfgPath2="${JsonKeyParamsAiIndexCfgDirPath}/JsonKeyParametersAIO"
+JsonKeyParamsAiIndexconfigureFile="/etc/config/Jsonconfig"
+
+#RS232 Key Parameters Rs485 Index Configuration
+JsonKeyParamsRS232IndexCfgDirPath="/root/JSONParametersAppComponent/etc/Config"
+JsonKeyParamsRS232IndexconfigureCfgPath="${JsonKeyParamsRS232IndexCfgDirPath}/JsonKeyParametersRS232Index"
+JsonKeyParamsRS232IndexconfigureCfgPath2="${JsonKeyParamsRS232IndexCfgDirPath}/JsonKeyParametersRS232"
+JsonKeyParamsRS232IndexconfigureFile="/etc/config/Jsonconfig"
+
+#SNMP Key Parameters Rs485 Index Configuration
+JsonKeyParamsSNMPIndexCfgDirPath="/root/JSONParametersAppComponent/etc/Config"
+JsonKeyParamsSNMPIndexconfigureCfgPath="${JsonKeyParamsSNMPIndexCfgDirPath}/JsonKeyParametersSNMPIndex"
+JsonKeyParamsSNMPIndexconfigureCfgPath2="${JsonKeyParamsSNMPIndexCfgDirPath}/JsonKeyParametersSNMP"
+JsonKeyParamsSNMPIndexconfigureFile="/etc/config/Jsonconfig"
+
+#Temp Key Parameters Rs485 Index Configuration
+JsonKeyParamsTempIndexCfgDirPath="/root/JSONParametersAppComponent/etc/Config"
+JsonKeyParamsTempIndexconfigureCfgPath="${JsonKeyParamsTempIndexCfgDirPath}/JsonKeyParametersRTDIndex"
+JsonKeyParamsTempIndexconfigureCfgPath2="${JsonKeyParamsTempIndexCfgDirPath}/JsonKeyParametersRTD"
+JsonKeyParamsTempIndexconfigureFile="/etc/config/Jsonconfig"
+
+#RS485 Configuration
+RS485DeviceCfgDirPath="/root/EnergyMeterAppComponent/etc/Config"
+RS485DeviceconfigureCfgPath="${RS485DeviceCfgDirPath}/RS485DeviceConfig"
+RS485DeviceconfigureCfgPath2="${RS485DeviceCfgDirPath}/RS485DeviceConfig2"
+RS485DeviceconfigureFile="DeviceConfigGeneric"
+#RS485DeviceconfigureFile2="DeviceConfigGeneric"
+
+#RS485 registerconfig
+#RS485registerconfigCfgDirPath="/root/EnergyMeterAppComponent/etc/Config"
+#RS485registerconfigconfigureCfgPath="${RS485registerconfigCfgDirPath}/RS485DeviceConfig"
+#RS485registerconfigconfigureCfgPath2="${RS485registerconfigCfgDirPath}/RS485DeviceConfig2"
+#RS485registerconfigFile="/etc/config/registerconfig"
+
+
+#RS232 Configuration
+RS232DeviceCfgDirPath="/root/RS232ReadAppComponent/etc/Config"
+RS232DeviceconfigureCfgPath="${RS232DeviceCfgDirPath}/RS232DeviceConfig"
+RS232DeviceconfigureFile="RS232DeviceConfigGeneric"
+
+#Temperature Configuration
+TemperatureDeviceCfgDirPath="/root/ReadTemperatureSensorAppComponent/etc/Config"
+TemperatureDeviceconfigureCfgPath="${TemperatureDeviceCfgDirPath}/ReadTempAppConfigParameters"
+TemperatureDeviceconfigureFile="temperatureconfig"
+tempSensorCount=0
+
+#DIO Configuration
+DIODeviceCfgDirPath="/root/ReadDIAppComponent/etc/Config"
+DIODeviceconfigureCfgPath="${DIODeviceCfgDirPath}/ReadDIAppConfig"
+DIODeviceAlarmconfigureCfgPath="${DIODeviceCfgDirPath}/ReadDIAppConfigParameters"
+DIOEventfile="digitalinputconfig"
+DIOconfigureEventSection="digitalinputconfig"
+
+#AIO Configuration
+AIODeviceCfgDirPath="/root/ReadAIAppComponent/etc/Config"
+AIODeviceconfigureCfgPath="${AIODeviceCfgDirPath}/ReadAIAppWebConfig"
+AIOEventfile="analoginputconfig"
+AIOconfigureEventSection="analoginputconfig"
+
+#HTTP Server Configuration
+HTTPCfgDirPath="/root/HTTPSenderAppComponent/etc/Config"
+HTTPconfigureCfgPath="${HTTPCfgDirPath}/HTTPSenderServerClientConfig"
+#httpEventfile="HTTPServerGeneric"
+#httpconfigureEventSection="httpconfig"
+httpEventfile="cloudconfig"
+httpconfigureEventSection="cloudconfig"
+
+#RS485 Utility Configuration
+RS485UtilityCfgDirPath="/root/RS485UtilityComponent/etc/Config"
+RS485UtilityCfgPath="${RS485UtilityCfgDirPath}/RS485utilityConfig"
+RS485UtilityConfigfile="RS485UtilityConfigGeneric"
+RS485configureUtilitySection="rs485utilityconfig"
+
+#AI Utility Configuration
+ADCUtilityCfgDirPath="/root/ADCUtilityComponent/etc/Config"
+ADCUtilityCfgPath="${ADCUtilityCfgDirPath}/ADCUtilityConfig"
+ADCUtilityConfigfile="ADCUtilityConfigGeneric"
+ADCconfigureUtilitySection="adcutilityconfig"
+
+#RS232 Utility Configuration
+RS232UtilityCfgDirPath="/root/RS232UtilityComponent/etc/Config"
+RS232UtilityCfgPath="${RS232UtilityCfgDirPath}/RS232utilityConfig"
+RS232UtilityConfigfile="RS232UtilityConfigGeneric"
+RS232configureUtilitySection="rs232utilityconfig"
+
+FixedPacketCfgDirPath="/root/FixedPacketAppComponent/etc/Config"
+FixedPacketconfigureCfgPath="${FixedPacketCfgDirPath}/FixedPacketConfig"
+FixedPacketconfigureFile="FixedPacketConfigGeneric"
+FixedPacketconfigureEventSection="fixedpacketconfig"
+
+#BLC utility configuration
+BLCsrcpath="/etc/config/BLControlSensorEventsActions"
+AIsrcpath="/etc/config/analoginputconfig"
+BLCEventsConfigcfgpath="/root/BLControlAppComponent/etc/Config/BLControlSensorEventsActions.cfg"
+BLClimitscfgpath="/root/BLControlAppComponent/etc/Config/BLControl.cfg";
+NoOfEvents=0
+BLCverify=1
+
+#Data Collector Config
+
+DataCollectorColumnCfgDirPath="/root/DataCollectorAppComponentRS485DIO/etc/Config"
+DataCollectorRS485DatabaseColumnCfgPath="${DataCollectorColumnCfgDirPath}/RS485PerDatabaseColumnsConfig"
+DataCollectorRS485Database="/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db"
+
+DataCollectorconfigureFile="FixedPacketConfigGeneric"
+DataCollectorconfigureEventSection="fixedpacketconfig"
+
+# Data Collector Ctrl config
+
+DataCollectorCtrlCfgDirPath="/root/DataCollectorAppComponentRS485DIO/etc/Config"
+DataCollectorRS485DatabaseCtrlCfgPath="${DataCollectorCtrlCfgDirPath}/RS485PerDatabaseCtrlConfig"
+
+#Source configuration
+
+SourceConfigDirPath="/root/SourceAppComponent/etc/Config"
+SourceConfigPath="${SourceConfigDirPath}/DataSourcesConfig"
+
+SourceconfigureFile="sourceconfig"
+SourceconfigureEventSection="sourceconfig"
+
+#MQTT Configuration
+
+MQTTCfgDirPath="/root/MQTTSenderAppComponent/etc/Config"
+MQTTconfigureCfgPath="${MQTTCfgDirPath}/externalBrokerConfig"
+MQTTExternalPath="${MQTTCfgDirPath}/externalTopics"
+MQTTEventfile="cloudconfig"
+MQTTconfigureEventSection="cloudconfig"
+
+#Software version Configuration
+SoftwareVerCfgDirPath="/root/SoftwareVersionComponent/etc/Config"
+SoftwareVerCfgPath="${SoftwareVerCfgDirPath}/SoftwareVersion"
+SoftwareVerconfigureFile="boardconfig"
+SoftwareVerconfigureEventSection="board"
+
+PortConfigScriptPath="/bin/UpdatePortConfig"
+PortConfigSerialToTCPScriptPath="/bin/SerialToTCP.sh"
+
+#Azure Server Configuration
+AzureCfgDirPath="/root/AzureAppComponent/etc/Config"
+AzureconfigureCfgPath="${AzureCfgDirPath}/CloudConnectAzureIOTHubClient"
+azureEventfile="cloudconfig"
+azureconfigureEventSection="cloudconfig"
+
+tmpfile="/tmp/rs485slave.txt"
+tmpfile2="/tmp/rs485slave2.txt"
+tmpfilers232="/tmp/rs232slave.txt"
+
+unique=0
+unique2=0
+
+usage()
+{
+    cat <<EOF
+    Usage:  ${0##*/} <ACTION>
+
+    ACTIONS:
+    ucitoappcfg  update application configuration using UCI
+EOF
+}
+
+UpdateInterfaces()
+{
+    echo "Updating Interface configuration "
+  
+    config_load "$NetworkInterfaceEventfile"
+    config_get  ModeSettings  "$NetworkInterfaceConfigureEventSection"  ModeSettings
+    if [ "$ModeSettings" = "1" ]
+    then
+    {
+        echo "Mode1=1"
+        echo "Mode2=0"
+    } > "${ModeSettingConfigureCfgPath}.cfg"
+        
+        config_get  eth0   "$NetworkInterfaceConfigureEventSection"  eth0
+        config_get  ecm0   "$NetworkInterfaceConfigureEventSection"  ecm0
+        config_get  eth1  "$NetworkInterfaceConfigureEventSection"  eth1
+        config_get  eth2   "$NetworkInterfaceConfigureEventSection"  eth2
+
+        {
+            echo "eth0=$eth0"
+            echo "ecm0=$ecm0"
+            echo "eth1=$eth1"
+            echo "eth2=$eth2"
+        } > "${ModeOneConfigureCfgPath}.cfg"
+        
+        config_get  Gateway1  "$NetworkInterfaceConfigureEventSection"  Gateway1   
+        if [ "$Gateway1" = "rmnet_data0" ]
+        then
+        {
+		   uci set modem.rmnet_data0.dataenable='1' 2>&1
+           uci set modem.rmnet_data0.enable_gateway='1' 2>&1
+            uci commit
+            ubus call interfacemanager update '{}' 2>&1
+            echo "Rmnet0Enable=\"1\""
+        } > "${RmnetDefaultCfgPath}.cfg"  
+        elif [ "$Gateway1" != "rmnet_data0" ]
+        then
+        {
+            echo "Rmnet0Enable=\"0\""
+        } > "${RmnetDefaultCfgPath}.cfg"  
+        fi
+        
+        #eth0 default gateway
+        ReplaceEthernetEnable="EthernetEnable=\"0\""
+        ResultEthernetEnable=$(grep -w  "EthernetEnable" ${EthernetDefaultGateway})
+        if [ $? -eq 0 ]
+        then
+            sed -i "s/${ResultEthernetEnable}/${ReplaceEthernetEnable}/" "$EthernetDefaultGateway"
+        fi     
+        
+    elif [ "$ModeSettings" = "2" ] 
+    then
+    {
+        echo "Mode1=0"
+        echo "Mode2=1"
+    } > "${ModeSettingConfigureCfgPath}.cfg"
+        
+        config_get  ecm0  "$NetworkInterfaceConfigureEventSection"  ecm0
+        config_get  eth0  "$NetworkInterfaceConfigureEventSection"  eth0
+        config_get  eth2   "$NetworkInterfaceConfigureEventSection"  eth2
+
+        {
+            echo "ecm0=$ecm0"
+            echo "eth0=$eth0"
+            echo "eth2=$eth2"
+        } > "${ModeTwoConfigureCfgPath}.cfg"  
+        
+        config_get  Gateway2  "$NetworkInterfaceConfigureEventSection"  Gateway2 
+        # rmnet_data0 default gateway  
+        if [ "$Gateway2" = "rmnet_data0" ]
+        then
+        {
+			uci set modem.rmnet_data0.dataenable='1' 2>&1
+            uci set modem.rmnet_data0.enable_gateway='1' 2>&1
+            uci commit
+            ubus call interfacemanager update '{}' 2>&1
+            echo "Rmnet0Enable=\"1\""
+        } > "${RmnetDefaultCfgPath}.cfg"  
+        elif [ "$Gateway2" != "rmnet_data0" ]
+        then
+        {
+            echo "Rmnet0Enable=\"0\""
+        } > "${RmnetDefaultCfgPath}.cfg"  
+        fi
+                
+        #eth0 default gateway
+        config_get  EthernetProtocol2             "$NetworkInterfaceConfigureEventSection"  EthernetProtocolMode2Eth1
+        config_get  EthernetClientStaticGateway2  "$NetworkInterfaceConfigureEventSection"  EthernetClientStaticGatewayMode2Eth1
+        config_get  EthernetClientDHCPGateway2    "$NetworkInterfaceConfigureEventSection"  EthernetClientDHCPGatewayMode2Eth1
+        if [ "$EthernetProtocol2"  =  "static" ]
+        then  
+            if [ "$Gateway2" = "eth1" ]
+            then
+            {
+                echo "EthernetEnable=\"1\""
+                echo "EthernetGatewayIP=$EthernetClientStaticGateway2"
+            } > "${EthernetDefaultCfgPath}.cfg"  
+            elif [ "$Gateway2" != "eth1" ]
+            then
+            {
+                echo "EthernetEnable=\"0\""
+                echo "EthernetGatewayIP=$EthernetClientStaticGateway2"
+            } > "${EthernetDefaultCfgPath}.cfg"  
+            fi
+        elif [ "$EthernetProtocol2"  =  "dhcp" ] 
+        then
+            if [ "$Gateway2" = "eth1" ]
+            then
+            {
+                echo "EthernetEnable=\"1\""
+                echo "EthernetGatewayIP=$EthernetClientDHCPGateway2"
+            } > "${EthernetDefaultCfgPath}.cfg"  
+            elif [ "$Gateway2" != "eth1" ]
+            then
+            {
+                echo "EthernetEnable=\"0\""
+                echo "EthernetGatewayIP=$EthernetClientDHCPGateway2"
+            } > "${EthernetDefaultCfgPath}.cfg"  
+            fi
+        fi  
+    fi
+
+     config_get  EthernetMode1  "$NetworkInterfaceConfigureEventSection"  EthernetMode1    
+    #********************************ETHERNET Configurations***********************************************#  
+     #when Ethernet to be configured as static or Dhcp server  
+    if [ "$ModeSettings" = "1" ]  
+    then
+        #****************************************Ethernet0 eth0  configuration in Mode 1 *****************************#
+        config_get  EthernetProtocolMode1Eth0  "$NetworkInterfaceConfigureEventSection"  EthernetProtocolMode1Eth0
+        if [  "$EthernetProtocolMode1Eth0"  =  "static"  ]
+        then
+            config_get  EthernetServerStaticIPMode1Eth0   "$NetworkInterfaceConfigureEventSection"  EthernetServerStaticIPMode1Eth0
+            config_get  EthernetServerNetmaskMode1Eth0    "$NetworkInterfaceConfigureEventSection"  EthernetServerNetmaskMode1Eth0
+            config_get  EthernetServerBroadcastMode1Eth0  "$NetworkInterfaceConfigureEventSection"  EthernetServerBroadcastMode1Eth0
+            {
+                echo "EthernetModeEth0=\"server\""
+                echo "EthernetEth0=\"eth0\""
+                echo "ProtocolEth0=\"$EthernetProtocolMode1Eth0\""
+                echo "StaticIPEth0=$EthernetServerStaticIPMode1Eth0"
+                echo "BroadcastEth0=$EthernetServerBroadcastMode1Eth0"
+                echo "NetmaskEth0=\"$EthernetServerNetmaskMode1Eth0\""
+            } > "${EthernetEth0ConfigureCfgPath}.cfg"
+        elif [  "$EthernetProtocolMode1Eth0"  =  "dhcp"  ]
+        then
+            config_get  EthernetServerDHCPIPMode1Eth0         "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPIPMode1Eth0
+            config_get  EthernetServerDHCPBroadcastMode1Eth0  "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPBroadcastMode1Eth0
+            {
+                echo "EthernetModeEth0=\"server\""
+                echo "EthernetEth0=\"eth0\""
+                echo "ProtocolEth0=\"$EthernetProtocolMode1Eth0\""
+                echo "DHCPIPEth0=$EthernetServerDHCPIPMode1Eth0"
+                echo "DHCPBroadcastEth0=$EthernetServerDHCPBroadcastMode1Eth0"
+            } > "${EthernetEth0ConfigureCfgPath}.cfg"
+            
+        fi
+
+        #****************************************Ethernet1 eth1  configuration in Mode 1 *****************************#
+
+        config_get  EthernetProtocolMode1Eth1  "$NetworkInterfaceConfigureEventSection"  EthernetProtocolMode1Eth1
+        if [  "$EthernetProtocolMode1Eth1"  =  "static"  ]
+        then
+            config_get  EthernetServerStaticIPMode1Eth1   "$NetworkInterfaceConfigureEventSection"  EthernetServerStaticIPMode1Eth1
+            config_get  EthernetServerNetmaskMode1Eth1    "$NetworkInterfaceConfigureEventSection"  EthernetServerNetmaskMode1Eth1
+            config_get  EthernetServerBroadcastMode1Eth1  "$NetworkInterfaceConfigureEventSection"  EthernetServerBroadcastMode1Eth1
+            {
+				
+                echo "EthernetModeEth1=\"server\""
+                echo "EthernetEth1=\"eth1\""
+                echo "ProtocolEth1=\"$EthernetProtocolMode1Eth1\""
+                echo "StaticIPEth1=$EthernetServerStaticIPMode1Eth1"
+                echo "BroadcastEth1=$EthernetServerBroadcastMode1Eth1"
+                echo "NetmaskEth1=\"$EthernetServerNetmaskMode1Eth1\""
+            } > "${EthernetEth1ConfigureCfgPath}.cfg"
+        elif [  "$EthernetProtocolMode1Eth1"  =  "dhcp"  ]
+        then
+            config_get  EthernetServerDHCPIPMode1Eth1         "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPIPMode1Eth1
+            config_get  EthernetServerDHCPBroadcastMode1Eth1  "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPBroadcastMode1Eth1
+            {
+                echo "EthernetModeEth1=\"server\""
+                echo "EthernetEth1=\"eth1\""
+                echo "ProtocolEth1=\"$EthernetProtocolMode1Eth1\""
+                echo "DHCPIPEth1=$EthernetServerDHCPIPMode1Eth1"
+                echo "DHCPBroadcastEth1=$EthernetServerDHCPBroadcastMode1Eth1"
+            } > "${EthernetEth1ConfigureCfgPath}.cfg"
+            
+        fi
+
+        #****************************************Ethernet2 eth2  configuration in Mode 1 *****************************#
+
+        config_get  EthernetProtocolMode1Eth2  "$NetworkInterfaceConfigureEventSection"  EthernetProtocolMode1Eth2
+        if [  "$EthernetProtocolMode1Eth2"  =  "static"  ]
+        then
+            config_get  EthernetServerStaticIPMode1Eth2   "$NetworkInterfaceConfigureEventSection"  EthernetServerStaticIPMode1Eth2
+            config_get  EthernetServerBroadcastMode1Eth2    "$NetworkInterfaceConfigureEventSection"  EthernetServerBroadcastMode1Eth2
+            config_get  EthernetServerNetmaskMode1Eth2  "$NetworkInterfaceConfigureEventSection"  EthernetServerNetmaskMode1Eth2
+            {
+                echo "EthernetModeEth2=\"server\""
+                echo "EthernetEth2=\"eth2\""
+                echo "ProtocolEth2=\"$EthernetProtocolMode1Eth2\""
+                echo "StaticIPEth2=$EthernetServerStaticIPMode1Eth2"
+                echo "BroadcastEth2=$EthernetServerBroadcastMode1Eth2"
+                echo "NetmaskEth2=\"$EthernetServerNetmaskMode1Eth2\""
+            } > "${EthernetEth2ConfigureCfgPath}.cfg"
+        elif [  "$EthernetProtocolMode1Eth2"  =  "dhcp"  ]
+        then
+            config_get  EthernetServerDHCPIPMode1Eth2         "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPIPMode1Eth2
+            config_get  EthernetServerDHCPBroadcastMode1Eth2  "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPBroadcastMode1Eth2
+            {
+                echo "EthernetModeEth2=\"server\""
+                echo "EthernetEth2=\"eth2\""
+                echo "ProtocolEth2=\"$EthernetProtocolMode1Eth2\""
+                echo "DHCPIPEth2=$EthernetServerDHCPIPMode1Eth2"
+                echo "DHCPBroadcastEth2=$EthernetServerDHCPBroadcastMode1Eth2"
+            } > "${EthernetEth2ConfigureCfgPath}.cfg"
+            
+        fi
+        
+        sed -i '/gateway/d' "$Interface"
+        config_get  BridgeEthernetEth0Mode1   "$NetworkInterfaceConfigureEventSection"  BridgeEthernetEth0Mode1
+        config_get  BridgeEthernetEth1Mode1   "$NetworkInterfaceConfigureEventSection"  BridgeEthernetEth1Mode1
+        config_get  BridgeEthernetEth2Mode1   "$NetworkInterfaceConfigureEventSection"  BridgeEthernetEth2Mode1
+        config_get  BridgeEthernetStaticIP    "$NetworkInterfaceConfigureEventSection"  BridgeEthernetStaticIP
+        config_get  BridgeEthernetNetmask     "$NetworkInterfaceConfigureEventSection"  BridgeEthernetNetmask
+
+                ReplaceInterfacesEth0ConfigFile="#source /etc/network/eth0.cfg"
+                ReplaceInterfacesEth1ConfigFile="#source /etc/network/eth1.cfg"
+                ReplaceInterfacesEth2ConfigFile="#source /etc/network/eth2.cfg"
+
+                  {
+                    echo "ProtocolbrEth0=\"$BridgeEthernetEth0Mode1\""
+                    echo "ProtocolbrEth1=\"$BridgeEthernetEth1Mode1\""
+                    echo "ProtocolbrEth2=\"$BridgeEthernetEth2Mode1\""
+                    echo "StaticIP=$BridgeEthernetStaticIP"
+                    echo "Netmask=$BridgeEthernetNetmask"	
+	          } > "${BridgeConfigureCfgPath}.cfg"
+	            
+    fi
+    
+   # when Ethernet to be configured as static or Dhcp client
+    if [ "$ModeSettings" = "2" ] 
+    then
+  #***************************************Ethernet0 eth0 Configuration in Mode 2********************************************************
+        config_get  EthernetProtocolMode2Eth0  "$NetworkInterfaceConfigureEventSection"  EthernetProtocolMode2Eth0
+        if [  "$EthernetProtocolMode2Eth0"  =  "static"  ]
+        then
+            config_get  EthernetServerStaticIPMode2Eth0   "$NetworkInterfaceConfigureEventSection"  EthernetServerStaticIPMode2Eth0
+            config_get  EthernetServerNetmaskMode2Eth0    "$NetworkInterfaceConfigureEventSection"  EthernetServerNetmaskMode2Eth0
+            config_get  EthernetServerBroadcastMode2Eth0  "$NetworkInterfaceConfigureEventSection"  EthernetServerBroadcastMode2Eth0
+            {
+                echo "EthernetModeEth0=\"server\""
+                echo "EthernetEth0=\"eth0\""
+                echo "ProtocolEth0=\"$EthernetProtocolMode2Eth0\""
+                echo "StaticIPEth0=$EthernetServerStaticIPMode2Eth0"
+                echo "BroadcastEth0=$EthernetServerBroadcastMode2Eth0"
+                echo "NetmaskEth0=\"$EthernetServerNetmaskMode2Eth0\""
+            } > "${EthernetEth0ConfigureCfgPath}.cfg"
+        elif [  "$EthernetProtocolMode2Eth0"  =  "dhcp"  ]
+        then
+            config_get  EthernetServerDHCPIPMode2Eth0         "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPIPMode2Eth0
+            config_get  EthernetServerDHCPBroadcastMode2Eth0  "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPBroadcastMode2Eth0
+            {
+                echo "EthernetModeEth0=\"server\""
+                echo "EthernetEth0=\"eth0\""
+                echo "ProtocolEth0=\"$EthernetProtocolMode2Eth0\""
+                echo "DHCPIPEth0=$EthernetServerDHCPIPMode2Eth0"
+                echo "DHCPBroadcastEth0=$EthernetServerDHCPBroadcastMode2Eth0"
+            } > "${EthernetEth0ConfigureCfgPath}.cfg"
+            
+        fi
+   
+
+        #*****************************************Ethernet1 eth1 configuration in Mode2********************************************#
+        config_get  EthernetProtocolMode2Eth1  "$NetworkInterfaceConfigureEventSection"  EthernetProtocolMode2Eth1
+        config_get  StaticIP           "$NetworkInterfaceConfigureEventSection"  EthernetClientStaticIPMode2Eth1
+        config_get  Netmask            "$NetworkInterfaceConfigureEventSection"  EthernetClientStaticNetmaskMode2Eth1
+        config_get  gateway            "$NetworkInterfaceConfigureEventSection"  Gateway2
+        if [ "$EthernetProtocolMode2Eth1"  =  "static" ]
+        then  
+        {
+            echo "EthernetMode=\"clientstatic\""    
+        } > "${EthernetEth1ConfigureCfgPath}.cfg"
+                  
+            ReplaceifaceEth1="iface eth1 inet static"
+            ResultifaceEth1=$(grep -w  "iface eth1 inet dhcp" ${InterfaceEth1})
+            if [ $? -eq 0 ]
+            then
+                sed -i "s/${ResultifaceEth1}/${ReplaceifaceEth1}/" "$InterfaceEth1"
+                ResultIPaddress=$(grep -w "address"  ${InterfaceEth1})
+                if [ $? -eq 1 ]                                            
+                then       
+                    Resultnetmask=$(grep -w "netmask"  ${InterfaceEth1})
+                    if [ $? -eq 1 ]                                            
+                    then
+                        sed -i '/^iface eth1 inet static$/ s:$:\naddress\nnetmask:'  "$InterfaceEth1"     
+                    fi
+                fi                                                     
+            fi                                             
+                    
+            #Updating the value of address in /etc/network/$InterfaceEth0
+            ReplaceIPaddress="address  $StaticIP"
+            ResultIPaddress=$(grep -w "address"  ${InterfaceEth1})
+            if [ $? -eq 0 ]
+            then
+                sed -i "s/${ResultIPaddress}/${ReplaceIPaddress}/" "$InterfaceEth1"
+            fi
+    
+            #Updating the value of netmask in /etc/network/$InterfaceEth1
+            ReplaceNetmask="netmask  $Netmask"
+            ResultNetmask=$(grep -w  "netmask"  ${InterfaceEth1})
+            if [ $? -eq 0 ]
+            then
+                sed  -i "s/${ResultNetmask}/${ReplaceNetmask}/" "$InterfaceEth1"
+            fi  
+            
+            config_get  Gateway2                      "$NetworkInterfaceConfigureEventSection"  Gateway2
+            config_get  Gateway3                      "$NetworkInterfaceConfigureEventSection"  Gateway3
+            config_get  EthernetClientStaticGatewayMode2Eth1  "$NetworkInterfaceConfigureEventSection"  EthernetClientStaticGatewayMode2Eth1
+            if [ "$Gateway2"  =  "eth1" ] 
+            then
+                ResultGateway=$(grep -w  "gateway"  ${InterfaceEth1})
+                if [ $? -eq 1 ]
+                then
+                    sed -i '/netmask/i\gateway' "$InterfaceEth1" 
+                fi
+                ReplaceGateway="gateway  $EthernetClientStaticGatewayMode2Eth1"
+                ResultGateway=$(grep -w  "gateway"  ${InterfaceEth1})
+                if [ $? -eq 0 ]
+                then
+                    sed  -i "s/${ResultGateway}/${ReplaceGateway}/" "$InterfaceEth1"
+                fi
+                uci set modem.rmnet_data0.dataenable='0' 2>&1
+               uci set modem.rmnet_data0.enable_gateway='0' 2>&1
+                uci commit
+                ubus call interfacemanager update '{}' 2>&1
+            elif [ "$Gateway2"  !=  "eth1" ] 
+            then    
+                sed -i '/gateway/d' "$InterfaceEth1"
+            fi
+        elif [ "$EthernetProtocolMode2Eth1"  =  "dhcp" ]
+        then
+        {
+            echo "EthernetMode=\"client\""  
+        } > "${EthernetEth1ConfigureCfgPath}.cfg"
+
+            config_get  Gateway2                      "$NetworkInterfaceConfigureEventSection"  Gateway2
+            config_get  Gateway3                      "$NetworkInterfaceConfigureEventSection"  Gateway3
+            config_get  EthernetClientDHCPGatewayMode2Eth1  "$NetworkInterfaceConfigureEventSection"  EthernetClientDHCPGatewayMode2Eth1
+            if [ "$Gateway2"  =  "eth1" ] 
+            then
+                ResultGateway=$(grep -w  "gateway"  ${InterfaceEth1})
+                if [ $? -eq 1 ]
+                then
+                    sed -i '/netmask/i\gateway' "$Interface" 
+                fi
+                ReplaceGateway="gateway  $EthernetClientDHCPGatewayMode2Eth1"
+                ResultGateway=$(grep -w  "gateway"  ${InterfaceEth1})
+                if [ $? -eq 0 ]
+                then
+                    sed  -i "s/${ResultGateway}/${ReplaceGateway}/" "$InterfaceEth1"
+                fi
+                uci set modem.rmnet_data0.dataenable='0' 2>&1
+                uci set modem.rmnet_data0.enable_gateway='0' 2>&1
+                uci commit
+                ubus call interfacemanager update '{}' 2>&1
+            fi 
+            ReplaceifaceEth1="iface eth1 inet dhcp"
+            ResultifaceEth1=$(grep -w  "iface eth1 inet"  ${InterfaceEth1})    
+            if [ $? -eq 0 ]
+            then
+                sed  -i "s/${ResultifaceEth1}/${ReplaceifaceEth1}/" "$InterfaceEth1"
+            fi
+            
+            Resultaddress=$(grep -w "#address" ${InterfaceEth1})                   
+            if [ $? -eq 0 ]                                                     
+            then                                                                        
+                echo $Resultaddress                                                 
+            else                                                                                                                                        
+                sed -i  "s/address/#address/"  "$InterfaceEth1"
+                sed -i  "s/netmask/#netmask/"  "$InterfaceEth1"
+                sed -i  '/gateway/d' "$Interface"
+            fi  
+        fi   
+        #***************************************Ethernet2 eth2 configuration in Mode2************************************************#
+         config_get  EthernetProtocolMode2Eth2  "$NetworkInterfaceConfigureEventSection"  EthernetProtocolMode2Eth2
+        if [  "$EthernetProtocolMode2Eth2"  =  "static"  ]
+        then
+            config_get  EthernetServerStaticIPMode2Eth2   "$NetworkInterfaceConfigureEventSection"  EthernetServerStaticIPMode2Eth2
+            config_get  EthernetServerNetmaskMode2Eth2    "$NetworkInterfaceConfigureEventSection"  EthernetServerNetmaskMode2Eth2
+            config_get  EthernetServerBroadcastMode2Eth2  "$NetworkInterfaceConfigureEventSection"  EthernetServerBroadcastMode2Eth2
+            {
+                echo "EthernetModeEth2=\"server\""
+                echo "EthernetEth2=\"eth2\""
+                echo "ProtocolEth2=\"$EthernetProtocolMode2Eth2\""
+                echo "StaticIPEth2=$EthernetServerStaticIPMode2Eth2"
+                echo "BroadcastEth2=$EthernetServerBroadcastMode2Eth2"
+                echo "NetmaskEth2=\"$EthernetServerNetmaskMode2Eth2\""
+            } > "${EthernetEth2ConfigureCfgPath}.cfg"
+        elif [  "$EthernetProtocolMode2Eth2"  =  "dhcp"  ]
+        then
+            config_get  EthernetServerDHCPIPMode2Eth2         "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPIPMode2Eth2
+            config_get  EthernetServerDHCPBroadcastMode2Eth2  "$NetworkInterfaceConfigureEventSection"  EthernetServerDHCPBroadcastMode2Eth2
+            {
+                echo "EthernetModeEth2=\"server\""
+                echo "EthernetEth2=\"eth2\""
+                echo "ProtocolEth2=\"$EthernetProtocolMode2Eth2\""
+                echo "DHCPIPEth2=$EthernetServerDHCPIPMode2Eth2"
+                echo "DHCPBroadcastEth2=$EthernetServerDHCPBroadcastMode2Eth2"
+            } > "${EthernetEth2ConfigureCfgPath}.cfg"
+            
+        fi  
+        
+        config_get  BridgeEthernetEth0Mode2   "$NetworkInterfaceConfigureEventSection"  BridgeEthernetEth0Mode2
+        config_get  BridgeEthernetEth2Mode2   "$NetworkInterfaceConfigureEventSection"  BridgeEthernetEth2Mode2
+        config_get  BridgeEthernetStaticIPMode2    "$NetworkInterfaceConfigureEventSection"  BridgeEthernetStaticIPMode2
+        config_get  BridgeEthernetNetmaskMode2     "$NetworkInterfaceConfigureEventSection"  BridgeEthernetNetmaskMode2
+
+                ReplaceInterfacesEth0ConfigFile="#source /etc/network/eth0.cfg"
+                ReplaceInterfacesEth1ConfigFile="#source /etc/network/eth1.cfg"
+                ReplaceInterfacesEth2ConfigFile="#source /etc/network/eth2.cfg"
+
+                  {
+                    echo "ProtocolbrEth0Mode2=\"$BridgeEthernetEth0Mode2\""
+                    echo "ProtocolbrEth2Mode2=\"$BridgeEthernetEth2Mode2\""
+                    echo "StaticIPMode2=$BridgeEthernetStaticIPMode2"
+                    echo "NetmaskMode2=$BridgeEthernetNetmaskMode2"	
+	          } > "${BridgeConfigureCfgPathMode2}.cfg"
+        
+    fi             
+}
+
+CronReadListValues()
+{
+    TmpVal=""
+    local value="$1"
+    local VarName="$2"
+    TmpVal="$(eval echo '$'ListVal"$VarName")"
+    eval ListVal"$VarName"="${TmpVal}${value},"
+}
+
+UpgradeAutoUpgrade()
+{
+    echo "Updating UpgradeManager cron configuration"
+    echo "Updating 'crontab' configurations"
+    config_load UpgradeManagerGeneric
+    config_get  enable  "global" enable
+    if [ "$enable" =  "1" ]
+    then
+    config_list_foreach "$UpgradeManagerGenericSection" Hours CronReadListValues Hours
+    config_list_foreach "$UpgradeManagerGenericSection" Minutes CronReadListValues Minutes
+    config_list_foreach "$UpgradeManagerGenericSection" DayOfWeek CronReadListValues DayOfWeek
+    config_list_foreach "$UpgradeManagerGenericSection" DayOfMonth CronReadListValues DayOfMonth
+    config_list_foreach "$UpgradeManagerGenericSection" Month CronReadListValues Month
+    
+    ListValHours=$(echo "$ListValHours" | sed s'/,$//')
+    ListValMinutes=$(echo "$ListValMinutes" | sed s'/,$//')
+    ListValDayOfWeek=$(echo "$ListValDayOfWeek" | sed s'/,$//')
+    echo "ListValDayOfWeek=$ListValDayOfWeek"
+    ListValDayOfMonth=$(echo "$ListValDayOfMonth" | sed s'/,$//')
+    ListValMonth=$(echo "$ListValMonth" | sed s'/,$//')
+    
+	elif [ "$enable" = "0" ]
+    then 
+	    ListValHours=" "
+	    ListValMinutes=" "
+	    ListValDayOfWeek=" "
+	    ListValDayOfMonth=" "
+	    ListValMonth=" "
+	    a1RebootType=" "
+	    sed -i '/AutoUpgradeAppGateway.sh/d' /etc/crontabs/root
+    fi
+    # add entry to cron file
+    sed -i '/AutoUpgradeAppGateway.sh/d' /etc/crontabs/root
+    echo "$ListValMinutes $ListValHours $ListValDayOfMonth $ListValMonth $ListValDayOfWeek  /bin/AutoUpgradeAppGateway.sh" >> /etc/crontabs/root
+	/etc/init.d/cron restart
+    sleep 2
+}
+
+
+CronReadListValuesMaintenanceReboot()
+{
+	 TmpVal=""
+    local value="$1"
+    local VarName="$2"
+    TmpVal="$(eval echo '$'ListValue"$VarName")"
+    eval ListValue"$VarName"="${TmpVal}${value},"
+	
+}
+
+UpgradeMaintenanceReboot()
+{
+    echo "Updating Maintenance Reboot  cron configuration"
+    echo "Updating '/etc/cron.d/interfacemanager' configurations"
+    config_load "$UpgradeManagerMaintenaceRebootGenericFile" 
+    config_get  enable  "$UpgradeManagerMaintenaceRebootGenericSection" enable
+    if [ "$enable" =  "1" ]
+    then
+        config_list_foreach "$UpgradeManagerMaintenaceRebootGenericSection" Hours CronReadListValuesMaintenanceReboot Hours
+	    config_list_foreach "$UpgradeManagerMaintenaceRebootGenericSection" Minutes CronReadListValuesMaintenanceReboot Minutes
+	    config_list_foreach "$UpgradeManagerMaintenaceRebootGenericSection" DayOfWeek CronReadListValuesMaintenanceReboot DayOfWeek
+	    config_list_foreach "$UpgradeManagerMaintenaceRebootGenericSection" DayOfMonth CronReadListValuesMaintenanceReboot DayOfMonth
+	    config_list_foreach "$UpgradeManagerMaintenaceRebootGenericSection" Month CronReadListValuesMaintenanceReboot Month
+	    config_get  SelectReboot  "$UpgradeManagerMaintenaceRebootGenericSection" SelectReboot
+	    
+	    if [ "$SelectReboot" =  "reboot" ]
+	    then
+	        config_get  RebootType  "$UpgradeManagerMaintenaceRebootGenericSection" RebootType
+	    elif [ "$SelectReboot" =  "none" ]
+	    then 
+	        RebootType=""
+	    fi
+    
+	    if [ "$RebootType" = "hardware" ]
+	    then 
+	        RebootType="Hardware"
+	    elif [  "$RebootType" = "system" ]
+	    then 
+	        RebootType="Software"
+	    fi
+    
+	    ListValHours=$(echo "$ListValueHours" | sed s'/,$//')
+	    ListValMinutes=$(echo "$ListValueMinutes" | sed s'/,$//')
+	    ListValDayOfWeek=$(echo "$ListValueDayOfWeek" | sed s'/,$//')
+	    ListValDayOfMonth=$(echo "$ListValueDayOfMonth" | sed s'/,$//')
+	    ListValMonth=$(echo "$ListValueMonth" | sed s'/,$//')
+	    
+    elif [ "$enable" = "0" ]
+    then 
+	    ListValHours=" "
+	    ListValMinutes=" "
+	    ListValDayOfWeek=" "
+	    ListValDayOfWeekfinal=" "
+	    ListValDayOfMonth=" "
+	    ListValMonth=" "
+	    a1RebootType=" "
+    fi
+    
+    # add entry to cron file
+    sed -i '/MaintenanceReboot.sh/d' /etc/crontabs/root
+    echo "$ListValMinutes $ListValHours $ListValDayOfMonth $ListValMonth $ListValDayOfWeekfinal /bin/MaintenanceReboot.sh $RebootType" >> /etc/crontabs/root
+    
+    /etc/init.d/crond restart
+    sleep 2
+}
+
+
+UpdateEnableGateway()
+{
+  "${InitEthernet}" start	
+  "${IPTablesMode}" start
+  "${EnableDefaultGateway}" start  
+   
+}
+
+# function to extract slave address from a section
+get_slave_address() {
+	
+    local ValidRS485DeviceConfigSection="$1"  
+     # get the value of the SlaveAddress option in the current section
+   config_get SlaveAddress   "$ValidRS485DeviceConfigSection"  SlaveAddress
+   config_get InterfaceID   "$ValidRS485DeviceConfigSection"  InterfaceID                                                                                                                                                  
+   #mbusdEnable=$(uci get modbusconfig.modbusconfig.mbusdEnable)
+   #device=$(uci get modbusconfig.modbusconfig.device)
+    
+     if [ "$InterfaceID" = "1" ]                                                                       
+     then  
+          NoOfRS485DeviceCount=$((NoOfRS485DeviceCount + 1))
+           # write the slave ID to the temporary file
+          echo $SlaveAddress >> $tmpfile
+     #fi
+          
+     elif [ "$InterfaceID" = "2" ]                                                                       
+     then
+          NoOfRS485DeviceCount2=$((NoOfRS485DeviceCount2 + 1))
+		 # write the slave ID to the temporary file
+		  echo $SlaveAddress >> $tmpfile2
+     fi	
+ 
+  
+ 
+}
+
+ValidateRS485Config() {
+	 rm -rf $tmpfile	
+	ser2netEnable1=$(uci get portconfig.portconfig.Ser2netEnable1)
+    EnableRS4851=$(uci get sourceconfig.sourceconfig.EMeterRS485Line1DataSourceEnable)
+	ser2netEnable2=$(uci get portconfig.portconfig.Ser2netEnable2)
+    EnableRS4852=$(uci get sourceconfig.sourceconfig.EMeterRS485Line2DataSourceEnable)
+    
+     if [ ! -f /tmp/updateconfigoutput.txt ]; then
+		    touch /tmp/updateconfigoutput.txt
+		fi
+		
+    if [ "$ser2netEnable1" -eq 1 ] && [ "$EnableRS4851" -eq 1 ] || [ "$ser2netEnable1" -eq 0 ] && [ "$EnableRS4851" -eq 1 ] || [ "$ser2netEnable1" -eq 3 ] && [ "$EnableRS4851" -eq 1 ] || [ "$ser2netEnable1" -eq 4 ] && [ "$EnableRS4851" -eq 1 ]
+    then
+       	echo "Please verify Transparent Serial Port 1 Settings or Source Configuration" > /tmp/updateconfigoutput.txt
+    	return 1
+    elif [ "$ser2netEnable2" -eq 1 ] && [ "$EnableRS4852" -eq 1 ] || [ "$ser2netEnable2" -eq 0 ] && [ "$EnableRS4852" -eq 1 ] || [ "$ser2netEnable2" -eq 3 ] && [ "$EnableRS4852" -eq 1 ] || [ "$ser2netEnable2" -eq 4 ] && [ "$EnableRS4852" -eq 1 ]
+     then
+       	echo "Please verify Transparent Serial Port 2 Settings or Source Configuration" > /tmp/updateconfigoutput.txt
+    	return 1	
+    else
+	config_load "$RS485DeviceconfigureFile"
+    config_foreach get_slave_address RS485Config
+    unique=$(cat $tmpfile | tr ' ' '\n' | sort -u | wc -l)
+    unique2=$(cat $tmpfile2 | tr ' ' '\n' | sort -u | wc -l)
+	  if [ $unique -le 32 ] && [ $unique2 -le 32 ]
+	  then
+	    echo "Number of unique numbers is $unique, which is less than or equal to 32"
+	    return 0 # success
+	  else
+	    echo "Number of unique numbers is $unique, which is greater than 32"
+	    return 1 # failure
+	  fi
+	fi  
+    
+}
+
+
+get_RS232slave_address() {
+	
+    local ValidRS232DeviceConfigSection="$1"                                                                                                                                                    
+    NoOfvalidRS232DeviceCount=$((NoOfvalidRS232DeviceCount + 1))
+     	
+  # get the value of the SlaveAddress option in the current section
+   config_get SlaveAddress   "$ValidRS232DeviceConfigSection"  SlaveAddress
+  
+  # write the slave ID to the temporary file
+  echo $SlaveAddress >> $tmpfilers232
+}
+
+ValidateRS232Config() 
+{
+	 rm -rf $tmpfilers2
+    ser2netEnable2=$(uci get portconfig.portconfig.Ser2netEnable2)
+    EnableRS232=$(uci get sourceconfig.sourceconfig.EMeterRS232Line1DataSourceEnable)
+    
+    if [ ! -f /tmp/updateconfigoutput.txt ]; then
+		    touch /tmp/updateconfigoutput.txt
+		fi 
+		
+    if [ "$ser2netEnable2" -eq 1 ] && [ "$EnableRS232" -eq 1 ] || [ "$ser2netEnable2" -eq 0 ] && [ "$EnableRS232" -eq 1 ] || [ "$ser2netEnable2" -eq 3 ] && [ "$EnableRS232" -eq 1 ] || [ "$ser2netEnable2" -eq 4 ] && [ "$EnableRS232" -eq 1 ]
+     then
+       	echo "Please verify Transparent Serial Port 2 Settings" > /tmp/updateconfigoutput.txt
+    	return 1
+    #else	
+		#config_load "$RS232DeviceconfigureFile"
+	    #config_foreach get_RS232slave_address RS232Config
+	    #uniquers232=$(cat $tmpfilers232 | tr ' ' '\n' | sort -u | wc -l)
+	     #if [ $uniquers232 -eq 1 ]; then
+		    #echo "Number of unique RS232 numbers is $uniquers232, which is equal to 1"
+		    #return 0 # success
+		 #else
+		    #echo "Number of unique RS232 numbers is $uniquers232, which is greater than 1"
+		    #return 1 # failure
+         #fi
+    fi     
+    
+}
+
+
+RS485DeviceConfigUpdate() {
+    local RS485DeviceConfigSection="$1"
+    NoOfDeviceCount=$((NoOfDeviceCount + 1))
+    NumberOfRegisterMaps=0
+
+    echo "no of device count is $NoOfDeviceCount" 
+
+
+    config_get startregisteru "$RS485DeviceConfigSection" startregisteru
+    config_get countregister "$RS485DeviceConfigSection" countregister
+    config_get Baudrate "$RS485DeviceConfigSection" Baudrate
+    config_get NoOfStopbits "$RS485DeviceConfigSection" NoOfStopbits
+    config_get Parity "$RS485DeviceConfigSection" Parity
+    config_get SlaveAddress "$RS485DeviceConfigSection" serialslaveid
+    config_get Databits "$RS485DeviceConfigSection" Databits
+    config_get serialport1 "$RS485DeviceConfigSection" serialport1
+    config_get MeterID "$RS485DeviceConfigSection" MeterID
+    config_get USBFilename "$RS485DeviceConfigSection" USBFilename
+    config_get functioncode "$RS485DeviceConfigSection" functioncode
+    config_get serialdeviceid "$RS485DeviceConfigSection" serialdeviceid
+    #config_get ModbusProtocol "$RS485DeviceConfigSection" ModbusProtocol
+    # config_get registername "$RS485DeviceConfigSection" registername
+    # config_get Datatype "$RS485DeviceConfigSection" Datatype
+    # config_get startregister "$RS485DeviceConfigSection" startregister
+    # config_get registercount "$RS485DeviceConfigSection" registercount
+    config_get EEnable "$RS485DeviceConfigSection" EEnable
+    #config_get optiondevice "$RS485DeviceConfigSection" optiondevice
+    config_get devicetype "$RS485DeviceConfigSection" devicetype
+    config_get tagNameInput "$RS485DeviceConfigSection" tagNameInput
+    config_get TagDatatype "$RS485DeviceConfigSection" TagDatatype
+    config_get registerlen "$RS485DeviceConfigSection" registerlen
+    config_get defaultchecked "$RS485DeviceConfigSection" defaultchecked
+    config_get Customchecked "$RS485DeviceConfigSection" Customchecked
+    config_get protocol "$RS485DeviceConfigSection" protocol
+
+    #config_get mapping_type "$RS485DeviceConfigSection" mapping_typ
+
+
+    Ser2netEnable1=$(uci get portconfig.portconfig.Ser2netEnable1)
+    Ser2netEnable2=$(uci get portconfig.portconfig.Ser2netEnable2)
+    device=$(uci get portconfig.portconfig.device)
+    MultiblockEnable=$(uci get FixedPacketConfigGeneric.fixedpacketconfig.MultiblockEnable)
+
+   
+    if [ "$serialport1" = "1" ]; then
+        if [ "$Ser2netEnable1" = "1" ] && [ "$device" != "/dev/ttyS1" ] || [ "$Ser2netEnable1" = "0" ] && [ "$device" != "/dev/ttyS1" ] || [ "$Ser2netEnable1" = "2" ]; then
+            NoOfDeviceCount1=$((NoOfDeviceCount1 + 1))
+            {
+                echo "#Energy Meter $NoOfDeviceCount1"
+                echo "Model_${NoOfDeviceCount1}=\"$serialdeviceid\""
+                echo "EnergyMeterType_${NoOfDeviceCount1}=0"
+                echo "SlaveID_${NoOfDeviceCount1}=$SlaveAddress"
+                echo "Baudrate_${NoOfDeviceCount1}=$Baudrate"
+                echo "Parity_${NoOfDeviceCount1}=$Parity"
+                echo "Databits_${NoOfDeviceCount1}=$Databits"
+                echo "Stopbits_${NoOfDeviceCount1}=$NoOfStopbits"
+                echo "StartRegister_${NoOfDeviceCount1}=$startregisteru"
+                echo "NumberOfRegisters_${NoOfDeviceCount1}=$countregister"
+                echo "FunctionalCode_${NoOfDeviceCount1}=$functioncode"
+                echo "InterfaceID_${NoOfDeviceCount1}=$serialport1"
+                echo "MeterID_${NoOfDeviceCount1}=$MeterID"
+                #echo "NumberOfRegisterMaps_${NoOfDeviceCount1}=$registerlen"
+                echo "SerialPort_${NoOfDeviceCount1}=\"/dev/ttyS1\""
+                echo "EEnable_${NoOfDeviceCount1}=$EEnable"
+                #echo "optiondevice_${NoOfDeviceCount1}=\"$optiondevice\""
+               # echo "devicetype_${NoOfDeviceCount1}=\"$devicetype\""
+                #echo "tagNameInput_${NoOfDeviceCount1}=\"$tagNameInput\""
+                #echo "TagDatatype_${NoOfDeviceCount1}=$TagDatatype"
+               # echo "mapping_type_${NoOfDeviceCount1}=$mapping_type"
+               
+               
+                #echo "defaultchecked_${NoOfDeviceCount1}=$defaultchecked"
+				#echo "Customchecked_${NoOfDeviceCount1}=$Customchecked"
+				
+				
+				
+			if [ "$MultiblockEnable" = "0" ]; then
+				 if [ "$defaultchecked" = "1" ]; then
+					 config_get registerlen "$RS485DeviceConfigSection" registerlen
+					 NumberOfRegisterMaps=1
+
+					 echo "NumberOfRegisterMaps_${NoOfDeviceCount1}=1"
+					 echo "Key_${NoOfDeviceCount1}_${NumberOfRegisterMaps}=\"$tagNameInput\""
+                                         echo "DataType_${NoOfDeviceCount1}_${NumberOfRegisterMaps}=$TagDatatype"
+					 echo "SelectRegister_${NoOfDeviceCount1}_${NumberOfRegisterMaps}=$startregisteru"
+					 echo "RegisterCount_${NoOfDeviceCount1}_${NumberOfRegisterMaps}=$countregister"
+               
+				 fi
+				      
+				 else
+				 if [ "$defaultchecked" = "1" ]; then
+					 config_get registerlen "$RS485DeviceConfigSection" registerlen
+					 NumberOfRegisterMaps=1
+					 echo "NumberOfRegisterMaps_${NoOfDeviceCount1}=$registerlen"
+					 echo "Key_${NoOfDeviceCount1}_${NumberOfRegisterMaps}=\"$tagNameInput\""
+                                         echo "DataType_${NoOfDeviceCount1}_${NumberOfRegisterMaps}=$TagDatatype"
+					 echo "SelectRegister_${NoOfDeviceCount1}_${NumberOfRegisterMaps}=$startregisteru"
+					 echo "RegisterCount_${NoOfDeviceCount1}_${NumberOfRegisterMaps}=$countregister"
+                    
+				fi
+				 
+		 fi
+				 
+               if [ "$protocol" = "TCP" ]; then
+                    config_get CommIp "$RS485DeviceConfigSection" CommIp
+                    config_get CommPort "$RS485DeviceConfigSection" CommPort
+                    config_get commT "$RS485DeviceConfigSection" commT
+                    echo "CommType_${NoOfDeviceCount1}=2"
+                    echo "CommIP_${NoOfDeviceCount1}=\"$CommIp\""
+                    echo "CommPort_${NoOfDeviceCount1}=$CommPort"
+                    echo "CommTimeout_${NoOfDeviceCount1}=$commT"
+                else
+                    echo "CommType_${NoOfDeviceCount1}=1"
+                    echo "CommIP_${NoOfDeviceCount1}=\"0.0.0.0\""
+                    echo "CommPort_${NoOfDeviceCount1}=0"
+                    echo "CommTimeout_${NoOfDeviceCount1}=0"
+ 
+                fi
+
+                if [ "$MultiblockEnable" = "0" ]; then
+                    echo "NoOfBlocks1_$NoOfDeviceCount1=1"
+                   
+					
+						 if [ "$Customchecked" = "1" ]; then
+								 
+							for map_index in $(seq 1 $registerlen); do
+								local Key
+								local SelectRegister
+								local RegisterCount
+								local DataType
+
+								registername=$(uci get registerconfig.${RS485DeviceConfigSection}.registername_$((map_index-1)))
+                                startregister=$(uci get registerconfig.${RS485DeviceConfigSection}.startregister_$((map_index-1)))
+                                registercount=$(uci get registerconfig.${RS485DeviceConfigSection}.registercount_$((map_index-1)))
+                                Datatype=$(uci get registerconfig.${RS485DeviceConfigSection}.Datatype_$((map_index-1)))
+								
+
+								echo "Key_${NoOfDeviceCount1}_${map_index}=\"$registername\"" >> "${RS485DeviceconfigureCfgPath}.cfg"
+								echo "SelectRegister_${NoOfDeviceCount1}_${map_index}=$startregister" >> "${RS485DeviceconfigureCfgPath}.cfg"
+								echo "RegisterCount_${NoOfDeviceCount1}_${map_index}=$registercount" >> "${RS485DeviceconfigureCfgPath}.cfg"
+								echo "DataType_${NoOfDeviceCount1}_${map_index}=$Datatype" >> "${RS485DeviceconfigureCfgPath}.cfg"
+							done 
+							echo "NumberOfRegisterMaps_${NoOfDeviceCount1}=$registerlen"
+						fi  
+                else
+                
+                             echo "NoOfBlocks1_$NoOfDeviceCount1=1"
+                   
+					
+						 if [ "$Customchecked" = "1" ]; then
+								 
+							for map_index in $(seq 1 $registerlen); do
+								local Key
+								local SelectRegister
+								local RegisterCount
+								local DataType
+
+								registername=$(uci get registerconfig.${RS485DeviceConfigSection}.registername_$((map_index-1)))
+                                startregister=$(uci get registerconfig.${RS485DeviceConfigSection}.startregister_$((map_index-1)))
+                                registercount=$(uci get registerconfig.${RS485DeviceConfigSection}.registercount_$((map_index-1)))
+                                Datatype=$(uci get registerconfig.${RS485DeviceConfigSection}.Datatype_$((map_index-1)))
+
+								echo "Key_${NoOfDeviceCount1}_${map_index}=\"$registername\"" >> "${RS485DeviceconfigureCfgPath}.cfg"
+								echo "SelectRegister_${NoOfDeviceCount1}_${map_index}=$startregister" >> "${RS485DeviceconfigureCfgPath}.cfg"
+								echo "RegisterCount_${NoOfDeviceCount1}_${map_index}=$registercount" >> "${RS485DeviceconfigureCfgPath}.cfg"
+								echo "DataType_${NoOfDeviceCount1}_${map_index}=$Datatype" >> "${RS485DeviceconfigureCfgPath}.cfg"
+							done 
+							echo "NumberOfRegisterMaps_${NoOfDeviceCount1}=$registerlen"
+						fi  
+						
+						fi
+
+					 echo ""
+					 echo ""
+
+
+            } >> "${RS485DeviceconfigureCfgPath}.cfg"
+
+            sed -i 's/\s*$//' "${RS485DeviceconfigureCfgPath}.cfg"
+            sed -i -e '/=$/d' "${RS485DeviceconfigureCfgPath}.cfg"
+        fi
+    fi
+
+    if [ "$serialport1" = "2" ]; then
+        echo "Port 2 Config"
+        if [ "$Ser2netEnable2" = "1" ] && [ "$device" != "/dev/ttyS2" ] || [ "$Ser2netEnable2" = "0" ] && [ "$device" != "/dev/ttyS2" ] || [ "$Ser2netEnable2" = "2" ]; then
+            echo "Port 2 Config needs to be updated"
+            NoOfDeviceCount2=$((NoOfDeviceCount2 + 1))
+            {
+                echo "#Energy Meter $NoOfDeviceCount2"
+                echo "Model_${NoOfDeviceCount2}=\"$serialdeviceid\""
+                echo "EnergyMeterType_${NoOfDeviceCount2}=0"
+                echo "SlaveID_${NoOfDeviceCount2}=$SlaveAddress"
+                echo "Baudrate_${NoOfDeviceCount2}=$Baudrate"
+                echo "Parity_${NoOfDeviceCount2}=$Parity"
+                echo "Databits_${NoOfDeviceCount2}=$Databits"
+                echo "Stopbits_${NoOfDeviceCount2}=$NoOfStopbits"
+                echo "StartRegister_${NoOfDeviceCount2}=$startregisteru"
+                echo "NumberOfRegisters_${NoOfDeviceCount2}=$countregister"
+                echo "FunctionalCode_${NoOfDeviceCount2}=$functioncode"
+                echo "MeterID_${NoOfDeviceCount2}=$MeterID"
+                echo "EEnable_${NoOfDeviceCount2}=$EEnable"
+               # echo "optiondevice_${NoOfDeviceCount2}=\"$optiondevice\""
+              #  echo "devicetype_${NoOfDeviceCount2}=\"$devicetype\""
+                #echo "tagNameInput_${NoOfDeviceCount2}=\"$tagNameInput\""
+                #echo "TagDatatype_${NoOfDeviceCount2}=$TagDatatype"
+                echo "InterfaceID_${NoOfDeviceCount2}=$serialport2"
+               # echo "MeterID_${NoOfDeviceCount2}=$MeterID"
+                echo "SerialPort_${NoOfDeviceCount2}=\"/dev/ttyS2\""
+				#echo "NumberOfRegisterMaps_${NoOfDeviceCount2}=$registerlen"
+				#echo "mapping_type_${NoOfDeviceCount2}=$mapping_type"
+				
+				
+				#echo "defaultchecked_${NoOfDeviceCount2}=$defaultchecked"
+				#echo "Customchecked_${NoOfDeviceCount2}=$Customchecked"
+
+			if [ "$MultiblockEnable" = "0" ]; then
+
+				 if [ "$defaultchecked" = "1" ]; then
+					# config_get NumberOfRegisterMaps "$RS485DeviceConfigSection" NumberOfRegisterMaps
+					 NumberOfRegisterMaps=1
+
+					 echo "NumberOfRegisterMaps_${NoOfDeviceCount2}=1"
+					 echo "Key_${NoOfDeviceCount2}_${NumberOfRegisterMaps}=\"$tagNameInput\""
+                                         echo "DataType_${NoOfDeviceCount2}_${NumberOfRegisterMaps}=$TagDatatype"
+					 echo "SelectRegister_${NoOfDeviceCount2}_${NumberOfRegisterMaps}=$startregisteru"
+					 echo "RegisterCount_${NoOfDeviceCount2}_${NumberOfRegisterMaps}=$countregister"
+                   		
+				 fi
+				 
+				 
+		      else
+					
+				 if [ "$defaultchecked" = "1" ]; then
+	                              #config_get NumberOfRegisterMaps "$RS485DeviceConfigSection" NumberOfRegisterMaps
+				      NumberOfRegisterMaps=1
+
+				      echo "NumberOfRegisterMaps_${NoOfDeviceCount2}=1"
+				      echo "Key_${NoOfDeviceCount2}_${NumberOfRegisterMaps}=\"$tagNameInput\""
+                                      echo "DataType_${NoOfDeviceCount2}_${NumberOfRegisterMaps}=$TagDatatype"
+			              echo "SelectRegister_${NoOfDeviceCount2}_${NumberOfRegisterMaps}=$startregisteru"
+				      echo "RegisterCount_${NoOfDeviceCount2}_${NumberOfRegisterMaps}=$countregister"
+                                fi	
+			fi	 
+  
+                if [ "$protocol" = "TCP" ]; then
+                    config_get CommIp "$RS485DeviceConfigSection" CommIp
+                    config_get CommPort "$RS485DeviceConfigSection" CommPort
+                    config_get commT "$RS485DeviceConfigSection" commT
+                    echo "CommType_${NoOfDeviceCount2}=2"
+                    echo "CommIP_${NoOfDeviceCount2}=\"$CommIp\""
+                    echo "CommPort_${NoOfDeviceCount2}=$CommPort"
+                    echo "CommTimeout_${NoOfDeviceCount2}=$commT"
+                else
+                    echo "CommType_${NoOfDeviceCount2}=1"
+                    echo "CommIP_${NoOfDeviceCount2}=\"0.0.0.0\""
+                    echo "CommPort_${NoOfDeviceCount2}=0"
+                    echo "CommTimeout_${NoOfDeviceCount2}=0"
+                fi
+
+                if [ "$MultiblockEnable" = "0" ]; then
+                    echo "NoOfBlocks2_$NoOfDeviceCount2=1"
+                    
+                  
+                     if [ "$Customchecked" = "1" ]; then
+					for map_index in $(seq 1 $registerlen); do
+					local Key
+					local SelectRegister
+					local RegisterCount
+					local DataType
+
+					registername=$(uci get registerconfig.${RS485DeviceConfigSection}.registername_$((map_index-1)))
+                    startregister=$(uci get registerconfig.${RS485DeviceConfigSection}.startregister_$((map_index-1)))
+                    registercount=$(uci get registerconfig.${RS485DeviceConfigSection}.registercount_$((map_index-1)))
+                    Datatype=$(uci get registerconfig.${RS485DeviceConfigSection}.Datatype_$((map_index-1)))
+
+					echo "Key_${NoOfDeviceCount2}_${map_index}=\"$registername\"" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+					echo "SelectRegister_${NoOfDeviceCount2}_${map_index}=$startregister" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+					echo "registercount_${NoOfDeviceCount2}_${map_index}=$registercount" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+					echo "DataType_${NoOfDeviceCount2}_${map_index}=$Datatype" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+				done
+				
+				echo "NumberOfRegisterMaps_${NoOfDeviceCount2}=$registerlen"	
+				
+				fi
+                else
+                   echo "NoOfBlocks2_$NoOfDeviceCount2=1"
+                    
+                  
+                     if [ "$Customchecked" = "1" ]; then
+			for map_index in $(seq 1 $registerlen); do
+					local Key
+					local SelectRegister
+					local RegisterCount
+					local DataType
+
+		               registername=$(uci get registerconfig.${RS485DeviceConfigSection}.registername_$((map_index-1)))
+                               startregister=$(uci get registerconfig.${RS485DeviceConfigSection}.startregister_$((map_index-1)))
+                    registercount=$(uci get registerconfig.${RS485DeviceConfigSection}.registercount_$((map_index-1)))
+                    Datatype=$(uci get registerconfig.${RS485DeviceConfigSection}.Datatype_$((map_index-1)))
+
+					echo "Key_${NoOfDeviceCount2}_${map_index}=\"$registername\"" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+					echo "SelectRegister_${NoOfDeviceCount2}_${map_index}=$startregister" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+					echo "registercount_${NoOfDeviceCount2}_${map_index}=$registercount" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+					echo "DataType_${NoOfDeviceCount2}_${map_index}=$Datatype" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+				done
+				echo "NumberOfRegisterMaps_${NoOfDeviceCount2}=$registerlen"
+					
+                fi
+               
+                
+              fi
+ 
+                 echo ""
+                 echo ""
+                
+       } >> "${RS485DeviceconfigureCfgPath2}.cfg"
+
+            sed -i 's/\s*$//' "${RS485DeviceconfigureCfgPath2}.cfg"
+            sed -i -e '/=$/d' "${RS485DeviceconfigureCfgPath2}.cfg"
+        fi
+    fi
+}
+   
+   
+   
+
+UpdateRS485Cfg()                                               
+{    
+	 NoOfDeviceCount1=0          
+	 NoOfDeviceCount2=0 
+	 tempDeviceCount1=0 
+	 tempDeviceCount2=0 
+	 NoOfUniqueDevices1=0
+	 NoOfUniqueDevices2=0
+	 NumberOfBlocks1=1
+	 NumberOfBlocks2=1
+	 slaveAddressOld=0
+	 firstconfig1=1
+	 firstconfig2=1
+	 MultiblockEnable=$(uci get FixedPacketConfigGeneric.fixedpacketconfig.MultiblockEnable)
+	rm "${RS485DeviceconfigureCfgPath}.cfg"
+    rm "${RS485DeviceconfigureCfgPath2}.cfg"           
+    config_load "$RS485DeviceconfigureFile"
+    config_foreach RS485DeviceConfigUpdate RS485Config
+    echo "#Number of meters to read" >> "${RS485DeviceconfigureCfgPath}.cfg"
+    echo "NoOfDevices=$NoOfDeviceCount1" >> "${RS485DeviceconfigureCfgPath}.cfg"
+    echo "NoOfDevices=$NoOfDeviceCount2" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+    if [ "$MultiblockEnable" = "1" ]
+	then
+	     echo "NoOfEMetersInLine1=$NoOfDeviceCount1" >> "${SourceConfigPath}.cfg"
+	    echo "NoOfEMetersInLine2=$NoOfDeviceCount2" >> "${SourceConfigPath}.cfg"
+	    echo "NoOfEMetersInLine1=$NoOfDeviceCount1" >> "${RS485DeviceconfigureCfgPath}.cfg"
+	    echo "NoOfEMetersInLine2=$NoOfDeviceCount2" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+	    echo "NoOfUniqueEMetersInLine1=$NoOfDeviceCount1" >> "${SourceConfigPath}.cfg"
+	    echo "NoOfUniqueEMetersInLine2=$NoOfDeviceCount2" >> "${SourceConfigPath}.cfg"
+	    echo "NoOfUniqueEMetersInLine1=$NoOfDeviceCount1" >> "${RS485DeviceconfigureCfgPath}.cfg"
+	    echo "NoOfUniqueEMetersInLine2=$NoOfDeviceCount2" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+	else
+	    echo "NoOfEMetersInLine1=$NoOfDeviceCount1" >> "${SourceConfigPath}.cfg"
+	    echo "NoOfEMetersInLine2=$NoOfDeviceCount2" >> "${SourceConfigPath}.cfg"
+	    echo "NoOfEMetersInLine1=$NoOfDeviceCount1" >> "${RS485DeviceconfigureCfgPath}.cfg"
+	    echo "NoOfEMetersInLine2=$NoOfDeviceCount2" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+	    echo "NoOfUniqueEMetersInLine1=$NoOfDeviceCount1" >> "${SourceConfigPath}.cfg"
+	    echo "NoOfUniqueEMetersInLine2=$NoOfDeviceCount2" >> "${SourceConfigPath}.cfg"
+	    echo "NoOfUniqueEMetersInLine1=$NoOfDeviceCount1" >> "${RS485DeviceconfigureCfgPath}.cfg"
+	    echo "NoOfUniqueEMetersInLine2=$NoOfDeviceCount2" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+	    #echo "NoOfBlocks1_$NoOfDeviceCount1=$NumberOfBlocks1" >> "${SourceConfigPath}.cfg"
+	    #echo "NoOfBlocks2_$NoOfDeviceCount2=$NumberOfBlocks2" >> "${SourceConfigPath}.cfg"
+   fi
+   
+       
+      
+	   res1=$(cat /root/EnergyMeterAppComponent/etc/Config/RS485DeviceConfig.cfg | grep NoOfBlocks1)
+	   res2=$(cat /root/EnergyMeterAppComponent/etc/Config/RS485DeviceConfig2.cfg | grep NoOfBlocks2)
+	   echo "$res1" >> "${SourceConfigPath}.cfg"
+	   echo "$res2" >> "${SourceConfigPath}.cfg"
+    
+   echo "MaxNoOfRetries=3" >> "${RS485DeviceconfigureCfgPath}.cfg"
+   echo "MaxNoOfRetries=3" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+   echo "SleepRetries=10" >> "${RS485DeviceconfigureCfgPath}.cfg"
+   echo "SleepRetries=10" >> "${RS485DeviceconfigureCfgPath2}.cfg"
+   
+}
+
+
+
+RS232DeviceConfigUpdate() 
+{ 
+	Ser2netEnable2=$(uci get portconfig.portconfig.Ser2netEnable2)
+    local RS232DeviceConfigSection="$1"                                                                                                                                                    
+    NoOfRS232DeviceCount=$((NoOfRS232DeviceCount + 1))
+     
+    echo "no of RS232 device count is $NoOfRS232DeviceCount"                                                                                                                                          
+   
+    config_get StartRegister  "$RS232DeviceConfigSection"  StartRegister   
+    config_get NoOfRegister   "$RS232DeviceConfigSection"  NoOfRegister   
+    config_get Baudrate       "$RS232DeviceConfigSection"  Baudrate   
+    config_get NoOfStopbits   "$RS232DeviceConfigSection"  NoOfStopbits 
+    config_get Parity         "$RS232DeviceConfigSection"  Parity
+    config_get SlaveAddress   "$RS232DeviceConfigSection"  SlaveAddress
+    config_get Databits       "$RS232DeviceConfigSection"  Databits
+    config_get InterfaceID    "$RS232DeviceConfigSection" InterfaceID
+    config_get MeterID        "$RS232DeviceConfigSection" MeterID
+    config_get USBFilename     "$RS232DeviceConfigSection" USBFilename
+    config_get FunctionalCode  "$RS232DeviceConfigSection" FunctionalCode
+    config_get FlowControl     "$RS232DeviceConfigSection" FlowControl
+    config_get Delay           "$RS232DeviceConfigSection" Delay
+    config_get Model           "$RS232DeviceConfigSection" Model
+    
+    USBFilename=$(uci get RS232UtilityConfigGeneric.rs232utilityconfig.SerialPort)
+    
+        
+   if [ "$Ser2netEnable2" = "2" ]
+   then 
+       {    
+        echo "#Energy Meter $NoOfRS232DeviceCount"
+        echo "Model_${NoOfRS232DeviceCount}=\"$Model\""
+        echo "EnergyMeterType_${NoOfRS232DeviceCount}=0"
+        echo "SlaveID_${NoOfRS232DeviceCount}=$SlaveAddress"
+        echo "Baudrate_${NoOfRS232DeviceCount}=$Baudrate"
+        echo "Parity_${NoOfRS232DeviceCount}=$Parity"
+        echo "Databits_${NoOfRS232DeviceCount}=$Databits"
+        echo "Stopbits_${NoOfRS232DeviceCount}=$NoOfStopbits" 
+        echo "StartRegister_${NoOfRS232DeviceCount}=$StartRegister"
+        echo "NumberOfRegisters_${NoOfRS232DeviceCount}=$NoOfRegister"
+        echo "FunctionalCode_${NoOfRS232DeviceCount}=$FunctionalCode"
+        echo "InterfaceID_${NoOfRS232DeviceCount}=$InterfaceID"
+        echo "MeterID_${NoOfRS232DeviceCount}=$MeterID"
+        echo "FlowControl_${NoOfRS232DeviceCount}=$FlowControl"
+        echo "Delay_${NoOfRS232DeviceCount}=$Delay"     
+        echo "SerialPort_${NoOfRS232DeviceCount}=\"$USBFilename\""
+
+        echo ""
+        echo ""
+    } >> "${RS232DeviceconfigureCfgPath}.cfg"    
+     
+    sed -i 's/\s*$//' "${RS232DeviceconfigureCfgPath}.cfg"  
+    sed -i -e '/=$/d' "${RS232DeviceconfigureCfgPath}.cfg"
+    #else
+				  #if [ ! -f /tmp/updateconfigoutput.txt ]; then
+				    #touch /tmp/updateconfigoutput.txt
+	          #fi 
+	               #echo "RS232 : Please verify Transparent Serial Port 2 Settings in Port Configuration. Aborting further tasks." > /tmp/updateconfigoutput.txt
+	               #return 1  
+		     fi                                                                                                                                     
+}               
+
+UpdateRS232Cfg()                                               
+{               
+    rm "${RS232DeviceconfigureCfgPath}.cfg"  
+    NoOfRS232DeviceCount=0        
+    config_load "$RS232DeviceconfigureFile"
+    config_foreach RS232DeviceConfigUpdate RS232Config
+    echo "#Number of meters to read" >> "${RS232DeviceconfigureCfgPath}.cfg"
+    echo "NoOfDevices=$NoOfRS232DeviceCount" >> "${RS232DeviceconfigureCfgPath}.cfg"
+    echo "NoOfRS232EMetersInLine1=$NoOfRS232DeviceCount" >> "${SourceConfigPath}.cfg"
+    echo "MaxNoOfRetries=3" >> "${RS232DeviceconfigureCfgPath}.cfg"
+    echo "SleepRetries=10" >> "${RS232DeviceconfigureCfgPath}.cfg"
+} 
+
+
+UpdateJsonKeyparamsDioIndexCfg() {
+    rm "${JsonKeyParamsDioIndexconfigureCfgPath}.cfg"
+    rm "${JsonKeyParamsDioIndexconfigureCfgPath2}.cfg"
+    config_load "$JsonKeyParamsDioIndexconfigureFile"
+
+    for i in $(seq 0 14); do
+        # ModbusParameter="ModbusParameter$i"
+        # Parameter="Parameter$i"
+        CurrentDioParameter=$(uci get Jsonconfig.@DioIndexconfig[$((i))].ModbusParameter)
+        CurrentDioParameterKey=$(uci get Jsonconfig.@DioIndexconfig[$((i))].Parameterkey)
+        CurrentDioParameterValue=$(uci get Jsonconfig.@DioIndexconfig[$((i))].Parametervalue)
+        KeyFound=false
+
+        for j in $(seq 0 9); do
+            Key="Key$j"
+            CurrentKey1=$(uci get Jsonconfig.DioIndexKeyconfig."$Key")
+
+            if [ "$CurrentDioParameter" == "$CurrentKey1" ]; then
+                KeyFound=true
+                echo "$CurrentDioParameter=\"$CurrentDioParameterKey\"" >> "${JsonKeyParamsDioIndexconfigureCfgPath2}.cfg"
+                break
+            fi
+        done
+
+       
+       
+       
+
+        for j in $(seq 10 14); do
+            Key="Key$j"
+            CurrentKey1=$(uci get Jsonconfig.DioIndexKeyconfig."$Key")
+
+            if [ "$CurrentDioParameter" == "$CurrentKey1" ]; then
+                KeyFound=true
+                 size=${#CurrentDioParameter}
+                index=${CurrentDioParameter:$size-1:1}
+                
+                echo "$CurrentDioParameter=\"$CurrentDioParameterKey\"" >> "${JsonKeyParamsDioIndexconfigureCfgPath2}.cfg"
+                 echo "DIOCustomParam${index}=\"$CurrentDioParameterValue\"" >> "${JsonKeyParamsDioIndexconfigureCfgPath2}.cfg"
+
+                
+                break
+            fi
+        done
+
+       
+       
+       
+       
+
+        if [ -n "$CurrentDioParameter" ]; then
+            echo "$CurrentDioParameter"  >> "${JsonKeyParamsDioIndexconfigureCfgPath}.cfg"
+        fi
+    done
+}
+UpdateJsonKeyparamsRS485IndexCfg() {
+    rm "${JsonKeyParamsRs485IndexconfigureCfgPath}.cfg"
+    rm "${JsonKeyParamsRs485IndexconfigureCfgPath2}.cfg"
+    config_load "$JsonKeyParamsRs485IndexconfigureFile"
+
+   
+    
+    for i in $(seq 0 19); do
+     
+        CurrentModbusParameter=$(uci get Jsonconfig.@JsonRs485Indexconfig[$((i))].ModbusParameter)
+        CurrentModbusCustomParameter=$(uci get Jsonconfig.@JsonRs485KeyCustomconfig[$((i))].ModbusCustomParameter)
+        CurrentParameter=$(uci get Jsonconfig.@JsonRs485Indexconfig[$((i))].Parameterkey)
+        CurrentParameterValue=$(uci get Jsonconfig.@JsonRs485Indexconfig[$((i))].Parametervalue )
+       
+        KeyFound=false
+
+
+        for j in $(seq 0 14); do
+            Key="Key$j"
+            CurrentKey=$(uci get Jsonconfig.JsonRs485Keyconfig."$Key")
+
+            if [ "$CurrentModbusParameter" == "$CurrentKey" ]; then
+                KeyFound=true
+                echo "$CurrentModbusParameter=\"$CurrentParameter\"" >> "${JsonKeyParamsRs485IndexconfigureCfgPath2}.cfg"
+                break
+            fi
+        done    
+
+      
+
+        for j in $(seq 15 19); do
+            Key="Key$j"
+            echo "$Key"
+            CurrentKey=$(uci get Jsonconfig.JsonRs485Keyconfig."$Key")
+
+            if [ "$CurrentModbusParameter" == "$CurrentKey" ]; then
+                KeyFound=true
+                size=${#CurrentModbusParameter}
+                index=${CurrentModbusParameter:$size-1:1}
+              echo "$CurrentModbusParameter=\"$CurrentParameter\"" >> "${JsonKeyParamsRs485IndexconfigureCfgPath2}.cfg"
+              echo "RS485CustomParam${index}=\"$CurrentParameterValue\"" >> "${JsonKeyParamsRs485IndexconfigureCfgPath2}.cfg"
+
+        
+       
+                
+                break
+        # fi
+
+            fi
+        done    
+
+
+
+        if [ -n "$CurrentModbusParameter" ]; then
+            echo "$CurrentModbusParameter"  >> "${JsonKeyParamsRs485IndexconfigureCfgPath}.cfg"
+        fi
+        
+    done
+    
+    
+    
+    
+    
+    
+}
+
+UpdateJsonKeyparamsAiIndexCfg() {
+    rm "${JsonKeyParamsAiIndexconfigureCfgPath}.cfg"
+    rm "${JsonKeyParamsAiIndexconfigureCfgPath2}.cfg"
+    config_load "$JsonKeyParamsAiIndexconfigureFile"
+
+    for i in $(seq 0 12); do
+        # ModbusParameter="ModbusParameter$i"
+        # Parameter="Parameter$i"
+        CurrentAiParameter=$(uci get Jsonconfig.@AIIndexconfig[$((i))].ModbusParameter)
+        CurrentAiParameterKey=$(uci get Jsonconfig.@AIIndexconfig[$((i))].Parameterkey)
+        CurrentAiParameterValue=$(uci get Jsonconfig.@AIIndexconfig[$((i))].Parametervalue)
+        KeyFound=false
+
+        for j in $(seq 0 7); do
+            Key="Key$j"
+            CurrentKey2=$(uci get Jsonconfig.AIIndexKeyconfig."$Key")
+
+            if [ "$CurrentAiParameter" == "$CurrentKey2" ]; then
+                KeyFound=true
+                echo "$CurrentAiParameter=\"$CurrentAiParameterKey\"" >> "${JsonKeyParamsAiIndexconfigureCfgPath2}.cfg"
+                break
+            fi
+        done
+
+      
+        for j in $(seq 8 12); do
+            Key="Key$j"
+            CurrentKey2=$(uci get Jsonconfig.AIIndexKeyconfig."$Key")
+
+            if [ "$CurrentAiParameter" == "$CurrentKey2" ]; then
+                KeyFound=true
+                size=${#CurrentAiParameter}
+                index=${CurrentAiParameter:$size-1:1}
+           
+              echo "$CurrentAiParameter=\"$CurrentAiParameterKey\"" >> "${JsonKeyParamsAiIndexconfigureCfgPath2}.cfg"
+             
+             echo "AIOCustomParam${index}=\"$CurrentAiParameterValue\"" >> "${JsonKeyParamsAiIndexconfigureCfgPath2}.cfg"
+
+             
+             
+                break
+            fi
+        done
+
+      
+      
+
+        if [ -n "$CurrentAiParameter" ]; then
+            echo "$CurrentAiParameter"  >> "${JsonKeyParamsAiIndexconfigureCfgPath}.cfg"
+        fi
+    done
+}
+UpdateJsonKeyparamsRS232IndexCfg() {
+    rm "${JsonKeyParamsRS232IndexconfigureCfgPath}.cfg"
+    rm "${JsonKeyParamsRS232IndexconfigureCfgPath2}.cfg"
+    config_load "$JsonKeyParamsRS232IndexconfigureFile"
+
+    for i in $(seq 0 18); do
+        # ModbusParameter="ModbusParameter$i"
+        # Parameter="Parameter$i"
+        CurrentRS232Parameter=$(uci get Jsonconfig.@RS232Indexconfig[$((i))].ModbusParameter)
+        CurrentRS232ParameterKey=$(uci get Jsonconfig.@RS232Indexconfig[$((i))].Parameterkey)
+        CurrentRS232ParameterValue=$(uci get Jsonconfig.@RS232Indexconfig[$((i))].Parametervalue)
+        KeyFound=false
+
+        for j in $(seq 0 13); do
+            Key="Key$j"
+            CurrentKey4=$(uci get Jsonconfig.RS232IndexKeyconfig."$Key")
+
+            if [ "$CurrentRS232Parameter" == "$CurrentKey4" ]; then
+                KeyFound=true
+                echo "$CurrentRS232Parameter=\"$CurrentRS232ParameterKey\"" >> "${JsonKeyParamsRS232IndexconfigureCfgPath2}.cfg"
+
+               
+                break
+            fi
+        done
+
+       
+       
+       
+        for j in $(seq 14 18); do
+            Key="Key$j"
+            CurrentKey4=$(uci get Jsonconfig.RS232IndexKeyconfig."$Key")
+
+            if [ "$CurrentRS232Parameter" == "$CurrentKey4" ]; then
+                KeyFound=true
+                
+                 size=${#CurrentRS232Parameter}
+                index=${CurrentRS232Parameter:$size-1:1}
+           
+                echo "$CurrentRS232Parameter=\"$CurrentRS232ParameterKey\"" >> "${JsonKeyParamsRS232IndexconfigureCfgPath2}.cfg"
+                  echo "RS232CustomParam${index}=\"$CurrentRS232ParameterValue\"" >> "${JsonKeyParamsRS232IndexconfigureCfgPath2}.cfg"
+
+                break
+            fi
+        done
+
+       
+       
+
+        if [ -n "$CurrentRS232Parameter" ]; then
+            echo "$CurrentRS232Parameter"  >> "${JsonKeyParamsRS232IndexconfigureCfgPath}.cfg"
+        fi
+    done
+}
+
+
+
+UpdateJsonKeyparamsSNMPIndexCfg() {
+    rm "${JsonKeyParamsSNMPIndexconfigureCfgPath}.cfg"
+    rm "${JsonKeyParamsSNMPIndexconfigureCfgPath2}.cfg"
+    config_load "$JsonKeyParamsSNMPIndexconfigureFile"
+
+    for i in $(seq 0 17); do
+        # ModbusParameter="ModbusParameter$i"
+        # Parameter="Parameter$i"
+        CurrentSNMPParameter=$(uci get Jsonconfig.@SNMPIndexconfig[$((i))].ModbusParameter)
+        CurrentSNMPParameterKey=$(uci get Jsonconfig.@SNMPIndexconfig[$((i))].Parameterkey)
+        CurrentSNMPParametervalue=$(uci get Jsonconfig.@SNMPIndexconfig[$((i))].Parametervalue)
+        KeyFound=false
+
+        for j in $(seq 0 12); do
+            Key="Key$j"
+            CurrentKey5=$(uci get Jsonconfig.SNMPIndexKeyconfig."$Key")
+
+            if [ "$CurrentSNMPParameter" == "$CurrentKey5" ]; then
+                KeyFound=true
+                echo "$CurrentSNMPParameter=\"$CurrentSNMPParameterKey\"" >> "${JsonKeyParamsSNMPIndexconfigureCfgPath2}.cfg"
+                break
+            fi
+        done
+
+       
+       
+       
+
+        for j in $(seq 13 17); do
+            Key="Key$j"
+            CurrentKey5=$(uci get Jsonconfig.SNMPIndexKeyconfig."$Key")
+
+            if [ "$CurrentSNMPParameter" == "$CurrentKey5" ]; then
+                KeyFound=true
+                
+                 size=${#CurrentSNMPParameter}
+                index=${CurrentSNMPParameter:$size-1:1}
+                
+                echo "$CurrentSNMPParameter=\"$CurrentSNMPParameterKey\"" >> "${JsonKeyParamsSNMPIndexconfigureCfgPath2}.cfg"
+                echo "SNMPCustomParam${index}=\"$CurrentSNMPParametervalue\"" >> "${JsonKeyParamsSNMPIndexconfigureCfgPath2}.cfg"
+                break
+            fi
+        done
+
+       
+        if [ -n "$CurrentSNMPParameter" ]; then
+            echo "$CurrentSNMPParameter"  >> "${JsonKeyParamsSNMPIndexconfigureCfgPath}.cfg"
+        fi
+    done
+}
+
+
+
+
+UpdateJsonKeyparamsTempIndexCfg() {
+    rm "${JsonKeyParamsTempIndexconfigureCfgPath}.cfg"
+    rm "${JsonKeyParamsTempIndexconfigureCfgPath2}.cfg"
+    config_load "$JsonKeyParamsTempIndexconfigureFile"
+
+    for i in $(seq 0 17); do
+        # ModbusParameter="ModbusParameter$i"
+        # Parameter="Parameter$i"
+        CurrentTempParameter=$(uci get Jsonconfig.@TmpIndexconfig[$((i))].ModbusParameter)
+        CurrentTempParameterKey=$(uci get Jsonconfig.@TmpIndexconfig[$((i))].Parameterkey)
+        CurrentTempParameterValue=$(uci get Jsonconfig.@TmpIndexconfig[$((i))].Parametervalue)
+        KeyFound=false
+
+        for j in $(seq 0 12); do
+            Key="Key$j"
+            CurrentKey3=$(uci get Jsonconfig.TempIndexKeyconfig."$Key")
+
+            if [ "$CurrentTempParameter" == "$CurrentKey3" ]; then
+                KeyFound=true
+                echo "$CurrentTempParameter=\"$CurrentTempParameterKey\"" >> "${JsonKeyParamsTempIndexconfigureCfgPath2}.cfg"
+                
+                
+                break
+            fi
+        done
+
+        for j in $(seq 13 17); do
+            Key="Key$j"
+            CurrentKey3=$(uci get Jsonconfig.TempIndexKeyconfig."$Key")
+
+            if [ "$CurrentTempParameter" == "$CurrentKey3" ]; then
+                KeyFound=true
+                 size=${#CurrentTempParameter}
+                index=${CurrentTempParameter:$size-1:1}
+                echo "$CurrentTempParameter=\"$CurrentTempParameterKey\"" >> "${JsonKeyParamsTempIndexconfigureCfgPath2}.cfg"
+			   echo "TemperatureCustomParam${index}=\"$CurrentTempParameterValue\"" >> "${JsonKeyParamsTempIndexconfigureCfgPath2}.cfg"
+
+               
+                break
+            fi
+        done
+
+        if [ -n "$CurrentTempParameter" ]; then
+            echo "$CurrentTempParameter"  >> "${JsonKeyParamsTempIndexconfigureCfgPath}.cfg"
+        fi
+    done
+}
+
+
+
+
+
+
+
+
+
+UpdateDataCollectorColumnConfig()
+{
+	
+	 rm "${DataCollectorRS485DatabaseColumnCfgPath}.cfg"  
+	 #rm "${DataCollectorRS485Database}"	                                            
+    
+     config_load "$DataCollectorconfigureFile"
+     config_get SiteIDEnable               "$DataCollectorconfigureEventSection"   SiteIDEnable
+     config_get SiteID                     "$DataCollectorconfigureEventSection"   SiteID 
+     config_get DeviceIDEnable             "$DataCollectorconfigureEventSection"   DeviceIDEnable
+     config_get DeviceID                   "$DataCollectorconfigureEventSection"   DeviceID
+    
+{      
+
+echo "#########################################################################################################
+#This file contains EMeter database parameters. 
+#Record Type -0 (Periodic) , 1- (Request--Internal/External)
+#Response Code : 99 - Default Code
+#TxStatus : 255-Sent Successfully to Server) , 0- Pending /Unsuccessful"
+echo "#######################################################################################################"                                                                            
+        echo "DatabaseName=/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db"
+        echo "TableName=EnergyMeter_RS485_table"                                                                                                      
+        echo "StartMark=TEXT"  
+        if [ "$SiteIDEnable" = "1" ]                                                                       
+        then                                                                                                   
+             echo "SiteID=TEXT"           
+        fi
+        if [ "$DeviceIDEnable" = "1" ]                                                                       
+        then                                                           
+			echo "SrcID=TEXT" 
+        fi                                                               
+        echo "RecordType=INTEGER"                                                        
+        echo "RequestID=INTEGER"
+        echo "SoftwareVer=TEXT"                                                        
+        echo "ResponseCode=TEXT"                                                         
+        echo "EMeterRS485RecordNumber=INTEGER PRIMARY KEY DESC"
+        echo "EMeterRS485SrcId=TEXT"
+		echo "EMeterRS485RecordType=INTEGER"
+		echo "EMeterRS485RequestId=INTEGER"
+		echo "EMeterRS485InterfaceId=INTEGER"
+		echo "EMeterRS485MeterID=INTEGER"
+		echo "EMeterRS485MeterModel=TEXT"
+		echo "EMeterRS485MeterType=TEXT"
+		echo "EMeterRS485SlaveID=TEXT"
+	    echo "EMeterRS485ResponseCode=TEXT"
+        echo "StartingRS485RegisterAddress=TEXT"
+        echo "FunctionCodeUsed=TEXT"
+        echo "NoOfRegisters=TEXT"
+		#counter=1
+		#Finalnumberofcolumns=$(($MaxNumberofRegisters + 2))
+		#while [ $counter -le $Finalnumberofcolumns  ]
+		#do
+			#echo "EMeterREG$counter=TEXT"
+			#counter=$(( $counter + 1 ))
+		#done	
+		echo "EMeterREG1=TEXT"
+		echo "EMeterREG2=TEXT"  
+		echo "EMeterREG3=TEXT"    
+	    echo "EMeterRS485ReadTimestamp=TEXT"
+		echo "EMeterRS485TxStatus=INTEGER"
+		echo "EMeterRS485TxTimestamp=TEXT"
+		echo "ReadTimeStamp=TEXT"
+		echo "EndMark=TEXT"
+    } >> "${DataCollectorRS485DatabaseColumnCfgPath}.cfg" 
+     
+}
+
+
+UpdateDataCollectorCtrlConfig()
+{
+	 rm "${DataCollectorRS485DatabaseCtrlCfgPath}.cfg"                                               
+     #rm "${DataCollectorRS485Database}"	                                            
+
+     config_load "$DataCollectorconfigureFile"
+    
+     config_get SiteIDEnable               "$DataCollectorconfigureEventSection"   SiteIDEnable
+     config_get SiteID                     "$DataCollectorconfigureEventSection"   SiteID 
+     config_get DeviceIDEnable             "$DataCollectorconfigureEventSection"   DeviceIDEnable
+     config_get DeviceID                   "$DataCollectorconfigureEventSection"   DeviceID
+    
+{      
+
+echo "#########################################################################################################
+#This file contains EMeter database Control parameters. 
+#Record Type -0 (Periodic) , 1- (Request--Internal/External)
+#Response Code : 99 - Default Code
+#TxStatus : 255-Sent Successfully to Server) , 0- Pending /Unsuccessful"
+echo "#######################################################################################################"  
+
+echo "EMeterRS485RecordNumber=\"EMeterRS485RecordNumber\""
+echo "EMeterRS485MaxRowsCount=2000"
+echo "EMeterRS485DatabaseAccessWaitInterval=5"
+echo "EMeterRS485MaxDatabaseAccessRetry=10"
+echo "DatabaseName=\"/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db\""
+echo "TableName=\"EnergyMeter_RS485_table\""
+echo "EMeterRS485RequestIdColumn=\"EMeterRS485RequestId\""
+echo "EMeterRS485RecordIDColumn=\"EMeterRS485RecordNumber\""
+echo "EMeterRS485RecordWriteTimestampColumn=\"ReadTimeStamp\""
+echo "EMeterRS485RecordReadTimestampColumn=\"ReadTimeStamp\""
+echo "EMeterRS485TxStatusColumn=\"EMeterRS485TxStatus\""
+echo "EMeterRS485TxStatusTimeColumn=\"EMeterRS485TxTimestamp\""
+echo "EMeterRS485StartMarkColumn=\"StartMark\""
+echo "EMeterRS485EndMarkColumn=\"EndMark\""
+echo "EMeterRS485RS485InterfaceId=\"EMeterRS485InterfaceId\""
+echo "EMeterRS485MeterID=\"EMeterRS485MeterID\""
+echo "EMeterRS485MeterModel=\"EMeterRS485MeterModel\""
+echo "EMeterRS485MeterType=\"EMeterRS485MeterType\""
+echo "EMeterRS485SlaveID=\"EMeterRS485SlaveID\""
+echo "StartingRS485RegisterAddress=\"StartingRS485RegisterAddress\""
+echo "FunctionCodeUsed=\"FunctionCodeUsed\""
+echo "NoOfRegisters=\"NoOfRegisters\""
+echo "RecordType=\"RecordType\""
+
+
+#counter=1
+		#Finalnumberofcolumns=$(($MaxNumberofRegisters + 2))
+		#while [ $counter -le $Finalnumberofcolumns  ]
+		#do
+			#echo "EMeterREG$counter=\"EMeterREG$counter\""
+			#counter=$(( $counter + 1 ))
+		#done	
+echo "EMeterREG1=\"EMeterREG1\""
+echo "EMeterREG2=\"EMeterREG2\""
+echo "EMeterREG3=\"EMeterREG3\""
+echo "EMeterRS485MaxReadTry=20"
+echo "EMeterRS485RecordNumberIndex=3"
+echo "EMeterRS485RecordTimeStampIndex=2"
+echo "EMeterRS485TxStatus=0"
+
+} >> "${DataCollectorRS485DatabaseCtrlCfgPath}.cfg" 
+
+
+}
+
+UpdateSourceConfig()
+{
+	 rm "${SourceConfigPath}.cfg"    
+	 touch "${SourceConfigPath}.cfg"
+	 chmod 0777 "${SourceConfigPath}.cfg"
+	                                     
+     NoOfEMeterRS485DataSources=0
+     NoOfEMeterRS232DataSources=0
+     ser2netEnable1=$(uci get portconfig.portconfig.Ser2netEnable1)
+     ser2netEnable2=$(uci get portconfig.portconfig.Ser2netEnable2)
+     
+     enablepublishoverlan=$(uci get cloudconfig.cloudconfig.enablepublishoverlan)
+     
+     config_load "$SourceconfigureFile"
+     
+     config_get EMeterRS485Line1DataSourceEnable                        "$SourceconfigureEventSection"   EMeterRS485Line1DataSourceEnable 
+     config_get EMeterRS485Line1DataSourcePerPublishInterval            "$SourceconfigureEventSection"   EMeterRS485Line1DataSourcePerPublishInterval 
+     config_get SleepIntervalbetweensuccessiveEnergyMetersInMilliSec    "$SourceconfigureEventSection"   SleepIntervalbetweensuccessiveEnergyMetersInMilliSec
+     
+     config_get EMeterRS485Line2DataSourceEnable                        "$SourceconfigureEventSection"   EMeterRS485Line2DataSourceEnable 
+     config_get EMeterRS485Line2DataSourcePerPublishInterval            "$SourceconfigureEventSection"   EMeterRS485Line2DataSourcePerPublishInterval 
+     
+     config_get EMeterRS232Line1DataSourceEnable                        "$SourceconfigureEventSection"   EMeterRS232Line1DataSourceEnable 
+     config_get EMeterRS232Line1DataSourcePerPublishInterval            "$SourceconfigureEventSection"   EMeterRS232Line1DataSourcePerPublishInterval 
+     config_get SleepIntervalbetweensuccessiveRS232MetersInMilliSec    "$SourceconfigureEventSection"    SleepIntervalbetweensuccessiveRS232MetersInMilliSec
+     
+     config_get DIODataSourceEnable                                     "$SourceconfigureEventSection"   DIODataSourceEnable 
+     config_get DIODataSourcePerPublishInterval                         "$SourceconfigureEventSection"   DIODataSourcePerPublishInterval 
+          
+     config_get TEMPERATUREDataSourceEnable                             "$SourceconfigureEventSection"   TEMPERATUREDataSourceEnable 
+     config_get TEMPERATUREDataSourcePerPublishInterval                 "$SourceconfigureEventSection"   TEMPERATUREDataSourcePerPublishInterval 
+
+     config_get  AIODataSourceEnable                                     "$SourceconfigureEventSection"   AIODataSourceEnable 
+     config_get  AIODataSourcePerPublishInterval                         "$SourceconfigureEventSection"   AIODataSourcePerPublishInterval 
+          
+     config_get  SNMPLine1DataSourceEnable                              "$SourceconfigureEventSection"   SNMPLine1DataSourceEnable 
+     config_get  SNMPLine1DataSourcePerPublishInterval                   "$SourceconfigureEventSection"   SNMPLine1DataSourcePerPublishInterval 
+     config_get  SleepIntervalbetweensuccessiveSNMPDevicesInMilliSec     "$SourceconfigureEventSection"   SleepIntervalbetweensuccessiveSNMPDevicesInMilliSec
+               
+              
+    { 
+		echo "ser2netEnable1=$ser2netEnable1"
+		echo "ser2netEnable2=$ser2netEnable1"
+		
+		# To handle MQTT over LAN
+            if [ "$enablepublishoverlan" = "1" ]
+	    then
+	         echo "enablepublishoverlan=1"
+	    else
+	         echo "enablepublishoverlan=0"      
+	    fi
+	    
+		if [ "$EMeterRS485Line1DataSourceEnable" = "1" ] && [ "$ser2netEnable1" -eq 2 ];                                                       
+        then                                          
+                NoOfEMeterRS485DataSources=$(( $NoOfEMeterRS485DataSources + 1 ))
+        fi
+        
+        if [ "$EMeterRS485Line2DataSourceEnable" = "1" ] && [ "$ser2netEnable2" -eq 2 ];                                                     
+        then                                          
+                NoOfEMeterRS485DataSources=$(( $NoOfEMeterRS485DataSources + 1 ))
+        fi
+        if [ "$EMeterRS232Line1DataSourceEnable" = "1" ] && [ "$ser2netEnable2" -eq 2 ];                                                        
+        then                                          
+                NoOfEMeterRS232DataSources=$(( $NoOfEMeterRS232DataSources + 1 ))
+        fi
+         echo "EMeterRS485Line1DataSourceEnable=$EMeterRS485Line1DataSourceEnable"
+	     echo "EMeterRS485Line1DataSourcePerPublishInterval=$EMeterRS485Line1DataSourcePerPublishInterval"
+	     
+	     echo "EMeterRS485Line2DataSourceEnable=$EMeterRS485Line2DataSourceEnable"
+	     echo "EMeterRS485Line2DataSourcePerPublishInterval=$EMeterRS485Line2DataSourcePerPublishInterval"
+	     
+	     echo "SleepIntervalbetweensuccessiveEnergyMetersInMilliSec=$SleepIntervalbetweensuccessiveEnergyMetersInMilliSec"
+         echo "NoOfEMeterRS485DataSources=$NoOfEMeterRS485DataSources"
+         
+         echo "EMeterRS232Line1DataSourceEnable=$EMeterRS232Line1DataSourceEnable"
+	     echo "EMeterRS232Line1DataSourcePerPublishInterval=$EMeterRS232Line1DataSourcePerPublishInterval"
+	     echo "SleepIntervalbetweensuccessiveRS232EnergyMetersInMilliSec=$SleepIntervalbetweensuccessiveRS232MetersInMilliSec"
+	     echo "NoOfEMeterRS232DataSources=$NoOfEMeterRS232DataSources"
+	     
+	     echo "DIODataSourceEnable=$DIODataSourceEnable"
+	     echo "DIODataSourcePerPublishInterval=$DIODataSourcePerPublishInterval"
+	     
+	     echo "TEMPERATUREDataSourceEnable=$TEMPERATUREDataSourceEnable"
+	     echo "TEMPERATUREDataSourcePerPublishInterval=$TEMPERATUREDataSourcePerPublishInterval"
+	     
+	     echo "SNMPLine1DataSourceEnable=$SNMPLine1DataSourceEnable"
+	     echo "SNMPLine1DataSourcePerPublishInterval=$SNMPLine1DataSourcePerPublishInterval"
+	     echo "SleepIntervalbetweensuccessiveSNMPDevicesInMilliSec=$SleepIntervalbetweensuccessiveSNMPDevicesInMilliSec"
+         echo "NoOfSNMPDataSources=1"
+         echo "NoOfSNMPDevicesInLine1=2"
+         
+         echo "HartDataSourceEnable=0"
+         echo "InterfaceManagerDataSourceEnable=0"
+         echo "SystemManagerDataSourceEnable=0"         
+         echo "AIODataSourceEnable=$AIODataSourceEnable"
+         echo "AIODataSourcePerPublishInterval=$AIODataSourcePerPublishInterval"  
+         echo "NoOfSources=6"
+         echo "NoOfDataBases=6"  
+           
+    } >> "${SourceConfigPath}.cfg"
+}
+
+
+UpdateSoftwareVersionCfg()
+{
+	rm "${SoftwareVerCfgPath}.cfg"           
+    config_load "$SoftwareVerconfigureFile"
+    config_get GWFirmwareVer          "$SoftwareVerconfigureEventSection"   GWFirmwareVer
+    config_get GWApplicationSwVer     "$SoftwareVerconfigureEventSection"   GWApplicationSwVer 
+    {
+		echo "SoftwareVer=\"$GWApplicationSwVer\""
+		echo "CweVer=\"$GWFirmwareVer\""
+		
+	} >> "${SoftwareVerCfgPath}.cfg"
+} 
+
+
+MountPartitions()
+{
+    printf "creating mount points\n"
+    #create dir to allote space
+    rm -rf /reap/disk/
+    mkdir /reap/disk/
+    mkdir /reap/disk/AppSrc/
+    mkdir /reap/disk/AppData/
+    mkdir /reap/disk/SDCard_Src1/
+    mkdir /reap/disk/SDCard_Src2/
+    #mount to allot space
+    sleep 2
+    #1gb
+   # mount /dev/mmcblk0p1 /mnt/usb/AppTmp
+	mount /dev/mmcblk0p1 /reap/disk/AppSrc
+	sleep 4
+	#1gb
+	#mount /dev/mmcblk0p2 /mnt/usb/AppSrc
+	mount /dev/mmcblk0p2 /reap/disk/AppData
+	sleep 4
+	#1gb
+	#mount /dev/mmcblk0p3 /mnt/usb/AppData/
+	mount /dev/mmcblk0p3 /reap/disk/SDCard_Src1
+	sleep 4
+	#543 mb
+	#mount /dev/mmcblk0p4 /mnt/usb/Application/
+	mount /dev/mmcblk0p4 /reap/disk/SDCard_Src2
+    printf "Creating fstab file\n"
+
+cat <<EOF > /etc/config/fstab
+config 'global' 'automount'
+    option 'from_fstab' '1'
+    option 'anon_mount' '0'
+
+config 'mount'
+    option 'target'   '/reap/disk/AppSrc'
+    option 'device'   '/dev/mmcblk0p1'
+    option 'fstype'   'ext4'
+    option 'options'  'rw'
+    option 'enabled'  '1'
+
+config 'mount'
+    option 'target'   '/reap/disk/AppData'
+    option 'device'   '/dev/mmcblk0p2'
+    option 'fstype'   'ext4'
+    option 'options'  'rw'
+    option 'enabled'  '1'
+
+config 'mount'
+    option 'target'   '/mnt/usb/SDCard_Src1'
+    option 'device'   '/dev/mmcblk0p3'
+    option 'fstype'   'ext4'
+    option 'options'  'rw'
+    option 'enabled'  '1'
+
+config 'mount'
+    option 'target'   '/reap/disk/SDCard_Src2'
+    option 'device'   '/dev/mmcblk0p4'
+    option 'fstype'   'ext4'
+    option 'options'  'rw'
+    option 'enabled'  '1'
+EOF
+
+    printf "enabling and restarting fstab/block-mount\n"
+    /etc/init.d/fstab enable
+    /etc/init.d/fstab start
+
+    printf "Verifying newly mounted partitions\n"
+    if ! grep -qsw "AppSrc" /proc/mounts
+    then
+        printf "SD card partition not mounted on AppSrc\n"
+        exit 1
+    fi
+    if ! grep -qsw "AppData" /proc/mounts
+    then
+        printf "SD card partition not mounted on AppData\n"
+        exit 1
+    fi
+    if ! grep -qsw "SDCard_Src1" /proc/mounts
+    then
+        printf "SD card partition not mounted on SDCard_Src1\n"
+        exit 1
+    fi
+    if ! grep -qsw "SDCard_Src2" /proc/mounts
+    then
+        printf "SD card partition not mounted on SDCard_Src2\n"
+        exit 1
+    fi
+
+    printf "SD card partitions mounted successfully\n"
+    printf "Now creating directories for applications\n"
+
+    mkdir /reap/disk/AppData/P500
+}
+
+UnmountPartition()
+{
+    for n in /dev/mmcblk0p* ; do umount $n ; done
+    if [ $? -ne 0 ]
+    then 
+        printf "SD card Partitions are not mounted\n"
+    else
+        printf "Unmounted all SD card partitions successfully\n"
+    fi
+}    
+
+
+UpdateHTTPCfg()
+{
+	
+	HTTPEnable=$(uci get cloudconfig.cloudconfig.cloudprotocol)
+	httpenable=0
+	if [ "$HTTPEnable" = "http" ]
+	then
+	     rm -rf "${HTTPconfigureCfgPath}.cfg"	
+	     httpenable=1
+		echo "Updating HTTP application configuration "
+	    echo "Updating '${HTTPconfigureCfgPath}.cfg' configuration"
+	    config_load "$httpEventfile"
+	    #config_get  httpenable                  "$httpconfigureEventSection"    httpenable
+	    config_get  HTTPServerURL                  "$httpconfigureEventSection"    HTTPServerURL
+	    config_get  HTTPServerPort                  "$httpconfigureEventSection"    HTTPServerPort
+	    config_get httpauthenable "$httpconfigureEventSection" httpauthenable
+	    config_get  username    "$httpconfigureEventSection"    username
+	    config_get  password  "$httpconfigureEventSection"    password
+	    config_get serverresponsevalidationenable "$httpconfigureEventSection" serverresponsevalidationenable
+	    config_get serverresponsestring "$httpconfigureEventSection" serverresponsestring
+	    config_get HTTPMethod "$httpconfigureEventSection" HTTPMethod
+	    config_get EnableSecondaryServer "$httpconfigureEventSection" EnableSecondaryServer
+	    
+	    {
+	        echo "httpenable=$httpenable"
+	        if [[ -z "$HTTPServerPort" ]]; then
+	             echo "HTTPServerURL=\"$HTTPServerURL\""
+	        else
+		        echo "HTTPServerURL=\"$HTTPServerURL:$HTTPServerPort\""
+	        fi
+	        echo "httpauthenable=$httpauthenable"
+	        if [ "$httpauthenable" = "1" ]                                                                       
+	        then 
+		        echo "username=\"$username\""
+		        echo "password=\"$password\""
+	        fi
+	        
+	        echo "serverresponsevalidationenable=$serverresponsevalidationenable"
+	        if [ "$serverresponsevalidationenable" = "1" ]                                                                       
+	        then 
+		        echo "serverresponsestring=\"$serverresponsestring\""
+		    fi
+		   
+		    echo "HTTPMethod=$HTTPMethod"
+		    echo "EnableSecondaryServer=$EnableSecondaryServer"
+		    echo "ServerDNSLookupTime=60"
+		    echo "ServerMaximumTransferTimeout=60"
+	        
+	    } > "${HTTPconfigureCfgPath}.cfg"         
+
+   fi
+}
+
+
+TemperatureDeviceConfigUpdate() 
+{ 
+    local TemperatureDeviceConfigSection="$1"                                                                                                                                                    
+    tempSensorCount=$((tempSensorCount+1))
+    
+    config_get Enable     			"$TemperatureDeviceConfigSection" Enable 
+	config_get TemperatureID 		"$TemperatureDeviceConfigSection" TemperatureID
+	config_get Address   			"$TemperatureDeviceConfigSection" Address
+	config_get AlarmEnable	 		"$TemperatureDeviceConfigSection" AlarmEnable
+	config_get UpperThreshold		"$TemperatureDeviceConfigSection" UpperThreshold
+	config_get LowerThreshold		"$TemperatureDeviceConfigSection" LowerThreshold
+	config_get TimeDependency		"$TemperatureDeviceConfigSection" TimeDependency
+	config_get AlarmStartTime		"$TemperatureDeviceConfigSection" AlarmStartTime
+	config_get AlarmStopTime		"$TemperatureDeviceConfigSection" AlarmStopTime
+	config_get DayDependency		"$TemperatureDeviceConfigSection" DayDependency
+	config_get DayDependencyValue	"$TemperatureDeviceConfigSection" DayDependencyValue
+
+	if [ "$AlarmEnable" = "1" ]
+	then
+		temp=$(echo "${UpperThreshold}."  | cut -d "." -f 2)
+		if [ -z $temp ]
+		then
+			echo "TemperatureSensor${tempSensorCount}UpperThreshold=${UpperThreshold}.00" >> "$BLClimitscfgpath"
+		else
+			echo "TemperatureSensor${tempSensorCount}UpperThreshold=${UpperThreshold}" >> "$BLClimitscfgpath"
+		fi
+			
+		temp=$(echo "${LowerThreshold}."  | cut -d "." -f 2)
+		if [ -z $temp ]
+		then
+			echo "TemperatureSensor${tempSensorCount}LowerThreshold=${LowerThreshold}.00" >> "$BLClimitscfgpath"
+		else
+			echo "TemperatureSensor${tempSensorCount}LowerThreshold=${LowerThreshold}" >> "$BLClimitscfgpath"
+		fi
+	
+	else
+		echo "TemperatureSensor${tempSensorCount}UpperThreshold=9999.999999" >> "$BLClimitscfgpath"
+		echo "TemperatureSensor${tempSensorCount}LowerThreshold=9999.999999" >> "$BLClimitscfgpath"
+	fi
+	
+     
+    echo "no of device count is $NoOfTemperatureDeviceCount"   
+    {   
+		echo "########## Temperature Sensor ${tempSensorCount} Configuration############"
+		echo "TemperatureSensor${tempSensorCount}ID=${TemperatureID}"
+		echo "TemperatureSensor${tempSensorCount}Enable=${Enable}"
+
+		if [ "$Enable" = "0" ]
+		then 	
+			Address="xx.xxxxxxxxxxxx"
+		fi
+		echo "TemperatureSensor${tempSensorCount}Address=\"${Address}\""
+		echo "TemperatureSensor${tempSensorCount}AlarmEnable=${AlarmEnable}"
+		
+		if [ "$AlarmEnable" = "1" ]
+		then
+			temp=$(echo "${UpperThreshold}."  | cut -d "." -f 2)
+			if [ -z $temp ]
+			then
+				echo "TemperatureSensor${tempSensorCount}UpperThreshold=${UpperThreshold}.00"
+			else
+				echo "TemperatureSensor${tempSensorCount}UpperThreshold=${UpperThreshold}"
+			fi
+			
+			temp=$(echo "${LowerThreshold}."  | cut -d "." -f 2)
+			if [ -z $temp ]
+			then
+				echo "TemperatureSensor${tempSensorCount}LowerThreshold=${LowerThreshold}.00"
+			else
+				echo "TemperatureSensor${tempSensorCount}LowerThreshold=${LowerThreshold}"
+			fi
+			
+			echo "TemperatureSensor${tempSensorCount}TimeDependency=${TimeDependency}"
+			
+			if [ "$TimeDependency" = "1" ]
+			then
+				echo "TemperatureSensor${tempSensorCount}AlarmStartTime=\"${AlarmStartTime}\""
+				echo "TemperatureSensor${tempSensorCount}AlarmStopTime=\"${AlarmStopTime}\""
+			fi
+			
+			echo "TemperatureSensor${tempSensorCount}DayDependency=${DayDependency}"
+			
+			if [ "$DayDependency" = "1" ]
+			then
+				echo "TemperatureSensor${tempSensorCount}DayDependencyValue=${DayDependencyValue}"
+			fi
+		fi
+    } >> "${TemperatureDeviceconfigureCfgPath}.cfg"    
+     
+    sed -i 's/\s*$//' "${TemperatureDeviceconfigureCfgPath}.cfg"  
+    sed -i -e '/=$/d' "${TemperatureDeviceconfigureCfgPath}.cfg"                                                                                                                             
+}           
+    
+UpdateTemperatureCfg()
+{
+	rm -rf "$BLClimitscfgpath"
+	rm "${TemperatureDeviceconfigureCfgPath}.cfg"           
+    config_load "$TemperatureDeviceconfigureFile"
+    config_foreach TemperatureDeviceConfigUpdate TemperatureConfig
+    echo ""
+    echo ""
+    echo "#Number of Temperature Sensors to read" >> "${TemperatureDeviceconfigureCfgPath}.cfg"
+    echo "NoOfTemperatureSensors=${tempSensorCount}" >> "${TemperatureDeviceconfigureCfgPath}.cfg"
+    
+    echo "noOfTempSensors=${tempSensorCount}" >> "$BLClimitscfgpath"
+} 
+
+UpdateDIOCfg()
+{
+	rm "${DIODeviceconfigureCfgPath}.cfg" 
+	rm "${DIODeviceAlarmconfigureCfgPath}.cfg" 
+	config_load "$DIOEventfile"
+    config_get  DInput1Enable                  "$DIOconfigureEventSection"    DInput1Enable
+    config_get  DIOMode1                  "$DIOconfigureEventSection"    DIOMode1
+    config_get  DInput1AlarmActiveState                  "$DIOconfigureEventSection"    DInput1AlarmActiveState
+    config_get  DInput1AlarmActiveFilterTimeInMilliSeconds                  "$DIOconfigureEventSection"    DInput1AlarmActiveFilterTimeInMilliSeconds
+    config_get  DInput1AlarmDeActiveFilterTimeInMilliSeconds                  "$DIOconfigureEventSection"    DInput1AlarmDeActiveFilterTimeInMilliSeconds
+    config_get  DInput1TimeDependency                  "$DIOconfigureEventSection"    DInput1TimeDependency
+    config_get  DInput1AlarmStartTime                  "$DIOconfigureEventSection"    DInput1AlarmStartTime
+    config_get  DInput1AlarmStopTime                  "$DIOconfigureEventSection"    DInput1AlarmStopTime
+    config_get  DInput1MaskValue                  "$DIOconfigureEventSection"    DInput1MaskValue
+    config_get  DInput1AlarmSetNotifyVal                  "$DIOconfigureEventSection"    DInput1AlarmSetNotifyVal
+    config_get  DInput1AlarmResetNotifyVal                  "$DIOconfigureEventSection"    DInput1AlarmResetNotifyVal
+    
+   
+    config_get  DInput2Enable                  "$DIOconfigureEventSection"    DInput2Enable
+    config_get  DIOMode2                  "$DIOconfigureEventSection"    DIOMode2
+    config_get  DInput2AlarmActiveState                  "$DIOconfigureEventSection"    DInput2AlarmActiveState
+    config_get  DInput2AlarmActiveFilterTimeInMilliSeconds                  "$DIOconfigureEventSection"    DInput2AlarmActiveFilterTimeInMilliSeconds
+    config_get  DInput2AlarmDeActiveFilterTimeInMilliSeconds                  "$DIOconfigureEventSection"    DInput2AlarmDeActiveFilterTimeInMilliSeconds
+    config_get  DInput2TimeDependency                  "$DIOconfigureEventSection"    DInput2TimeDependency
+    config_get  DInput2AlarmStartTime                  "$DIOconfigureEventSection"    DInput2AlarmStartTime
+    config_get  DInput2AlarmStopTime                  "$DIOconfigureEventSection"    DInput2AlarmStopTime
+    config_get  DInput2MaskValue                  "$DIOconfigureEventSection"    DInput2MaskValue
+    config_get  DInput2AlarmSetNotifyVal                  "$DIOconfigureEventSection"    DInput2AlarmSetNotifyVal
+    config_get  DInput2AlarmResetNotifyVal                  "$DIOconfigureEventSection"    DInput2AlarmResetNotifyVal
+    
+    config_get  DInput3Enable                  "$DIOconfigureEventSection"    DInput3Enable
+    config_get  DIOMode3                  "$DIOconfigureEventSection"    DIOMode3
+    config_get  DInput3AlarmActiveState                  "$DIOconfigureEventSection"    DInput3AlarmActiveState
+    config_get  DInput3AlarmActiveFilterTimeInMilliSeconds                  "$DIOconfigureEventSection"    DInput3AlarmActiveFilterTimeInMilliSeconds
+    config_get  DInput3AlarmDeActiveFilterTimeInMilliSeconds                  "$DIOconfigureEventSection"    DInput3AlarmDeActiveFilterTimeInMilliSeconds
+    config_get  DInput3TimeDependency                  "$DIOconfigureEventSection"    DInput3TimeDependency
+    config_get  DInput3AlarmStartTime                  "$DIOconfigureEventSection"    DInput3AlarmStartTime
+    config_get  DInput3AlarmStopTime                  "$DIOconfigureEventSection"    DInput3AlarmStopTime
+    config_get  DInput3MaskValue                  "$DIOconfigureEventSection"    DInput3MaskValue
+    config_get  DInput3AlarmSetNotifyVal                  "$DIOconfigureEventSection"    DInput3AlarmSetNotifyVal
+    config_get  DInput3AlarmResetNotifyVal                  "$DIOconfigureEventSection"    DInput3AlarmResetNotifyVal
+        
+    config_get  DInput4Enable                   "$DIOconfigureEventSection"    DInput4Enable
+    config_get  DIOMode4                  "$DIOconfigureEventSection"    DIOMode4
+    config_get  DInput4AlarmActiveState                  "$DIOconfigureEventSection"    DInput4AlarmActiveState
+    config_get  DInput4AlarmActiveFilterTimeInMilliSeconds                  "$DIOconfigureEventSection"    DInput4AlarmActiveFilterTimeInMilliSeconds
+    config_get  DInput4AlarmDeActiveFilterTimeInMilliSeconds                  "$DIOconfigureEventSection"    DInput4AlarmDeActiveFilterTimeInMilliSeconds
+    config_get  DInput4TimeDependency                  "$DIOconfigureEventSection"    DInput4TimeDependency
+    config_get  DInput4AlarmStartTime                  "$DIOconfigureEventSection"    DInput4AlarmStartTime
+    config_get  DInput4AlarmStopTime                  "$DIOconfigureEventSection"    DInput4AlarmStopTime
+    config_get  DInput4MaskValue                  "$DIOconfigureEventSection"    DInput4MaskValue
+    config_get  DInput4AlarmSetNotifyVal                  "$DIOconfigureEventSection"    DInput4AlarmSetNotifyVal
+    config_get  DInput4AlarmResetNotifyVal                  "$DIOconfigureEventSection"    DInput4AlarmResetNotifyVal
+    
+	    uci get digitalinputconfig.didogpioconfig
+		uci get digitalinputconfig.didogpioconfig.numberOfDido
+	    DI1=$(uci get digitalinputconfig.didogpioconfig.di1)
+		DI2=$(uci get digitalinputconfig.didogpioconfig.di2)
+		DI3=$(uci get digitalinputconfig.didogpioconfig.di3)
+		DI4=$(uci get digitalinputconfig.didogpioconfig.di4)
+		DO1=$(uci get digitalinputconfig.didogpioconfig.do1)
+		DO2=$(uci get digitalinputconfig.didogpioconfig.do2)
+		DO3=$(uci get digitalinputconfig.didogpioconfig.do3)
+		DO4=$(uci get digitalinputconfig.didogpioconfig.do4)
+
+    
+    
+    
+if echo "$board_name" | grep -qE "(IDBXX)";
+	then
+		for i in 392 393 394 395
+		do
+			echo "$i" > /sys/class/gpio/export
+			echo "out" > /sys/class/gpio/gpio${i}/direction
+			echo "0" > /sys/class/gpio/gpio${i}/value
+		done
+			
+		if [ "$DIOMode1" = "1" ]                                                                    
+		then                      
+				echo "388" > /sys/class/gpio/export
+				echo "out" > /sys/class/gpio/gpio388/direction
+				
+				echo "1" > /sys/class/gpio/gpio392/value
+		fi
+		
+		if [ "$DIOMode2" = "1" ]                                                                    
+		then                      
+				echo "389" > /sys/class/gpio/export
+				echo "out" > /sys/class/gpio/gpio389/direction
+				
+				echo "1" > /sys/class/gpio/gpio393/value
+		fi
+		
+		if [ "$DIOMode3" = "1" ]                                                                    
+		then                      
+				echo "390" > /sys/class/gpio/export
+				echo "out" > /sys/class/gpio/gpio390/direction
+				
+				echo "1" > /sys/class/gpio/gpio394/value
+		fi
+		
+		if [ "$DIOMode4" = "1" ]                                                                    
+		then                      
+				echo "391" > /sys/class/gpio/export
+				echo "out" > /sys/class/gpio/gpio391/direction
+				
+				echo "1" > /sys/class/gpio/gpio395/value
+		fi
+	
+	    {
+			echo "########## DIO1 Configuration############"
+			echo "DInput1Enable=$DInput1Enable"
+			echo "DIOMode1=$DIOMode1"		
+			echo "DInput1AlarmActiveState=$DInput1AlarmActiveState"
+			echo "DInput1AlarmActiveFilterTimeInMilliSeconds=$DInput1AlarmActiveFilterTimeInMilliSeconds"
+			echo "DInput1AlarmDeActiveFilterTimeInMilliSeconds=$DInput1AlarmDeActiveFilterTimeInMilliSeconds"
+			echo "DInput1TimeDependency=$DInput1TimeDependency"
+			echo "DInput1AlarmStartTime=\"$DInput1AlarmStartTime\""
+			echo "DInput1AlarmStopTime=\"$DInput1AlarmStopTime\""
+			echo ""
+			echo ""
+			echo "########## DIO2 Configuration############"
+			echo "DInput2Enable=$DInput2Enable"
+			echo "DIOMode2=$DIOMode2"
+			echo "DInput2AlarmActiveState=$DInput2AlarmActiveState"
+			echo "DInput2AlarmActiveFilterTimeInMilliSeconds=$DInput2AlarmActiveFilterTimeInMilliSeconds"
+			echo "DInput2AlarmDeActiveFilterTimeInMilliSeconds=$DInput2AlarmDeActiveFilterTimeInMilliSeconds"
+			echo "DInput2TimeDependency=$DInput2TimeDependency"
+			echo "DInput2AlarmStartTime=\"$DInput2AlarmStartTime\""
+			echo "DInput2AlarmStopTime=\"$DInput2AlarmStopTime\""
+			echo ""
+			echo ""
+			echo "########## DIO3 Configuration############"
+			echo "DInput3Enable=$DInput3Enable"
+			echo "DIOMode3=$DIOMode3"
+			echo "DInput3AlarmActiveState=$DInput3AlarmActiveState"
+			echo "DInput3AlarmActiveFilterTimeInMilliSeconds=$DInput3AlarmActiveFilterTimeInMilliSeconds"
+			echo "DInput3AlarmDeActiveFilterTimeInMilliSeconds=$DInput3AlarmDeActiveFilterTimeInMilliSeconds"
+			echo "DInput3TimeDependency=$DInput3TimeDependency"
+			echo "DInput3AlarmStartTime=\"$DInput3AlarmStartTime\""
+			echo "DInput3AlarmStopTime=\"$DInput3AlarmStopTime\""
+			echo ""
+			echo ""
+			echo "########## DIO4 Configuration############"
+			echo "DInput4Enable=$DInput4Enable"
+			echo "DIOMode4=$DIOMode4"
+			echo "DInput4AlarmActiveState=$DInput4AlarmActiveState"
+			echo "DInput4AlarmActiveFilterTimeInMilliSeconds=$DInput4AlarmActiveFilterTimeInMilliSeconds"
+			echo "DInput4AlarmDeActiveFilterTimeInMilliSeconds=$DInput4AlarmDeActiveFilterTimeInMilliSeconds"
+			echo "DInput4TimeDependency=$DInput4TimeDependency"
+			echo "DInput4AlarmStartTime=\"$DInput4AlarmStartTime\""
+			echo "DInput4AlarmStopTime=\"$DInput4AlarmStopTime\""
+			
+			
+		} >>  "${DIODeviceconfigureCfgPath}.cfg" 
+		
+		{
+			echo "#No of DI Inputs"
+			echo "NoOfDInput=4"
+			echo ""
+			echo ""
+			echo "#No Of Holidays"
+			echo "NoOfHolidays = 0"
+			echo ""
+			echo ""
+			echo "DInput1PinNo=384"
+			echo "DInput1DayDependency=0"
+			echo "DInput1AlarmIgnoreDay=\"01-05-2000\""
+			echo "DInput1MaskValue =$DInput1MaskValue"
+			echo "#Possible Value for Alarm Set 6/1"
+			echo "DInput1AlarmSetNotifyVal=$DInput1AlarmSetNotifyVal"
+			echo "#Possible Value for Alarm ReSet 3/0"
+			echo "DInput1AlarmResetNotifyVal=$DInput1AlarmResetNotifyVal"
+			echo ""
+			echo ""		
+			echo "DInput2PinNo=385"
+			echo "DInput2DayDependency=0"
+	        echo "DInput2AlarmIgnoreDay=\"01-05-2000\""
+			echo "DInput2MaskValue=$DInput2MaskValue"
+			echo "#Possible Value for Alarm Set 6/1"
+			echo "DInput2AlarmSetNotifyVal=$DInput2AlarmSetNotifyVal"
+			echo "#Possible Value for Alarm ReSet 3/0"
+			echo "DInput2AlarmResetNotifyVal=$DInput2AlarmResetNotifyVal"
+			echo ""
+			echo ""
+			echo "DInput3PinNo=386"
+			echo "DInput3DayDependency=0"
+			echo "DInput3AlarmIgnoreDay=\"01-05-2000\""
+			echo "DInput3MaskValue =$DInput3MaskValue"
+			echo "#Possible Value for Alarm Set 6/1"
+			echo "DInput3AlarmSetNotifyVal=$DInput3AlarmSetNotifyVal"
+			echo "#Possible Value for Alarm ReSet 3/0"
+			echo "DInput3AlarmResetNotifyVal=$DInput3AlarmResetNotifyVal"
+			echo ""
+			echo ""
+			echo "DInput4PinNo=387"
+			echo "DInput4DayDependency=0"
+			echo "DInput4AlarmIgnoreDay=\"01-05-2000\""
+			echo "DInput4MaskValue=$DInput4MaskValue"
+			echo "#Possible Value for Alarm Set 6/1"
+			echo "DInput4AlarmSetNotifyVal=$DInput4AlarmSetNotifyVal"
+			echo "#Possible Value for Alarm ReSet 3/0"
+			echo "DInput4AlarmResetNotifyVal=$DInput4AlarmResetNotifyVal"
+		} >>  "${DIODeviceAlarmconfigureCfgPath}.cfg" 
+		
+		sed -i 's/\s*$//' "${DIODeviceconfigureCfgPath}.cfg"  
+	    sed -i -e '/=$/d' "${DIODeviceconfigureCfgPath}.cfg" 
+	    
+		sed -i 's/\s*$//' "${DIODeviceAlarmconfigureCfgPath}.cfg"  
+	    sed -i -e '/=$/d' "${DIODeviceAlarmconfigureCfgPath}.cfg"      
+	    /etc/init.d/initGPIO.sh start
+	else
+    
+	for i in 490 491 492 493
+	do
+		echo "$i" > /sys/class/gpio/export
+		echo "out" > /sys/class/gpio/gpio${i}/direction
+		echo "0" > /sys/class/gpio/gpio${i}/value
+	done
+		
+	if [ "$DIOMode1" = "1" ]                                                                    
+	then                      
+			echo "484" > /sys/class/gpio/export
+			echo "out" > /sys/class/gpio/gpio484/direction
+			
+			echo "1" > /sys/class/gpio/gpio490/value
+	fi
+	
+	if [ "$DIOMode2" = "1" ]                                                                    
+	then                      
+			echo "485" > /sys/class/gpio/export
+			echo "out" > /sys/class/gpio/gpio485/direction
+			
+			echo "1" > /sys/class/gpio/gpio491/value
+	fi
+	
+	if [ "$DIOMode3" = "1" ]                                                                    
+	then                      
+			echo "486" > /sys/class/gpio/export
+			echo "out" > /sys/class/gpio/gpio486/direction
+			
+			echo "1" > /sys/class/gpio/gpio492/value
+	fi
+	
+	if [ "$DIOMode4" = "1" ]                                                                    
+	then                      
+			echo "487" > /sys/class/gpio/export
+			echo "out" > /sys/class/gpio/gpio487/direction
+			
+			echo "1" > /sys/class/gpio/gpio493/value
+	fi
+
+    {
+		echo "########## DIO1 Configuration############"
+		echo "DInput1Enable=$DInput1Enable"
+		echo "DIOMode1=$DIOMode1"		
+		echo "DInput1AlarmActiveState=$DInput1AlarmActiveState"
+		echo "DInput1AlarmActiveFilterTimeInMilliSeconds=$DInput1AlarmActiveFilterTimeInMilliSeconds"
+		echo "DInput1AlarmDeActiveFilterTimeInMilliSeconds=$DInput1AlarmDeActiveFilterTimeInMilliSeconds"
+		echo "DInput1TimeDependency=$DInput1TimeDependency"
+		echo "DInput1AlarmStartTime=\"$DInput1AlarmStartTime\""
+		echo "DInput1AlarmStopTime=\"$DInput1AlarmStopTime\""
+		echo ""
+		echo ""
+		echo "########## DIO2 Configuration############"
+		echo "DInput2Enable=$DInput2Enable"
+		echo "DIOMode2=$DIOMode2"
+		echo "DInput2AlarmActiveState=$DInput2AlarmActiveState"
+		echo "DInput2AlarmActiveFilterTimeInMilliSeconds=$DInput2AlarmActiveFilterTimeInMilliSeconds"
+		echo "DInput2AlarmDeActiveFilterTimeInMilliSeconds=$DInput2AlarmDeActiveFilterTimeInMilliSeconds"
+		echo "DInput2TimeDependency=$DInput2TimeDependency"
+		echo "DInput2AlarmStartTime=\"$DInput2AlarmStartTime\""
+		echo "DInput2AlarmStopTime=\"$DInput2AlarmStopTime\""
+		echo ""
+		echo ""
+		echo "########## DIO3 Configuration############"
+		echo "DInput3Enable=$DInput3Enable"
+		echo "DIOMode3=$DIOMode3"
+		echo "DInput3AlarmActiveState=$DInput3AlarmActiveState"
+		echo "DInput3AlarmActiveFilterTimeInMilliSeconds=$DInput3AlarmActiveFilterTimeInMilliSeconds"
+		echo "DInput3AlarmDeActiveFilterTimeInMilliSeconds=$DInput3AlarmDeActiveFilterTimeInMilliSeconds"
+		echo "DInput3TimeDependency=$DInput3TimeDependency"
+		echo "DInput3AlarmStartTime=\"$DInput3AlarmStartTime\""
+		echo "DInput3AlarmStopTime=\"$DInput3AlarmStopTime\""
+		echo ""
+		echo ""
+		echo "########## DIO4 Configuration############"
+		echo "DInput4Enable=$DInput4Enable"
+		echo "DIOMode4=$DIOMode4"
+		echo "DInput4AlarmActiveState=$DInput4AlarmActiveState"
+		echo "DInput4AlarmActiveFilterTimeInMilliSeconds=$DInput4AlarmActiveFilterTimeInMilliSeconds"
+		echo "DInput4AlarmDeActiveFilterTimeInMilliSeconds=$DInput4AlarmDeActiveFilterTimeInMilliSeconds"
+		echo "DInput4TimeDependency=$DInput4TimeDependency"
+		echo "DInput4AlarmStartTime=\"$DInput4AlarmStartTime\""
+		echo "DInput4AlarmStopTime=\"$DInput4AlarmStopTime\""
+		
+		
+	} >>  "${DIODeviceconfigureCfgPath}.cfg" 
+	
+	{
+		echo "#No of DI Inputs"
+		echo "NoOfDInput=4"
+		echo ""
+		echo ""
+		echo "#No Of Holidays"
+		echo "NoOfHolidays = 0"
+		echo ""
+		echo ""
+		echo "DInput1PinNo=$DI1"
+		echo "DInput1DayDependency=0"
+		echo "DInput1AlarmIgnoreDay=\"01-05-2000\""
+		echo "DInput1MaskValue =$DInput1MaskValue"
+		echo "#Possible Value for Alarm Set 6/1"
+		echo "DInput1AlarmSetNotifyVal=$DInput1AlarmSetNotifyVal"
+		echo "#Possible Value for Alarm ReSet 3/0"
+		echo "DInput1AlarmResetNotifyVal=$DInput1AlarmResetNotifyVal"
+		echo ""
+		echo ""		
+		echo "DInput2PinNo=$DI2"
+		echo "DInput2DayDependency=0"
+        echo "DInput2AlarmIgnoreDay=\"01-05-2000\""
+		echo "DInput2MaskValue=$DInput2MaskValue"
+		echo "#Possible Value for Alarm Set 6/1"
+		echo "DInput2AlarmSetNotifyVal=$DInput2AlarmSetNotifyVal"
+		echo "#Possible Value for Alarm ReSet 3/0"
+		echo "DInput2AlarmResetNotifyVal=$DInput2AlarmResetNotifyVal"
+		echo ""
+		echo ""
+		echo "DInput3PinNo=$DI3"
+		echo "DInput3DayDependency=0"
+		echo "DInput3AlarmIgnoreDay=\"01-05-2000\""
+		echo "DInput3MaskValue =$DInput3MaskValue"
+		echo "#Possible Value for Alarm Set 6/1"
+		echo "DInput3AlarmSetNotifyVal=$DInput3AlarmSetNotifyVal"
+		echo "#Possible Value for Alarm ReSet 3/0"
+		echo "DInput3AlarmResetNotifyVal=$DInput3AlarmResetNotifyVal"
+		echo ""
+		echo ""
+		echo "DInput4PinNo=$DI4"
+		echo "DInput4DayDependency=0"
+		echo "DInput4AlarmIgnoreDay=\"01-05-2000\""
+		echo "DInput4MaskValue=$DInput4MaskValue"
+		echo "#Possible Value for Alarm Set 6/1"
+		echo "DInput4AlarmSetNotifyVal=$DInput4AlarmSetNotifyVal"
+		echo "#Possible Value for Alarm ReSet 3/0"
+		echo "DInput4AlarmResetNotifyVal=$DInput4AlarmResetNotifyVal"
+	} >>  "${DIODeviceAlarmconfigureCfgPath}.cfg" 
+	
+	sed -i 's/\s*$//' "${DIODeviceconfigureCfgPath}.cfg"  
+    sed -i -e '/=$/d' "${DIODeviceconfigureCfgPath}.cfg" 
+    
+	sed -i 's/\s*$//' "${DIODeviceAlarmconfigureCfgPath}.cfg"  
+    sed -i -e '/=$/d' "${DIODeviceAlarmconfigureCfgPath}.cfg"      
+    /etc/init.d/initGPIO.sh start
+fi
+}
+
+UpdateAIOCfg()
+{
+	rm "${AIODeviceconfigureCfgPath}.cfg" 
+
+	config_load "$AIOEventfile"
+    config_get  AInputBurstMode                  "$AIOconfigureEventSection"    AInputBurstMode 
+    config_get  AInput1Enable                  "$AIOconfigureEventSection"    AInput1Enable
+    config_get  AInput1AlarmActiveState                  "$AIOconfigureEventSection"    AInput1AlarmActiveState
+    config_get  AInput1UpperThreshold                  "$AIOconfigureEventSection"    AInput1UpperThreshold
+    config_get  AInput1UpperHysteresis                  "$AIOconfigureEventSection"    AInput1UpperHysteresis
+    config_get  AInput1LowerThreshold                  "$AIOconfigureEventSection"    AInput1LowerThreshold
+    config_get  AInput1LowerHysteresis                  "$AIOconfigureEventSection"    AInput1LowerHysteresis
+    config_get  AInput1TimeDependency                  "$AIOconfigureEventSection"    AInput1TimeDependency
+    config_get  AInput1AlarmStartTime                  "$AIOconfigureEventSection"    AInput1AlarmStartTime
+    config_get  AInput1AlarmStopTime                  "$AIOconfigureEventSection"    AInput1AlarmStopTime
+    config_get  AInput1DayDependency                  "$AIOconfigureEventSection"    AInput1DayDependency
+    config_get  AInput1DayDependencyValue                  "$AIOconfigureEventSection"    AInput1DayDependencyValue
+
+    
+    
+	config_get  AInput2Enable                  "$AIOconfigureEventSection"    AInput2Enable
+    config_get  AInput2AlarmActiveState                  "$AIOconfigureEventSection"    AInput2AlarmActiveState
+    config_get  AInput2UpperThreshold                  "$AIOconfigureEventSection"    AInput2UpperThreshold
+    config_get  AInput2UpperHysteresis                  "$AIOconfigureEventSection"    AInput2UpperHysteresis
+    config_get  AInput2LowerThreshold                  "$AIOconfigureEventSection"    AInput2LowerThreshold
+    config_get  AInput2LowerHysteresis                  "$AIOconfigureEventSection"    AInput2LowerHysteresis
+    config_get  AInput2TimeDependency                  "$AIOconfigureEventSection"    AInput2TimeDependency
+    config_get  AInput2AlarmStartTime                  "$AIOconfigureEventSection"    AInput2AlarmStartTime
+    config_get  AInput2AlarmStopTime                  "$AIOconfigureEventSection"    AInput2AlarmStopTime
+    config_get  AInput2DayDependency                  "$AIOconfigureEventSection"    AInput2DayDependency
+    config_get  AInput2DayDependencyValue                  "$AIOconfigureEventSection"    AInput2DayDependencyValue
+    
+        {
+		echo "########## AIO1 Configuration############"
+		echo "AInput1Enable=$AInput1Enable"				
+		echo "AInput1AlarmActiveState=$AInput1AlarmActiveState"
+		echo "AInput1UpperThreshold=$AInput1UpperThreshold"
+		echo "AInput1UpperHysteresis=$AInput1UpperHysteresis"
+		echo "AInput1LowerThreshold=$AInput1LowerThreshold"
+		echo "AInput1LowerHysteresis=$AInput1LowerHysteresis"
+		echo "AInput1TimeDependency=$AInput1TimeDependency"
+		echo "AInput1HolidayCheckStartTime=\"$AInput1AlarmStartTime\""
+		echo "AInput1HolidayCheckEndTime=\"$AInput1AlarmStopTime\""
+		
+		echo "AInput1DayDependency=$AInput1DayDependency"
+		echo "AInput1DayDependencyValue=$AInput1DayDependencyValue"
+		
+		if [ "$AInputBurstMode" = "1" ]
+        then
+			echo "AInput1NoOfSamples=1"
+        else
+			echo "AInput1NoOfSamples=20"    
+        fi
+
+		echo ""
+		echo ""
+		echo "########## AIO2 Configuration############"
+		echo "AInput2Enable=$AInput2Enable"		
+		echo "AInput2AlarmActiveState=$AInput2AlarmActiveState"
+		echo "AInput2UpperThreshold=$AInput2UpperThreshold"
+		echo "AInput2UpperHysteresis=$AInput2UpperHysteresis"
+		echo "AInput2LowerThreshold=$AInput2LowerThreshold"
+		echo "AInput2LowerHysteresis=$AInput2LowerHysteresis"
+		echo "AInput2TimeDependency=$AInput2TimeDependency"
+		echo "AInput2HolidayCheckStartTime=\"$AInput2AlarmStartTime\""
+		echo "AInput2HolidayCheckEndTime=\"$AInput2AlarmStopTime\""
+		
+		echo "AInput2DayDependency=$AInput2DayDependency"
+		echo "AInput2DayDependencyValue=$AInput2DayDependencyValue"
+		
+		if [ "$AInputBurstMode" = "1" ]
+        then
+			echo "AInput2NoOfSamples=1"
+        else
+			echo "AInput2NoOfSamples=20"    
+        fi
+
+		echo ""
+		echo ""
+		#if [ "$AInput1Enable" = "1" ] || [ "$AInput2Enable" = "1" ]
+		#then
+		#	echo "NoOfAInput=2"
+		#elif [ "$AInput1Enable" = "0" ] && [ "$AInput2Enable" = "0" ]
+		#then
+		#	echo "NoOfAInput=0"
+		#fi
+		echo "NoOfAInput=2"
+		echo "AInputBurstMode=$AInputBurstMode"
+		
+		
+	} >>  "${AIODeviceconfigureCfgPath}.cfg" 
+	
+
+	
+	sed -i 's/\s*$//' "${AIODeviceconfigureCfgPath}.cfg"  
+    sed -i -e '/=$/d' "${AIODeviceconfigureCfgPath}.cfg" 
+    
+     
+     
+} 
+
+#to update buissness Logic Control
+updateBLCcfg()
+{
+	#to verify the relays selected in action
+	do1_enable=$(uci get digitalinputconfig.digitalinputconfig.DInput1Enable)
+	do2_enable=$(uci get digitalinputconfig.digitalinputconfig.DInput2Enable)
+	do3_enable=$(uci get digitalinputconfig.digitalinputconfig.DInput3Enable)
+	do4_enable=$(uci get digitalinputconfig.digitalinputconfig.DInput4Enable)
+	
+	do1mode=$(uci get digitalinputconfig.digitalinputconfig.DIOMode1)
+	do2mode=$(uci get digitalinputconfig.digitalinputconfig.DIOMode2)
+	do3mode=$(uci get digitalinputconfig.digitalinputconfig.DIOMode3)
+	do4mode=$(uci get digitalinputconfig.digitalinputconfig.DIOMode4)
+	
+	section="$1"
+	NoOfEvents=$((NoOfEvents+1))
+	{
+		config_get name "$section" name
+		config_get EEnable "$section" EEnable
+		config_get SensorType "$section" SensorType
+		
+		echo "Event${NoOfEvents}=\"$name\""
+		echo "${name}Enable=$EEnable"
+		
+		if [ "$EEnable" = "1" ]
+		then			
+			echo "${name}NumberOfSensors=1"
+			echo "${name}Sensor1Type=${SensorType}"
+			
+			if [ "$SensorType" = "0" ]
+			then
+				config_get DINo "$section" DINo
+				config_get AlarmActiveState "$section" AlarmActiveState
+				
+				echo "${name}Sensor1Number=${DINo}"
+				echo "${name}Sensor1TriggerState=${AlarmActiveState}"
+				
+			elif [ "$SensorType" = "1" ]
+			then
+				config_get RelayNo "$section" RelayNo
+				config_get AlarmActiveState "$section" AlarmActiveState
+				
+				echo "${name}Sensor1Number=${RelayNo}"
+				echo "${name}Sensor1TriggerState=${AlarmActiveState}"
+				
+			elif [ "$SensorType" = "2" ]
+			then
+				config_get AINo "$section" AINo
+				
+				echo "${name}Sensor1Number=${AINo}"
+				
+			elif [ "$SensorType" = "3" ]
+			then
+				config_get TempSensorNo "$section" TempSensorNo
+				
+				echo "${name}Sensor1Number=${TempSensorNo}"
+			fi
+			
+			echo "${name}NumberOfActions=2"
+			
+			for i in $(seq 1 2)
+			do
+				config_get ActionActiveType "$section" Action${i}ActiveType
+				config_get ActionActiveRelayNo "$section" Action${i}ActiveRelayNo
+				config_get ActionActiveRelayAction "$section" Action${i}ActiveRelayAction
+				config_get ActionActiveRelayOnTimeOut "$section" Action${i}ActiveRelayOnTimeOut
+				config_get ActionActiveRelayOffTimeOut "$section" Action${i}ActiveRelayOffTimeOut
+				
+				if [ "$ActionActiveType" = "relay" ]
+				then
+					do_enable=$(uci get digitalinputconfig.digitalinputconfig.DInput${ActionActiveRelayNo}Enable)
+					do_mode=$(uci get digitalinputconfig.digitalinputconfig.DIOMode${ActionActiveRelayNo})
+					
+					if [ "$do_enable" = "0" ] || [ "$do_mode" = "0" ]
+					then 
+						BLCverify=0
+					fi
+					echo "${name}Action${i}AlarmRelayNumber=${ActionActiveRelayNo}"
+					echo "${name}Action${i}AlarmRelayAction=${ActionActiveRelayAction}"
+					
+					if [ "$ActionActiveRelayAction" = "2" ]  || [ "$ActionActiveRelayAction" = "4" ]
+					then 
+						echo "${name}Action${i}AlarmRelayOnTimeOut=${ActionActiveRelayOnTimeOut}"
+					fi
+					
+					if [ "$ActionActiveRelayAction" = "3" ]  || [ "$ActionActiveRelayAction" = "4" ]
+					then 
+						echo "${name}Action${i}AlarmRelayOffTimeOut=${ActionActiveRelayOffTimeOut}"
+					fi
+					
+				else
+					echo "${name}Action${i}AlarmRelayNumber=255"
+				fi
+				
+				config_get ActionInactiveType "$section" Action${i}InactiveType
+				config_get ActionInactiveRelayNo "$section" Action${i}InactiveRelayNo
+				config_get ActionInactiveRelayAction "$section" Action${i}InactiveRelayAction
+				config_get ActionInactiveRelayOnTimeOut "$section" Action${i}InactiveRelayOnTimeOut
+				config_get ActionInactiveRelayOffTimeOut "$section" Action${i}InactiveRelayOffTimeOut
+				
+				if [ "$ActionInactiveType" = "relay" ]
+				then
+					do_enable=$(uci get digitalinputconfig.digitalinputconfig.DInput${ActionInactiveRelayNo}Enable)
+					do_mode=$(uci get digitalinputconfig.digitalinputconfig.DIOMode${ActionInactiveRelayNo})
+					
+					if [ "$do_enable" = "0" ] || [ "$do_mode" = "0" ]
+					then 
+						BLCverify=0
+					fi
+					echo "${name}Action${i}NormalRelayNumber=${ActionInactiveRelayNo}"
+					echo "${name}Action${i}NormalRelayAction=${ActionInactiveRelayAction}"
+					
+					if [ "$ActionInactiveRelayAction" = "2" ] || [ "$ActionInactiveRelayAction" = "4" ]
+					then
+						echo "${name}Action${i}NormalRelayOnTimeOut=${ActionInactiveRelayOnTimeOut}"
+					fi
+					
+					if [ "$ActionInactiveRelayAction" = "3" ] || [ "$ActionInactiveRelayAction" = "4" ]
+					then
+						echo "${name}Action${i}NormalRelayOffTimeOut=${ActionInactiveRelayOffTimeOut}"
+					fi
+
+				else
+					echo "${name}Action${i}NormalRelayNumber=255"
+				fi
+				
+				if [ "$SensorType" = "2" ] || [ "$SensorType" = "3" ]
+				then
+					config_get ActionNormalType "$section" Action${i}NormalType
+					config_get ActionNormalRelayNo "$section" Action${i}NormalRelayNo
+					config_get ActionNormalRelayAction "$section" Action${i}NormalRelayAction
+					config_get ActionNormalRelayOnTimeOut "$section" Action${i}NormalRelayOnTimeOut
+					config_get ActionNormalRelayOffTimeOut "$section" Action${i}NormalRelayOffTimeOut
+					
+					if [ "$ActionNormalType" = "relay" ]
+					then
+						do_enable=$(uci get digitalinputconfig.digitalinputconfig.DInput${ActionNormalRelayNo}Enable)
+						do_mode=$(uci get digitalinputconfig.digitalinputconfig.DIOMode${ActionNormalRelayNo})
+						
+						if [ "$do_enable" = "0" ] || [ "$do_mode" = "0" ]
+						then 
+							BLCverify=0
+						fi
+						echo "${name}Action${i}LowAlarmRelayNumber=${ActionNormalRelayNo}"
+						echo "${name}Action${i}LowAlarmRelayAction=${ActionNormalRelayAction}"
+						
+						if [ "$ActionNormalRelayAction" = "2" ] || [ "$ActionNormalRelayAction" = "4" ]
+						then
+							echo "${name}Action${i}LowAlarmRelayOnTimeOut=${ActionNormalRelayOnTimeOut}"
+						fi
+						
+						if [ "$ActionNormalRelayAction" = "3" ] || [ "$ActionNormalRelayAction" = "4" ]
+						then
+							echo "${name}Action${i}LowAlarmRelayOffTimeOut=${ActionNormalRelayOffTimeOut}"
+						fi
+						
+					else
+						echo "${name}Action${i}LowAlarmRelayNumber=255"
+					fi				
+				fi
+				
+				config_get ActionFailureType "$section" Action${i}FailureType
+				config_get ActionFailureRelayNo "$section" Action${i}FailureRelayNo
+				config_get ActionFailureRelayAction "$section" Action${i}FailureRelayAction
+				config_get ActionFailureRelayOnTimeOut "$section" Action${i}FailureRelayOnTimeOut
+				config_get ActionFailureRelayOffTimeOut "$section" Action${i}FailureRelayOffTimeOut
+				
+				if [ "$ActionFailureType" = "relay" ]
+				then
+					do_enable=$(uci get digitalinputconfig.digitalinputconfig.DInput${ActionFailureRelayNo}Enable)
+					do_mode=$(uci get digitalinputconfig.digitalinputconfig.DIOMode${ActionFailureRelayNo})
+						
+					if [ "$do_enable" = "0" ] || [ "$do_mode" = "0" ]
+					then 
+						BLCverify=0
+					fi
+					echo "${name}Action${i}FailureRelayNumber=${ActionFailureRelayNo}"
+					echo "${name}Action${i}FailureRelayAction=${ActionFailureRelayAction}"
+					
+					if [ "$ActionFailureRelayAction" = "2" ]  || [ "$ActionFailureRelayAction" = "4" ]
+					then 
+						echo "${name}Action${i}FailureRelayOnTimeOut=${ActionFailureRelayOnTimeOut}"
+					fi
+					
+					if [ "$ActionFailureRelayAction" = "3" ]  || [ "$ActionFailureRelayAction" = "4" ]
+					then 
+						echo "${name}Action${i}FailureRelayOffTimeOut=${ActionFailureRelayOffTimeOut}"
+					fi
+					
+				else
+					echo "${name}Action${i}FailureRelayNumber=255"
+				fi
+			done
+		fi
+	} >> "$BLCEventsConfigcfgpath"
+}
+
+updateBLC()
+{
+	rm -rf "$BLCEventsConfigcfgpath"
+	config_load "$BLCsrcpath"
+	config_foreach updateBLCcfg SensorEventsActions	
+	echo "NoOfEvents=${NoOfEvents}" >> "$BLCEventsConfigcfgpath"
+	
+	config_load "$AIsrcpath"
+	{
+		config_get numberOfAI analoginputconfig numberOfAI
+		echo "NoOfAI=${numberOfAI}"
+		
+		for i in $(seq 1 $numberOfAI)
+		do
+			config_get AInputUpperThreshold analoginputconfig AInput${i}UpperThreshold
+			config_get AInputLowerThreshold analoginputconfig AInput${i}LowerThreshold
+			
+			temp=$(echo "${AInputUpperThreshold}."  | cut -d "." -f 2)
+			
+			if [ -z $temp ]
+			then
+				echo "AI${i}UpperThreshold=${AInputUpperThreshold}.00"		
+			else
+				echo "AI${i}UpperThreshold=${AInputUpperThreshold}"
+			fi
+			
+			temp=$(echo "${AInputLowerThreshold}."  | cut -d "." -f 2)
+			
+			if [ -z $temp ]
+			then
+				echo "AI${i}LowerThreshold=${AInputLowerThreshold}.00"
+			else
+				echo "AI${i}LowerThreshold=${AInputLowerThreshold}"
+			fi
+		done
+	} >> "$BLClimitscfgpath"
+	
+	echo "AI=$numberOfAI"
+}
+
+UpdateInterfaceCfg()
+{
+    echo "Updating application configurations..."
+    UpdateInterfaces
+    UpdateEnableGateway  
+}
+
+UpdateMaintenanceReboot()
+{
+    UpgradeMaintenanceReboot
+}
+
+UpdateAutoUpgrade()
+{
+   UpgradeAutoUpgrade
+}
+
+UpdateFixedPacketConfig()
+{
+   config_load "$FixedPacketconfigureFile"
+   
+   config_get OverallRecordstartmark     "$FixedPacketconfigureEventSection"   OverallRecordstartmark 
+   config_get OverallRecordendmark       "$FixedPacketconfigureEventSection"   OverallRecordendmark 
+   config_get Registerstartmark          "$FixedPacketconfigureEventSection"   Registerstartmark 
+   config_get Registerendmark            "$FixedPacketconfigureEventSection"   Registerendmark 
+   #config_get SiteIDEnable               "$FixedPacketconfigureEventSection"   SiteIDEnable
+   #config_get SiteID                     "$FixedPacketconfigureEventSection"   SiteID 
+   #config_get DeviceIDEnable             "$FixedPacketconfigureEventSection"   DeviceIDEnable
+   config_get DeviceID                   "$FixedPacketconfigureEventSection"   DeviceID
+   config_get IMEINoEnable               "$FixedPacketconfigureEventSection"   IMEINoEnable
+   config_get IMEINo                     "$FixedPacketconfigureEventSection"   IMEINo
+   config_get InvalidDataCharacter       "$FixedPacketconfigureEventSection"   InvalidDataCharacter
+   config_get FailureDataCharacter       "$FixedPacketconfigureEventSection"   FailureDataCharacter
+   config_get MultiblockEnable       "$FixedPacketconfigureEventSection"       MultiblockEnable
+   config_get BlockSeperatorCharacter       "$FixedPacketconfigureEventSection"   BlockSeperatorCharacter
+   config_get MaxNumberofRegisters 		 "$FixedPacketconfigureEventSection"   MaxNumberofRegisters
+   config_get EnableNewLineCharacter 		 "$FixedPacketconfigureEventSection"   EnableNewLineCharacter
+   #config_get EnableJSON                 "$FixedPacketconfigureEventSection"   EnableJSON
+   #config_get eMCCEnable 		         "$FixedPacketconfigureEventSection"   eMCCEnable
+   
+    #eMMCEnable=$(uci get FixedPacketConfigGeneric.fixedpacketconfig.eMCCEnable)
+
+    eMCCEnable=$(uci get Storageconfig.Storageconfig.eMCCEnable)
+    storagesize=$(uci get Storageconfig.Storageconfig.storagesize)
+
+    SiteID=$(uci get cloudconfig.cloudconfig.SiteID)
+    
+    EnableJSON=$(uci get Jsonconfig.Type.configType)
+    
+    #echo "EnableJSON=$EnableJSON"
+    
+    echo "SiteID=$SiteID"
+    echo "SiteIDEnable=1"
+    echo "DeviceIDEnable=1"
+    
+    echo "EnableJSON=$EnableJSON"
+     
+    if [ "$eMCCEnable" = "0" ]                                                       
+    then 
+         if [ $(ls /dev/mmcblk0) != "/dev/mmcblk0"  ] 
+	     then
+		      printf "SD Card /eMMC is not inserted\n" 
+		 else                                             
+              UnmountPartition
+         fi     
+    fi
+    
+    if [ "$eMCCEnable" = "1" ]                                                       
+    then  
+    
+	    if [ $(ls /dev/mmcblk0) != "/dev/mmcblk0"  ] 
+	    then
+	        printf "SD Card /eMMC is not inserted\n"
+	    else
+	         /bin/SDCardManager/SDCardManager.sh $storagesize  
+	    fi                                        
+          
+    fi
+   
+   {
+       echo "OverallRecordstartmark=\"$OverallRecordstartmark\""
+       echo "OverallRecordendmark=\"$OverallRecordendmark\""                                         
+       echo "Registerstartmark=\"$Registerstartmark\""
+       echo "Registerendmark=\"$Registerendmark\""
+       #echo "SiteIDEnable=$SiteIDEnable"
+        #if [ "$SiteIDEnable" = "1" ]                                                       
+        #then                                          
+                echo "SiteID=\"$SiteID\""
+        #fi
+                #echo "DeviceIDEnable=$DeviceIDEnable"
+        #if [ "$DeviceIDEnable" = "1" ]                                                                    
+        #then                      
+                echo "DeviceID=\"$DeviceID\""
+        #fi
+        
+        
+         echo "SiteIDEnable=1"
+        echo "DeviceIDEnable=1"
+                echo "IMEINoEnable=$IMEINoEnable"
+        if [ "$IMEINoEnable" = "1" ]                                                                  
+        then   
+                echo "IMEINo=$IMEINo"  
+        fi                             
+        echo "InvalidDataCharacter=\"$InvalidDataCharacter\""
+        echo "FailureDataCharacter=\"$FailureDataCharacter\""
+        echo "MultiblockEnable=$MultiblockEnable"
+        echo "BlockSeperatorCharacter=\"$BlockSeperatorCharacter\""
+        echo "MaxNumberofRegisters"="$MaxNumberofRegisters"
+        echo "EnableJSON"="$EnableJSON"
+        echo "EnableNewLineCharacter"="$EnableNewLineCharacter"
+   } >  "${FixedPacketconfigureCfgPath}.cfg"  
+
+}
+
+UpdateAzureCfg()
+{
+	
+	AzureEnable=$(uci get cloudconfig.cloudconfig.cloudprotocol)
+	
+	if [ "$AzureEnable" = "azure" ]
+	then
+	     rm -rf "${AzureconfigureCfgPath}.cfg"	
+	    
+		echo "Updating Azure application configuration "
+	    echo "Updating '${AzureconfigureCfgPath}.cfg' configuration"
+	    config_load "$azureEventfile"
+	    #config_get  httpenable                  "$httpconfigureEventSection"    httpenable
+	    config_get  Selectprotocol                  "$azureconfigureEventSection"    Selectprotocol
+	    config_get  connectionstring                  "$azureconfigureEventSection"    connectionstring
+	    
+	    
+	    {
+echo "#########################################################################################################
+#This file contains Azure Cloud parameters. 
+#Protocols - MQTT_Protocol,HTTP_Protocol,MQTT_WebSocket_Protocol,AMQP_Protocol,AMQP_Protocol_over_WebSocketsTls
+#connectionString : Copied from created Device in AzureIOTHub"
+echo "#######################################################################################################" 
+
+		    echo "Protocol=\"$Selectprotocol\""
+		    echo "MinPollingTime=30"
+		    echo "Timeout=30000"
+		    echo "connectionString=\"$connectionstring\""
+	        
+	    } > "${AzureconfigureCfgPath}.cfg"         
+
+   fi
+}
+
+UpdatePortConfig()
+{
+	res=$($PortConfigScriptPath 2>&1 &)
+	res=$($PortConfigSerialToTCPScriptPath 2>&1 &)
+}
+
+UpdateAppCfg()
+{
+	rm /tmp/updateconfigoutput.txt
+	
+    echo "Updating application configurations..."
+             
+    UpdateFixedPacketConfig
+    UpdatePortConfig
+    UpdateSourceConfig
+    UpdateSoftwareVersionCfg
+    UpdateHTTPCfg
+    UpdateAzureCfg
+    UpdateExternalMQTTTopicCfg
+    UpdateMQTTCfg
+    UpdateDIOCfg
+    UpdateAIOCfg
+    UpdateTemperatureCfg
+    updateBLC
+    UpdateTemperatureCfg 
+    UpdateJsonKeyparamsRS485IndexCfg
+    UpdateJsonKeyparamsDioIndexCfg
+    UpdateJsonKeyparamsAiIndexCfg
+    UpdateJsonKeyparamsRS232IndexCfg
+    UpdateJsonKeyparamsSNMPIndexCfg
+    UpdateJsonKeyparamsTempIndexCfg
+
+   
+	    ValidateRS485Config
+	    if [ "$?" -eq 0 ]; then
+		  echo "RS485 : Validation succeeded. Proceeding with next task."
+		  UpdateRS485Cfg
+		 
+	   #Run next task here
+		else
+		if [ ! -f /tmp/updateconfigoutput.txt ]; then
+		    touch /tmp/updateconfigoutput.txt
+		fi 
+		  echo "RS485 : Validation failed. Aborting further tasks." >> /tmp/updateconfigoutput.txt
+		  return 1
+		fi 
+		
+		if [ "$BLCverify" = "1" ]
+		then
+			echo "BLC : Validation succeeded. Proceeding with next task."
+	   
+		else
+			if [ ! -f /tmp/updateconfigoutput.txt ]; then
+				/tmp/updateconfigoutput.txt
+			fi 
+			echo "BLC : Validation failed. Aborting further tasks." >> /tmp/updateconfigoutput.txt
+			return 1
+		fi 
+		 
+	
+	 ValidateRS232Config
+    if [ "$?" -eq 0 ]; then
+	  echo "RS232 : Validation succeeded. Proceeding with next task."
+	  UpdateRS232Cfg
+   ##Run next task here
+	else
+	  if [ ! -f /tmp/updateconfigoutput.txt ]; then
+	    touch /tmp/updateconfigoutput.txt
+	  fi 
+	  echo "RS232 : Validation failed. Aborting further tasks." >> /tmp/updateconfigoutput.txt
+	  return 1
+	fi	
+	
+	if [ ! -f /tmp/updateconfigoutput.txt ]; then
+	    touch /tmp/updateconfigoutput.txt
+		echo "Success : Update Configuration" >> /tmp/updateconfigoutput.txt
+    fi
+    
+    sed -i '/NoOfRS232EMetersInLine1/d' /root/SourceAppComponent/etc/Config/DataSourcesConfig.cfg
+    echo "NoOfRS232EMetersInLine1=$NoOfRS232DeviceCount" >> "${SourceConfigPath}.cfg"
+    
+    cp /root/SourceAppComponent/etc/Config/DataSourcesConfig.cfg /Web_Page_Gateway_Apps/Common_GW_Files/DataSourcesConfig.cfg   
+	
+	 
+}
+
+UpdateRS485UtilityConfiguration()
+{
+    rm "${RS485UtilityCfgPath}.cfg"
+    config_load "$RS485UtilityConfigfile"
+    config_get  StartRegister      "$RS485configureUtilitySection"  StartRegister 
+    config_get  NumberOfRegisters  "$RS485configureUtilitySection"  NumberOfRegisters
+    config_get  Baudrate           "$RS485configureUtilitySection"  Baudrate
+    config_get  Stopbits           "$RS485configureUtilitySection"  Stopbits
+    config_get  Databits           "$RS485configureUtilitySection"  Databits
+    config_get  FunctionalCode     "$RS485configureUtilitySection"  FunctionalCode
+    config_get  FunctionalCode1     "$RS485configureUtilitySection"  FunctionalCode1
+    config_get  Parity             "$RS485configureUtilitySection"  Parity
+    config_get  SerialPort         "$RS485configureUtilitySection"  SerialPort
+    config_get  ModbusProtocol      "$RS485configureUtilitySection"  ModbusProtocol
+    config_get  modbusCommip        "$RS485configureUtilitySection"  modbusCommip
+    config_get  modbusCommport     "$RS485configureUtilitySection"  modbusCommport
+    config_get  modbusCommtimeout   "$RS485configureUtilitySection"  modbusCommtimeout
+    config_get  Mode                 "$RS485configureUtilitySection"  Mode
+    config_get  DataForMode2         "$RS485configureUtilitySection"  DataForMode2
+    
+    {
+		echo "Mode=$Mode"
+        echo "StartRegister=$StartRegister"
+        echo "NumberOfRegisters=$NumberOfRegisters"
+        echo "Baudrate=$Baudrate"
+        echo "Stopbits=$Stopbits"
+        echo "Databits=$Databits"
+        #echo "FunctionalCode=$FunctionalCode"
+        echo "Parity=$Parity"
+        echo "SerialPort=\"$SerialPort\""
+        echo "ModbusProtocol=\"$ModbusProtocol\""
+
+	     if [[ -z "$modbusCommip" ]]; then
+	          echo "modbusCommip=\"0.0.0.0\""
+	     else
+		      echo "modbusCommip=\"$modbusCommip\""
+	     fi
+	     
+	     if [[ -z "$modbusCommport" ]]; then
+	          echo "modbusCommport=502"
+	     else
+		      echo "modbusCommport=$modbusCommport"
+	     fi
+	     
+	     if [[ -z "$modbusCommtimeout" ]]; then
+	          echo "modbusCommtimeout=10"
+	     else
+		      echo "modbusCommtimeout=$modbusCommtimeout"
+	     fi
+	     
+	     if [ "$Mode" = "1" ]
+		then 
+		     echo "FunctionalCode=$FunctionalCode"
+	     else
+		     echo "FunctionalCode=$FunctionalCode1"
+	     fi
+	     
+   
+        
+    } > "${RS485UtilityCfgPath}.cfg"
+}
+
+UpdateRS485UtilityCfg()
+{
+	UpdateRS485UtilityConfiguration
+}
+
+UpdateADCUtilityConfiguration()
+{
+    rm "${ADCUtilityCfgPath}.cfg"
+    config_load "$ADCUtilityConfigfile"
+    config_get  SamplingRate      "$ADCconfigureUtilitySection"  SamplingRate 
+    config_get  ConversionMode  "$ADCconfigureUtilitySection"  ConversionMode
+    config_get  NoOfSamples           "$ADCconfigureUtilitySection"  NoOfSamples
+    config_get  address     "$ADCconfigureUtilitySection"  address
+    config_get  filename             "$ADCconfigureUtilitySection"  filename
+    
+    
+    {
+        echo "SamplingRate=$SamplingRate"
+        echo "ConversionMode=$ConversionMode"
+        echo "NoOfSamples=$NoOfSamples"
+        echo "CurDevResistance=200.0"
+        echo "VolMultiplier=0.0314"
+        echo "address=$address"
+        echo "filename=\"$filename\""
+    } > "${ADCUtilityCfgPath}.cfg"
+}
+
+UpdateADCUtilityCfg()
+{
+	UpdateADCUtilityConfiguration
+}
+
+UpdateRS232UtilityConfiguration()
+{
+    rm "${RS232UtilityCfgPath}.cfg"
+    config_load "$RS232UtilityConfigfile"
+    config_get  StartRegister      "$RS232configureUtilitySection"  StartRegister 
+    config_get  NumberOfRegisters  "$RS232configureUtilitySection"  NumberOfRegisters
+    config_get  Baudrate           "$RS232configureUtilitySection"  Baudrate
+    config_get  Stopbits           "$RS232configureUtilitySection"  Stopbits
+    config_get  Databits           "$RS232configureUtilitySection"  Databits
+    config_get  FunctionalCode     "$RS232configureUtilitySection"  FunctionalCode
+    config_get  Parity             "$RS232configureUtilitySection"  Parity
+    config_get  flow_control       "$RS232configureUtilitySection"  flow_control
+    config_get  Parity             "$RS232configureUtilitySection"  Parity
+    config_get  delay             "$RS232configureUtilitySection"  delay
+    config_get  SerialPort         "$RS232configureUtilitySection"  SerialPort
+    {
+        echo "start_reg=$StartRegister"
+        echo "No_of_reg=$NumberOfRegisters"
+        echo "baud=$Baudrate"
+        echo "stop_bits=$Stopbits"
+        echo "data_bits=$Databits"
+        echo "function_id=$FunctionalCode"
+        echo "parity=$Parity"
+        echo "flow_control=$flow_control"
+        echo "delay=$delay"
+        echo "SerialPort=\"$SerialPort\""
+        echo "sleep_in_milliseconds=500"
+    } > "${RS232UtilityCfgPath}.cfg"
+}
+
+UpdateRS232UtilityCfg()
+{
+	UpdateRS232UtilityConfiguration
+}
+
+
+UpdateMQTTConfiguration()
+{
+	
+certs_dir="/root/MQTTSenderAppComponent/etc/certs/"
+config_file="/root/MQTTSenderAppComponent/etc/Config/externalBrokerConfig.cfg"
+rootCAPathVariable="rootCAPath"
+ClientCertPathVariable="ClientCertPath"
+PrivateKeyPathVariable="PrivateKeyPath"
+
+sed -i '/rootCAPath/d' "$config_file"
+sed -i '/ClientCertPath/d' "$config_file"
+sed -i '/PrivateKeyPath/d' "$config_file"
+
+
+echo "rootCAPath=""" >> "$config_file"
+echo "ClientCertPath=""" >> "$config_file"
+echo "PrivateKeyPath=""" >> "$config_file"
+
+
+# Find the rootCA file with .crt extension
+#rootCA_file_path=$(find "$certs_dir" -name "*.crt" -type f -print | grep -E "/[^-]+\.crt$" | head -1)
+rootCA_file_path=$(find "$certs_dir" -name "*.pem" -type f -print | head -1)
+rootCA_file_path=\"$rootCA_file_path\"
+
+# Find the client certificate file with -certificate.pem.crt extension
+clientCert_file_path=$(find "$certs_dir" -name "*-certificate.pem.crt" -type f -print | head -1)
+clientCert_file_path=\"$clientCert_file_path\"
+
+# Find the private key file with -private.pem.key extension
+privateKey_file_path=$(find "$certs_dir" -name "*-private.pem.key" -type f -print | head -1)
+privateKey_file_path=\"$privateKey_file_path\"
+
+# Update the rootCAPath variable in the script
+if [[ -n "$rootCA_file_path" ]]; then
+    echo "Root CA file found: $rootCA_file_path"
+else
+    echo "No root CA file found with the extension .crt in $certs_dir"
+    rootCA_file_path=""
+    echo "rootCAPath set to empty string"
+fi
+
+echo "rootCA_filename=$rootCA_filename"
+sed -i "s|${rootCAPathVariable}=.*|${rootCAPathVariable}=${rootCA_file_path}|" "$config_file"
+
+# Update the clientCertPath variable in the script
+if [[ -n "$clientCert_file_path" ]]; then
+    echo "Client certificate file found: $clientCert_file_path"
+else
+    echo "No client certificate file found with the extension -certificate.pem.crt in $certs_dir"
+    clientCert_file_path=""
+    echo "clientCertPath set to empty string"
+fi
+
+echo "clientCert_file_path=$clientCert_file_path"
+sed -i "s|${ClientCertPathVariable}=.*|${ClientCertPathVariable}=${clientCert_file_path}|" "$config_file"
+
+# Update the privateKeyPath variable in the script
+if [[ -n "$privateKey_file_path" ]]; then
+    echo "Private key file found: $privateKey_file_path"
+else
+    echo "No private key file found with the extension -private.pem.key in $certs_dir"
+    privateKey_file_path=""
+    echo "privateKeyPath set to empty string"
+fi
+
+echo "privateKey_file_path=$privateKey_file_path"
+sed -i "s|${PrivateKeyPathVariable}=.*|${PrivateKeyPathVariable}=${privateKey_file_path}|" "$config_file"
+
+echo "Config file updated with the new file paths."
+   
+}
+
+UpdateMQTTCfg()
+{
+	MQTTEnable=$(uci get cloudconfig.cloudconfig.cloudprotocol)
+	
+	if [ $MQTTEnable = "mqtt" ]
+	then 
+	    
+	    rm -rf "{$MQTTconfigureCfgPath}.cfg"
+	     
+	    echo "Updating MQTT application configuration "
+	    echo "Updating '${MQTTconfigureCfgPath}.cfg' configuration"
+	    config_load "$MQTTEventfile"
+	    config_get  host                  "$MQTTconfigureEventSection"    host
+	    config_get  mqttport                  "$MQTTconfigureEventSection"    mqttport
+	    config_get  mqttauthmode                  "$MQTTconfigureEventSection"    mqttauthmode
+	    config_get mqttusername "$MQTTconfigureEventSection" mqttusername
+	    config_get  mqttpassword    "$MQTTconfigureEventSection"    mqttpassword
+	    config_get  enablepublishoverlan    "$MQTTconfigureEventSection"    enablepublishoverlan
+	
+	{
+		echo "host=\"$host\""
+        if [[ -z "$mqttport" ]]; then
+	             echo "port=1883"
+	        else
+		        echo "port=$mqttport"
+	        fi
+        echo "max_inflight=20"
+        echo "keepalive=60"
+        echo "clean_session=true"
+        echo "eol=true"
+        echo "protocol_version=true"
+        echo "sub_qos=1"
+        echo "pub_qos=2"
+        echo "debug=true" 
+        echo "rootCAPath=\"\"" 
+        echo "ClientCertPath=\"\""   
+        echo "PrivateKeyPath=\"\""
+                  
+        
+        if [ "$mqttauthmode" = "1" ]
+        then 
+            echo "enable_username_password=1"
+            echo "username=\"$mqttusername\""
+            echo "password=\"$mqttpassword\""
+        else 
+            echo "enable_username_password=0"
+        fi
+        
+        echo "enablepublishoverlan=$enablepublishoverlan"
+       
+           
+     } > "${MQTTconfigureCfgPath}.cfg"	
+     
+      
+        if [ "$mqttauthmode" = "0" ]
+        then
+             UpdateMQTTConfiguration            
+        fi       
+   fi
+}
+
+UpdateExternalMQTTTopicCfg()
+{
+	MQTTEnable=$(uci get cloudconfig.cloudconfig.cloudprotocol)
+	#SiteID=$(uci get FixedPacketConfigGeneric.fixedpacketconfig.SiteID)
+	config_load "$FixedPacketconfigureFile"
+	config_get SiteID     "$FixedPacketconfigureEventSection"   SiteID 
+	
+
+	echo "SiteID=$SiteID"
+	
+	if [ $MQTTEnable = "mqtt" ]
+	then 
+	    
+	    rm -rf "{$MQTTconfigureCfgPath}.cfg"
+	     
+	    echo "Updating MQTT application configuration "
+	    echo "Updating '${MQTTExternalPath}.cfg' configuration"
+	    echo "siteID"="$siteID"
+	    config_load "$MQTTEventfile"
+	     config_get  RS485Enable        "$MQTTconfigureEventSection"  RS485Enable
+	    config_get  rs485topic         "$MQTTconfigureEventSection"   rs485topic 	    
+	    config_get  rs232topic         "$MQTTconfigureEventSection"   rs232topic  
+	    config_get  diotopic           "$MQTTconfigureEventSection"   diotopic 
+	    config_get  aiotopic           "$MQTTconfigureEventSection"   aiotopic 
+	    config_get  temperaturetopic   "$MQTTconfigureEventSection"   temperaturetopic 
+	    config_get  commandrequesttopic   "$MQTTconfigureEventSection"   commandrequesttopic 
+	    config_get  commandresponsetopic   "$MQTTconfigureEventSection"   commandresponsetopic 
+	    { 
+			
+			
+	        if [[ -z "$rs485topic" ]]; then
+	             #echo "rs485 is blank"
+	             echo "externalBrokerPubTopic_0=\"$SiteID/RS485Data\""
+	        else
+	            #echo "rs485 is not blank"
+		        echo "externalBrokerPubTopic_0=\"$rs485topic\""
+	        fi	
+	        if [[ -z "$rs232topic" ]]; then
+	             #echo "rs232 is blank"
+	             echo "externalBrokerPubTopic_2=\"$SiteID/RS232Data\""
+	        else
+		        echo "externalBrokerPubTopic_2=\"$rs232topic\""
+	        fi	        
+	        if [[ -z "$diotopic" ]]; then
+	             #echo "diotopic is blank"
+	             echo "externalBrokerPubTopic_1=\"$SiteID/DIOData\""
+	        else
+		        echo "externalBrokerPubTopic_1=\"$diotopic\""
+	        fi	     
+	        
+	         if [[ -z "$aiotopic" ]]; then
+	             #echo "aiodata is blank"
+	             echo "externalBrokerPubTopic_4=\"$SiteID/AIOData\""
+	        else
+		        echo "externalBrokerPubTopic_4=\"$aiotopic\""
+	        fi	    
+	        if [[ -z "$temperaturetopic" ]]; then
+	             #echo "temperaturetopic is blank"
+	             echo "externalBrokerPubTopic_3=\"$SiteID/TemperatureData\""
+	        else
+		        echo "externalBrokerPubTopic_3=\"$temperaturetopic\""
+	        fi	
+	        
+	         if [[ -z "$commandrequesttopic" ]]; then
+	             #echo "temperaturetopic is blank"
+	             echo "externalBrokerSubTopic_0=\"$SiteID/IOcommandRequest\""
+	        else
+		        echo "externalBrokerSubTopic_0=\"$commandrequesttopic\""
+	        fi	
+	        
+	         if [[ -z "$commandresponsetopic" ]]; then
+	             #echo "temperaturetopic is blank"
+	             echo "externalBrokerPubTopic_5=\"$SiteID/IOcommandResponse\""
+	        else
+		        echo "externalBrokerPubTopic_5=\"$commandresponsetopic\""
+	        fi
+	        
+	        echo "NoOfSubscribeTopics=1"	        	  
+	        echo "NoOfPublishTopics=6"	        	  
+	        } > "${MQTTExternalPath}.cfg"
+	 fi
+}      
+	      
+if [ $# -ne 1 ]
+then
+    echo "${0##*/}: missing action"
+    usage
+else
+    action="$1"
+    case "$action" in
+            "ucitoappcfg")
+                UpdateAppCfg
+                ;;
+             "updatemaintenancereboot")
+                UpdateMaintenanceReboot
+                ;;
+             "updateautoupgrade")
+                UpdateAutoUpgrade
+                ;;
+             "rs485utilitycfg")
+                UpdateRS485UtilityCfg
+            ;;
+            
+            "rs232utilitycfg")
+                UpdateRS232UtilityCfg
+            ;;
+            
+            "MQTTConfig")
+                UpdateRS485UtilityCfg
+            ;;
+            "adcutilitycfg")
+                UpdateADCUtilityCfg
+            ;;
+            
+            "rs232PortUpadate")
+				UpdateRS232UtilityConfiguration
+				UpdateRS232Cfg
+			;;
+                 
+            *)
+                usage
+                ;;
+    esac
+fi
+
+exit 0

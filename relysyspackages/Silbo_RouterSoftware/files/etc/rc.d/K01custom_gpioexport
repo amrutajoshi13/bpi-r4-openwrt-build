@@ -1,0 +1,25 @@
+#!/bin/sh /etc/rc.common
+
+
+START=01
+STOP=01
+USE_PROCD=1
+
+start_service() {
+    board_name=$(cat /tmp/sysinfo/board_name)
+    if echo "$board_name" | grep -qE "(IE44)";then 
+		watchdogenabledisable=$(uci get applist_config.appconfig.watchdogenabledisable)
+		if [ "$watchdogenabledisable" = "0" ];then
+			echo 0 > /sys/class/gpio/gpio3/value
+			pid=$(pgrep -f "/bin/Watchdog_Enable_Disable")
+			kill -9 $pid	     
+		elif [ "$watchdogenabledisable" = "1" ];then
+		     /bin/Watchdog_Enable_Disable &
+		fi
+	fi
+}
+
+stop_service() {
+    echo "	"
+	
+}

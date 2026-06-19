@@ -1,0 +1,34 @@
+
+config applicationoverviewconfig
+    option utility "Energymeter Last Data Produced Time"
+    option action "READ"
+    
+   
+config applicationoverviewconfig
+    option utility "Energymeter Last Data Sent Time"
+    option action "READ"
+
+
+config applicationoverviewconfig
+    option utility "App Running Status"
+    option action "READ"
+
+config applicationoverviewconfig
+    option utility "Download Files"
+    option action "DOWNLOAD"
+    option inputs "1"
+    option input1Name "File/Database"
+    option input1Element "selection"
+    option input1Type "string"
+    list input1Values "EnergyMeterRS485"
+    list input1Values "ApplicationLogsCurrent"
+    option EnergyMeterRS485Database "/reap/disk/AppData/P500/DataCollector/Db/EMeterRS485DataCollectorDb.db"
+    option EnergyMeterRS232Database "/reap/disk/AppData/P500/DataCollector/Db/RS232DataCollectorDb.db"
+    option DIODatabase "/reap/disk/AppData/P500/DataCollector/Db/DIODataCollectorDB.db"
+    option AIODatabase "/reap/disk/AppData/P500/DataCollector/Db/AIODataCollectorDB.db"
+    option TemperatureDatabase "/reap/disk/AppData/P500/DataCollector/Db/TemperatureDataCollectorDB.db"
+    option EnergyMeterRS485Table "EnergyMeter_RS485_table"
+    option EnergyMeterRS232Table "RS232_table"
+    option DIOTable "DIO_table"        	
+    option AIOTable "AIO_table"        	
+    option TemperatureTable "Temperature_table" 

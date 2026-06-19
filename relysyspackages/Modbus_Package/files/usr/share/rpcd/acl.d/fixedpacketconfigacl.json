@@ -1,0 +1,16 @@
+{
+    "fixedpacketconfig": {
+        "description": "Fixed Packet Configuration",
+            "read": {
+                "uci": [
+                    "FixedPacketConfigGeneric"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "FixedPacketConfigGeneric"
+                ]
+            }
+    }
+}

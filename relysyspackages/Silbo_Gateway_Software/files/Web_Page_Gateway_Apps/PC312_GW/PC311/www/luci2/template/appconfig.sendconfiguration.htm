@@ -1,0 +1,504 @@
+
+<div class="row">
+	<div class="col-md-2">
+		<input type="radio" name="modbus" onchange="handlechange(event)" checked id="json"
+			value="json">
+		<label>JSON</label>
+	</div>
+	<div class="col-md-2">
+		<input type="radio" name="modbus" onchange="handlechange(event)" id="csv" value="csv">
+		<label>CSV</label>
+
+	</div>
+</div>
+<div id="senderconfig">
+
+<div class="tab-content" id="tabs" id="senderconfig">
+	<ul class="nav nav-tabs" id="my_tab"  data-tabs="tabs">
+		
+        <li class="TabC TabZf active">
+                        <a id="sectiontab_firewall_zonefor" href="#tab_zonefor" data-toggle="tab">Modbus Sender 
+				<span class="badge"></span>
+			    </a>
+        </li>
+
+
+<!--
+		<li class="TabC Tabdio">
+			<a id=":w" href="#tab_diosender" data-toggle="tab">DIO Sender 
+				<span class="badge"></span>
+			</a>
+		</li>
+-->
+
+<!--
+		<li class="TabC TabRl">
+			<a id="sectiontab_firewall_rules" href="#tab_aisender" data-toggle="tab">AI Sender
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC Tabrs232">
+			<a id="sectiontab_firewall_rs232" href="#tab_rs232sender" data-toggle="tab">RS232 Sender
+				<span class="badge"></span>
+			</a>
+		</li>
+-->
+
+<!--
+		<li class="TabC Tabsnmp">
+			<a id="sectiontab_firewall_snmp" href="#tab_snmpsender" data-toggle="tab">SNMP Sender
+				<span class="badge"></span>
+			</a>
+		</li>
+-->
+
+<!--
+		<li class="TabC TabSn">
+			<a id="sectiontab_firewall_snat" href="#tab_tsender" data-toggle="tab">Temperature Sender
+				<span class="badge"></span>
+			</a>
+		</li>
+-->
+
+	</ul>
+	
+	<div class="tab-pane TabC TabZf active"  id="tab_zonefor">
+		<div id="section_firewall_zonefor"></div>	
+		<div id="Mansection_firewall_zonefor" class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Modbus Sender Configuration:</h3>
+			</div>
+			
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+						<th class="cbi-section-table-cell">Field Content</th>
+						<th class="cbi-section-table-cell">Field JSON Key Name</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectionitem_firewall_zone_newZone" data-luci2-sid="newZone">
+
+		   <td>
+				<div class="luci2-field">
+				 <div class="luci2-field-widget">
+					<select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_src">
+						<option value="SiteID">SiteID</option>
+						<option value="ReadTimeStamp">ReadTimeStamp</option>
+						<option value="EpochTimeStamp">EpochTimeStamp</option>
+						<option value="EMeterRS485RecordNumber">RecordNumber</option>
+						<option value="RecordType">RecordType</option>
+						<option value="EMeterRS485RequestId">RequestId</option>
+						<option value="EMeterRS485InterfaceId">SerialPortNumber</option>
+						<option value="EMeterRS485CommIP">TCPCommIP</option>
+						<option value="EMeterRS485MeterID">EquipmentID</option>
+						<option value="EMeterRS485MeterModel">EquipmentModel</option>
+						<option value="EMeterRS485SlaveID">SlaveID</option>
+						<option value="FunctionCodeUsed">FunctionCode</option>
+						<option value="EMeterRS485ResponseCode">EquipmentCommStatus</option>
+						<option value="StartingRS485RegisterAddress">StartRegister</option>
+						<option value="NoOfRegisters">NoOfRegisters</option>
+						<option value="EMeterREG2">EquipmentData</option>
+						<option value="AlarmStatus">AlarmStatus</option>
+						<option value="EventStatus">EventStatus</option>
+						<option value="NetworkOperator">NetworkOperator</option>
+						<option value="NetworkMode">NetworkMode</option>
+						<option value="signalstrength">SignalStrength</option>
+						<option value="imei">IMEI</option>
+                        <option value="SerialNumber">SerialNumber</option>                                                     
+						<option value="RS485Customfield1">ModbusCustomparam1</option>
+						<option value="RS485Customfield2">ModbusCustomparam2</option>
+						<option value="RS485Customfield3">ModbusCustomparam3</option>
+						<option value="RS485Customfield4">ModbusCustomparam4</option>
+						<option value="RS485Customfield5">ModbusCustomparam5</option>
+			          </select>
+                         <input type="text" class="form-control luci2-field-validate custom-value-input" id="field_firewall_zone_newZone_srczone"  style="display: none;">
+                			<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+			<td>
+				<div class="luci2-field">
+				 <div class="luci2-field-widget">
+					<!-- <select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_dest"> -->
+                         <input type="text" class="form-control luci2-field-validate custom-value-input2" id="field_firewall_zone_newZone_destzone" type="text" placeholder="">
+                			<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+	
+						<td class="text-right" style="width: 1%;">
+							<div class="btn-group">
+								<button type="button" id="AddNewzoneForwarding" title="" class="btn btn-success">Add</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+    </div>
+
+	<div class="tab-pane TabC Tabdio"  id="tab_diosender">
+		<div id="sectiontab_dio_sender"></div>	
+		<div id="Mansectiontab_dio_sender" class="panel panel-default" >
+			<div class="panel-heading">
+				<h3 class="panel-title">DIO Sender Configuration :</h3>
+			</div>
+			
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+
+						<th class="cbi-section-table-cell">Field Content</th>
+						<th class="cbi-section-table-cell">Field JSON Key Name</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectiontab_dio_sender_newZone" data-luci2-sid="newZone">
+
+		    <td>
+				<div class="luci2-field">
+				<div class="luci2-field-widget">
+					<select class="form-control luci2-field-validate" id="field_dio_sender_zone_src">
+						<option value="SiteID">SiteID</option>
+						<option value="ReadTimeStamp">ReadTimeStamp</option>
+						<option value="EpochTimeStamp">EpochTimeStamp</option>
+						<option value="DIRecordNumber">RecordNumber</option>
+						<option value="DIRequestId">RequestId</option>
+						<option value="DIRecordType">Recordtype</option>
+						<option value="DIValues1">DIInput1</option>
+						<option value="DIValues2">DIInput2</option>
+						<option value="DIValues3">DIInput3</option>
+						<option value="DIValues4">DIInput4</option>
+						<option value="DIOCustomfield1">DIOCustomfield1</option>
+						<option value="DIOCustomfield2">DIOCustomfield2</option>
+						<option value="DIOCustomfield3">DIOCustomfield3</option>
+						<option value="DIOCustomfield4">DIOCustomfield4</option>
+						<option value="DIOCustomfield5">DIOCustomfield5</option>
+						<!-- <option value="FunctionCodeUsed">FunctionCode</option>
+						<option value="EMeterRS485ResponseCode">EquipmentCommStatus</option>
+						<option value="StartingRS485RegisterAddress">StartRegister</option>
+						<option value="NoOfRegisters">NoOfRegisters</option>
+						<option value="EMeterREG2">EquipmentData</option> -->
+					</select>
+						<input type="text" class="form-control luci2-field-validate custom-value-input" id="field_dio_sender_zone_srczone"  style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+			<td>
+				<div class="luci2-field">
+				<div class="luci2-field-widget">
+					<!-- <select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_dest"> -->
+						<input type="text" class="form-control luci2-field-validate custom-value-input2" id="field_dio_sender_zone_destzone" type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+
+						<td class="text-right" style="width: 1%;">
+							<div class="btn-group">
+								<button type="button" id="AddNewdiosenderconfiguration" title="" class="btn btn-success">Add</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+	    </div>
+    </div>
+	<div class="tab-pane TabC Tabai"  id="tab_aisender">
+		<div id="sectiontab_ai_sender"></div>	
+		<div id="Mansectiontab_ai_sender" class="panel panel-default" >
+			<div class="panel-heading">
+				<h3 class="panel-title">AI Sender Configuration:</h3>
+			</div>
+			
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+						<th class="cbi-section-table-cell">Field Content</th>
+						<th class="cbi-section-table-cell">Field JSON Key Name</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectiontab_ai_sender_newZone" data-luci2-sid="newZone">
+
+		   <td>
+				<div class="luci2-field">
+				 <div class="luci2-field-widget">
+					<select class="form-control luci2-field-validate" id="field_ai_sender_zone_src">
+						<option value="SiteID">SiteID</option>
+						<option value="ReadTimeStamp">ReadTimeStamp</option>
+						<option value="EpochTimeStamp">EpochTimeStamp</option>
+						<option value="AIRecordNumber">RecordNumber</option>
+						<option value="AIRequestId">RequestId</option>
+						<option value="AIRecordType">Recordtype</option>
+						<option value="AIValues1">AIInput1</option>
+						<option value="AIValues2">AIInput2</option>
+						<option value="AIOCustomfield1">AIOCustomfield1</option>
+						<option value="AIOCustomfield2">AIOCustomfield2</option>
+						<option value="AIOCustomfield3">AIOCustomfield3</option>
+						<option value="AIOCustomfield4">AIOCustomfield4</option>
+						<option value="AIOCustomfield5">AIOCustomfield5</option>
+					
+			          </select>
+                         <input type="text" class="form-control luci2-field-validate custom-value-input" id="field_ai_sender_zone_src"  style="display: none;">
+                			<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+			<td>
+				<div class="luci2-field">
+				 <div class="luci2-field-widget">
+					<!-- <select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_dest"> -->
+                         <input type="text" class="form-control luci2-field-validate custom-value-input2" id="field_ai_sender_zone_destzone" type="text" placeholder="">
+                			<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+	
+						<td class="text-right" style="width: 1%;">
+							<div class="btn-group">
+								<button type="button" id="AddNewaisenderconfiguration" title="" class="btn btn-success">Add</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+    </div>
+
+	<div class="tab-pane TabC Tabrs232"  id="tab_rs232sender">
+		<div id="sectiontab_rs_rs232"></div>	
+		<div id="Mansectiontab_rs232_sender" class="panel panel-default" >
+			<div class="panel-heading">
+				<h3 class="panel-title">RS232 Sender Configuration:</h3>
+			</div>
+			
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+						<th class="cbi-section-table-cell">Field Content</th>
+						<th class="cbi-section-table-cell">Field JSON Key Name</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectiontab_rs232_sender_newZone" data-luci2-sid="newZone">
+
+		   <td>
+				<div class="luci2-field">
+				 <div class="luci2-field-widget">
+					<select class="form-control luci2-field-validate" id="field_rs232_sender_zone_src">
+						<option value="SiteID">SiteID</option>
+						<option value="ReadTimeStamp">ReadTimeStamp</option>
+						<option value="EpochTimeStamp">EpochTimeStamp</option>
+						<option value="EMeterRS232RecordNumber">RecordNumber</option>
+						<option value="EMeterRS232RequestId">RequestId</option>
+						<option value="EMeterRS232InterfaceId">SerialPortNumber</option>
+						<option value="EMeterRS232MeterID">EquipmentID</option>
+						<option value="EMeterRS232MeterModel">EquipmentModel</option>
+						<option value="EMeterRS232SlaveID">SlaveID</option>
+						<option value="FunctionCodeUsed">FunctionCode</option>
+						<option value="EMeterRS232ResponseCode">EquipmentCommStatus</option>
+						<option value="StartingRS232RegisterAddress">StartRegister</option>
+						<option value="NoOfRegisters">NoOfRegisters</option>
+						<option value="RS232EMeterREG2">EquipmentData</option>
+						<option value="EMeterRS232MeterType">MeterType</option>
+						<option value="RS232Customfield1">RS232Customparam1</option>
+						<option value="RS232Customfield2">RS232Customparam2</option>
+						<option value="RS232Customfield3">RS232Customparam3</option>
+						<option value="RS232Customfield4">RS232Customparam4</option>
+						<option value="RS232Customfield5">RS232Customparam5</option>
+			          </select>
+                         <input type="text" class="form-control luci2-field-validate custom-value-input" id="field_rs232_sender_zone_src"  style="display: none;">
+                			<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+			<td>
+				<div class="luci2-field">
+				 <div class="luci2-field-widget">
+					<!-- <select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_dest"> -->
+                         <input type="text" class="form-control luci2-field-validate custom-value-input2" id="field_rs232_sender_zone_destzone" type="text" placeholder="">
+                			<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+	
+						<td class="text-right" style="width: 1%;">
+							<div class="btn-group">
+								<button type="button" id="AddNewrs232senderconfiguration" title="" class="btn btn-success">Add</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+    </div>
+
+	<div class="tab-pane TabC Tabsnmp"  id="tab_snmpsender">
+		<div id="sectiontab_snmp_sender"></div>	
+		<div id="Mansectiontab_snmp_sender" class="panel panel-default" >
+			<div class="panel-heading">
+				<h3 class="panel-title">SNMP Sender Configuration:</h3>
+			</div>
+			
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+						<th class="cbi-section-table-cell">Field Content</th>
+						<th class="cbi-section-table-cell">Field JSON Key Name</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectiontab_snmp_sender_newZone" data-luci2-sid="newZone">
+
+		   <td>
+				<div class="luci2-field">
+				 <div class="luci2-field-widget">
+					<select class="form-control luci2-field-validate" id="field_snmp_sender_zone_src">
+						<option value="SiteID">SiteID</option>
+						<option value="ReadTimeStamp">ReadTimeStamp</option>
+						<option value="EpochTimeStamp">EpochTimeStamp</option>
+						<option value="SNMPRecordNumber">RecordNumber</option>
+						<option value="SNMPRequestId">RequestId</option>
+						<option value="SNMPInterfaceId">InterfaceId</option>
+						<option value="SNMPDeviceIPAddress">DeviceIPAddress</option>
+						<option value="SNMPDevicePortNumber">DevicePortNumber</option>
+						<option value="SNMPDeviceType">DeviceType</option>
+						<option value="SNMPDeviceName">DeviceName</option>
+						<option value="SNMPDeviceResponseCode">DeviceResponseCode</option>
+						<option value="SNMPData">Data</option>
+						<option value="SNMPCustomfield1">SNMPCustomfield1</option>
+						<option value="SNMPCustomfield2">SNMPCustomfield2</option>
+						<option value="SNMPCustomfield3">SNMPCustomfield3</option>
+						<option value="SNMPCustomfield4">SNMPCustomfield4</option>
+						<option value="SNMPCustomfield5">SNMPCustomfield5</option>
+			          </select>
+                         <input type="text" class="form-control luci2-field-validate custom-value-input" id="field_snmp_sender_zone_src"  style="display: none;">
+                			<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+			<td>
+				<div class="luci2-field">
+				 <div class="luci2-field-widget">
+					<!-- <select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_dest"> -->
+                         <input type="text" class="form-control luci2-field-validate custom-value-input2" id="field_snmp_sender_zone_destzone" type="text" placeholder="">
+                			<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+	
+						<td class="text-right" style="width: 1%;">
+							<div class="btn-group">
+								<button type="button" id="AddNewsnmpsenderconfiguration" title="" class="btn btn-success">Add</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+    </div>
+
+	<div class="tab-pane TabC Tabtmp"  id="tab_tsender">
+		<div id="sectiontab_tmp_sender"></div>	
+		<div id="Mansectiontab_tmp_sender" class="panel panel-default" >
+			<div class="panel-heading">
+				<h3 class="panel-title">Temperature Sender:</h3>
+			</div>
+			
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+
+						<th class="cbi-section-table-cell">Field Content</th>
+						<th class="cbi-section-table-cell">Field JSON Key Name</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectiontab_tmp_sender_newZone" data-luci2-sid="newZone">
+
+		    <td>
+				<div class="luci2-field">
+				<div class="luci2-field-widget">
+					<select class="form-control luci2-field-validate" id="field_tmp_sender_zone_src">
+						<option value="SiteID">SiteID</option>
+						<option value="ReadTimestamp">ReadTimeStamp</option>
+						<option value="EpochTimeStamp">EpochTimeStamp</option>
+						<option value="TemperatureRecordNumber">RecordNumber</option>
+						<option value="TemperatureRequestId">RequestId</option>
+						<option value="TemperatureValues1">Temperature1</option>
+						<option value="TemperatureValues2">Temperature2</option>
+						<option value="TemperatureValues3">Temperature3</option>
+						<option value="TemperatureValues4">Temperature4</option>
+						<option value="TemperatureValues5">Temperature5</option>
+						<option value="TemperatureValues6">Temperature6</option>
+						<option value="TemperatureValues7">Temperature7</option>
+						<option value="TemperatureValues8">Temperature8</option>
+						<option value="TemperatureCustomfield1">TemperatureCustomfield1</option>
+						<option value="TemperatureCustomfield2">TemperatureCustomfield2</option>
+						<option value="TemperatureCustomfield3">TemperatureCustomfield3</option>
+						<option value="TemperatureCustomfield4">TemperatureCustomfield4</option>
+						<option value="TemperatureCustomfield5">TemperatureCustomfield5</option>
+						
+					</select>
+						<input type="text" class="form-control luci2-field-validate custom-value-input" id="field_tmp_sender_zone_srczone"  style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+			<td>
+				<div class="luci2-field">
+				<div class="luci2-field-widget">
+					<!-- <select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_dest"> -->
+						<input type="text" class="form-control luci2-field-validate custom-value-input2" id="field_tmp_sender_zone_destzone" type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>	
+
+						<td class="text-right" style="width: 1%;">
+							<div class="btn-group">
+								<button type="button" id="AddNewtmpsenderconfiguration" title="" class="btn btn-success">Add</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+	    </div>
+    </div>
+</div>
+</div>
+
+<div id="displayfixedpocket">
+	<div  id="fixedpocket" >
+
+	</div>
+</div>
+
+<style>
+#section_firewall_snat,#section_firewall_rules,#section_firewall_zone{
+border-color: #dddddd;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 25px 30px #0000001a;
+    border: 1px solid #70707038;
+    border-radius: 10px;
+    width:95%;
+    padding: 17px;
+    margin-bottom: 10px;
+}
+</style>

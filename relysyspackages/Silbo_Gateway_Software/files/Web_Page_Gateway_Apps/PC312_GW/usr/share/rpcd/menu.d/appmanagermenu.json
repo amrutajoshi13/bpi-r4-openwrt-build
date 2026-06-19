@@ -1,0 +1,66 @@
+{
+
+    "appmanager": {
+     "title": "Appmanager",
+        "index": 75
+    },
+
+
+    "appmanager/startstop": {
+        "title": "Application Start/Stop",
+        "acls": [ "applicationmanager" ],
+        "view": "appmanager/startstop",
+        "index": 10
+    },
+    
+    "appmanager/autoupgrademanager": {
+        "title": "Application Software Upgrade",
+        "acls": [ "upgrademanager" ],
+        "view": "appmanager/autoupgrademanager",
+        "index": 15
+    },
+    
+        "appmanager/importexportgatewayconfig": {
+        "title": "Import / Export Application Configurations",
+        "acls": [ "backup" ],
+        "view": "appmanager/importexportgatewayconfig",
+        "index": 25
+    },
+    
+     "appmanager/overview": {
+        "title": "App Health Status",
+        "acls": [ "ioutilities" ],
+        "view": "appmanager/overview",
+        "index": 30
+    },
+  /*  
+    "appmanager/autoupgrademanager": {
+        "title": "Application AutoUpgrade",
+        "acls": [ "upgrademanager" ],
+        "view": "appmanager/autoupgrademanager",
+        "index": 20
+    },
+    
+     "appmanager/upgrademanager": {
+        "title": "Application Upgrade",
+        "acls": [ "upgrademanager" ],
+        "view": "appmanager/upgrademanager",
+        "index": 30
+    },    
+    
+    "appmanager/maintenanceReboot": {
+        "title": "Maintenance reboot",
+        "acls": [ "maintenancereboot" ],
+        "view": "appmanager/maintenanceReboot",
+        "index": 40
+    }*/
+    
+    "appmanager/deletedatabase": {
+        "title": "Delete Database",
+        "acls": [ "ioutilities" ],
+        "view": "appmanager/deletedatabase",
+        "index": 97
+    }
+    
+
+}

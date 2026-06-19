@@ -1,0 +1,4 @@
+
+config genericconfig 'dmzconfig'
+	option enabledmz '0'
+

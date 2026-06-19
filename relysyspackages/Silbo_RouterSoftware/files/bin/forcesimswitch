@@ -1,0 +1,25 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+SIM="$1"
+
+Data_Switch=$(uci get simswitchconfig.simswitchconfig.cellulardataswitchlimitenable)
+
+if [ "${Data_Switch}" = "1" ]
+then
+ Data_Flag=$(cat /etc/sim"$SIM"dataflag)
+
+ if [ "${Data_Flag}" = "0" ]
+ then
+   /bin/simswitch "$SIM" > /dev/null 2>&1 &
+   /bin/sleep 1
+   echo "Module Switching to sim $SIM"
+ else
+   echo "Sim $SIM data is finished,Module is Not switching to sim $SIM"
+ fi
+else
+ /bin/simswitch "$SIM" > /dev/null 2>&1 &
+ /bin/sleep 1                                                       
+ echo "Module Switching to sim $SIM"
+fi

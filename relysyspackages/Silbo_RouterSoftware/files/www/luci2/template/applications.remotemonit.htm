@@ -1,0 +1,202 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">Remote Management System</h1>
+</div>
+
+
+<div class="pagecontent">
+	<ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+
+		<li class="TabC TabSt">
+			<a id="sectiontab_routing_status" href="#tab_status" data-toggle="tab">Status
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabGn active">
+			<a id="sectiontab_vpn_general" href="#tab_general" data-toggle="tab">General Settings
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC Tabnms">
+			<a id=":w" href="#tab_nms" data-toggle="tab">NMS
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabTr">
+			<a id="sectiontab_tr" href="#tab_tr" data-toggle="tab">TR_069
+				<span class="badge"></span>
+			</a>
+		</li>
+	</ul>
+
+	<div class="tab-content" id="tabs">
+
+		<div class="tab-pane TabC TabSt" id="tab_status">
+			<div class="refresh-icon" title="Refresh" tabindex="0" id="btn_nmsstatus_refresh">
+				<img src="/luci2/icons/refresh-icon.svg" alt="Refresh icon" />
+			</div>
+			<div id="NMS-Note"></div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">NMS Overview</h3>
+				</div>
+				<div id="section_routing_status"></div>
+			</div>
+		</div>
+
+		<div class="tab-pane TabC TabGn active" id="tab_general">
+			<div id="section_vpn_general"></div>
+		</div>
+
+		<div class="tab-pane TabC Tabnms" id="tab_nms">
+			<div id="section_config_nms"></div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Upload NMS Key</h3>
+				</div>
+				<p id="No-NMS-Config" class="no-configurations"></p>
+				<div class="cards" role="region" aria-label="Certificate cards">
+
+					<div class="card export" id="nms-card">
+
+						<div>
+							<div class="icon blue-circle">
+								<img src="/luci2/icons/cloud-arrow-up.svg" alt="Upload" class="svg-white">
+							</div>
+
+							<!-- <h3 id="export-title">Upload NMS Certificate and Key</h3> -->
+
+							<p>
+								Click <strong>Upload</strong> to select and upload your NMS certificate and private key
+								files.
+								These files are required for secure communication with the NMS server.
+							</p>
+						</div>
+
+
+						<div>
+							<div class="controls">
+								<button class="btn btn-primary" type="button" id="Upload-NMS"
+									aria-label="NMS configuration">
+									Upload
+								</button>
+							</div>
+							<div class="meta">Last Upload: <span id="last-upload">No backups yet</span></div>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<div class="tab-pane TabC TabTr" id="tab_tr">
+			<div id="section_tr"></div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.cards {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20px;
+		width: 100%;
+		height: auto;
+		border: none !important;
+		box-shadow: none !important;
+		background-color: none !important;
+	}
+
+	.card {
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), #fff);
+		border-radius: 14px;
+		padding: 22px;
+		border: 1px solid rgba(11, 63, 150, 0.06);
+		/* box-shadow: 0 18px 40px rgba(11, 38, 85, 0.06); */
+		box-shadow: none !important;
+		min-height: 240px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		transition: transform .22s cubic-bezier(.2, .9, .2, 1), box-shadow .22s ease;
+	}
+
+	/* .card:hover {
+		transform: translateY(-6px);
+		box-shadow: 0 30px 70px rgba(11, 38, 85, 0.08);
+	} */
+
+
+	.icon.blue-circle {
+		width: 96px;
+		height: 96px;
+		border-radius: 50%;
+		margin: 0 auto 12px auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: linear-gradient(135deg, #0b63d1 0%, #2fb3ff 100%);
+		/* box-shadow: 0 10px 30px rgba(11, 63, 209, 0.12); */
+	}
+
+
+	.icon.blue-circle img.svg-white {
+		width: 46px;
+		height: 46px;
+		filter: brightness(0) invert(1);
+	}
+
+
+	.card h3 {
+		text-align: left;
+		font-size: 16px;
+		margin: 11px 0px 20px 5px !important;
+		color: #071032;
+		font-weight: 800;
+		border-bottom: 1px solid rgba(16, 32, 52, 0.04)
+	}
+
+	.card p {
+		text-align: center;
+		color: #55607a;
+		font-size: 13px;
+		margin: 0 0 14px;
+		padding: 0 4px
+	}
+
+	.controls {
+		display: flex;
+		gap: 12px;
+		justify-content: center;
+		align-items: center;
+		flex-wrap: wrap;
+		margin-top: 8px
+	}
+
+
+	.meta {
+		margin-top: 14px;
+		font-size: 12px;
+		color: #6b7280;
+		text-align: center;
+	}
+	
+	.title-bar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	}
+
+	.refresh-icon {
+	--size: 28px;
+	width: var(--size);
+	height: var(--size);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	}
+</style>

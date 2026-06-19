@@ -1,0 +1,24 @@
+{
+        "maintenancereboot": {
+		"description": "Maintenance Reboot",
+		"read": {
+			"ubus" : {
+                "rpc-maintenancereboot":[
+                "configure"
+                   
+                ],
+                "rpc-importexport":[
+                "rebootsys"
+                ]
+            },
+			"uci": [
+				"MaintenanceRebootAction"
+			]
+		},
+		"write": {
+			"uci": [
+				"MaintenanceRebootAction"
+			]
+		}
+	},
+}

@@ -1,0 +1,72 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+if [ ! -f "/tmp/simnumfile" ]
+then
+ echo "Router is in Single SIM Configuration"
+ echo "ACTIVE SIM : bottom sim"
+else
+ echo "Router is in Dual SIM Configuration"
+ simnum=$(cat /tmp/simnumfile)
+
+ if [ "$simnum" = "1" ]
+ then
+  echo "ACTIVE SIM : SIM1(bottom sim)"
+ else
+  echo "ACTIVE SIM : SIM2(top sim)"
+ fi
+fi
+
+swlaninterface="SW_LAN"
+lan1interface="LAN1"
+lan2interface="LAN2"
+lan3interface="LAN3"
+lan4interface="LAN4"
+ethwan1interface="EWAN1"
+ethwan2interface="EWAN2"
+cellularwan1interface="CWAN1"
+cellularwan2interface="CWAN2"
+cellularwan3interface="CWAN3"
+cellularwan1sim1interface="CWAN1_0"
+cellularwan1sim2interface="CWAN1_1"
+wifiap="WIFI"
+wifista="WIFI_WAN"
+
+ReadSystemConfigFile()
+{
+   	config_load "$SystemConfigFile"
+   	config_get CellularOperationModelocal sysconfig CellularOperationMode
+   	config_get EnableCellular sysconfig enablecellular
+   	config_get Service sysconfig service
+   	config_get Sim2Service sysconfig sim2service
+}
+
+SystemConfigFile="/etc/config/sysconfig"
+
+ReadSystemConfigFile
+
+if [ "$EnableCellular" = "1" ]
+then
+	if [ "$CellularOperationModelocal" = "dualcellularsinglesim" ]
+	then
+	  ComPort1=$(cat "/tmp/InterfaceManager/status/$cellularwan1interface.ports" | grep -iw "Comport" | cut -d "=" -f 2)
+	  ComPort2=$(cat "/tmp/InterfaceManager/status/$cellularwan2interface.ports" | grep -iw "Comport" | cut -d "=" -f 2)
+	elif [ "$CellularOperationModelocal" = "singlecellulardualsim" ]
+	then
+	  simnum=$(cat /tmp/simnumfile)                                                                                         
+      if [ "$simnum" = "1" ]                                                                                                
+      then
+        ComPort=$(cat "/tmp/InterfaceManager/status/$cellularwan1sim1interface.ports" | grep -iw "Comport" | cut -d "=" -f 2)
+      else
+        ComPort=$(cat "/tmp/InterfaceManager/status/$cellularwan1sim2interface.ports" | grep -iw "Comport" | cut -d "=" -f 2)     
+      fi 
+	else
+      ComPort=$(cat "/tmp/InterfaceManager/status/$cellularwan1sim1interface.ports" | grep -iw "Comport" | cut -d "=" -f 2)
+	fi
+fi
+
+
+IMSI=$(gcom -d "$ComPort" -s /etc/gcom/getcardqccidinfo.gcom | awk NR==2 | cut -d ":" -f 2 | tr -d '\011\012\013\014\015\040')
+
+echo "IMSI : $IMSI"

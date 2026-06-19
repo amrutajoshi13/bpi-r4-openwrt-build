@@ -1,0 +1,69 @@
+{
+	"status": {
+		"description": "Status information display",
+		"read": {
+			"ubus": {
+				"rpc-updateportstatus": [
+          			"configurelan"
+       			 ],
+				"rpc-updateneighbours": [
+					"configure"
+				],
+				"rpc-UpdateConnectivityinfo": [
+					"configurecon"
+				],
+				"iwinfo": [
+					"devices",
+					"info",
+					"assoclist",
+					"phyname"
+				],
+				"system": [
+					"info",
+					"board"
+				],
+				"network.interface": [
+					"status"
+				],
+				"luci2.network": [
+					"conntrack_count",
+					"dhcp_leases",
+					"dhcp6_leases",
+					"routes",
+					"routes6"
+				],
+				"luci2.system": [
+					"diskfree",
+					"syslog",
+					"dmesg",
+					"process_list"
+				],
+				"rpc-updatewebinterface": [
+          		"configuregre"
+        		]
+			},
+			"uci": [
+					 "webinterface" 
+				]
+		},
+		"call": {
+			"ubus": {
+				"rpc-updateportstatus": [
+					"configurelan"
+				],
+				"rpc-updatewebinterface": [
+					"configuregre"
+				],
+				"rpc-updateneighbours": [
+					"configure"
+				],
+				 "rpc-UpdateConnectivityinfo": [
+					"configurecon"
+				]
+			},
+			"uci": [
+					 "webinterface"
+				]
+    }
+	}
+}

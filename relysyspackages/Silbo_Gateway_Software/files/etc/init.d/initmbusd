@@ -1,0 +1,37 @@
+#!/bin/sh
+
+#[ ! -x /usr/sbin/hwclock ] && exit 0
+
+START=99
+STOP=99
+USE_PROCD=1
+
+start() {
+    
+    echo "Starting MBUSD..."
+    /usr/bin/mbusd -c /etc/mbusdconfig.conf -v9
+    echo "MBUSD started"
+}
+
+stop() {
+    echo "Stopping MBUSD..."
+    /usr/bin/killall mbusd > /dev/null 2>&1
+    echo "MBUSD stopped"
+}
+
+case "$1" in 
+    start) 
+        echo "Invoking MBUSD Script" 
+        start
+        sleep 2
+    ;;
+    
+    stop)
+        echo "Stopping MBUSD Script"
+        stop
+    ;;
+    
+    *)
+        echo $"Usage: $0 {start|stop}"
+        exit 1
+esac

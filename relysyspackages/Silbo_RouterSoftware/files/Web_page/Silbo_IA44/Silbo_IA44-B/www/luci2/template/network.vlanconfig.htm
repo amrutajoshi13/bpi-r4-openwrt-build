@@ -1,0 +1,197 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">VLAN Configuration</h1>
+</div>
+
+<div class="pagecontent">
+
+	<div id="Update-VLAN-Note"></div>
+	<ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+
+		<li class="TabC Tabsr active">
+			<a id=":w" href="#Port_based_vlan" data-toggle="tab">Port Based VLAN
+				<span class="badge"></span>
+			</a>
+		</li>
+
+
+		<li class="TabC TabAsr">
+			<a id=":W" href="#Tagged_based_vlan" data-toggle="tab">Tagged Port Configuration
+				<span class="badge"></span>
+			</a>
+		</li>
+	</ul>
+
+	<div class="tab-content" id="tabs">
+		<div class="tab-pane TabC Tabsr active" id="Port_based_vlan">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="ipsec" id="btn_update"
+					title="Update Port VLAN">Update</button>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Port Based VLAN Configurations</h3>
+				</div>
+				<p id="No-PortVLAN-Config"></p>
+				<div class="scrollable-x " id="section_vlan_port"></div>
+			</div>
+
+			<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+				aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header modal-title">
+							<h3 id="vlanModalTitle">Add VLAN Configuration</h3>
+						</div>
+						<div class="modal-body">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>VLAN ID</label>
+										<input class="form-control luci2-field-validate" id="vlanid" type="number"
+											min="1" placeholder="">
+									</div>
+								</div>
+								<!-- <div class="col-md-6">
+									<div class="form-group">
+										<label>Port 2</label>
+										<select class="form-control luci2-field-validate" id="port2Id" type="text"
+											placeholder="">
+											<option value="off">OFF</option>
+											<option value="untagged">Untagged</option>
+											<option value="tagged">Tagged</option>
+										</select>
+									</div>
+								</div> -->
+							</div>
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Port 0</label>
+										<select class="form-control luci2-field-validate" id="port0Id" type="text"
+											placeholder="">
+											<option value="off">OFF</option>
+											<option value="untagged">Untagged</option>
+											<option value="tagged">Tagged</option>
+										</select>
+									</div>
+								</div>
+								<!-- <div class="col-md-6">
+									<div class="form-group">
+										<label>Port 3</label>
+										<select class="form-control luci2-field-validate" id="port3Id" type="text"
+											placeholder="">
+											<option value="off">OFF</option>
+											<option value="untagged">Untagged</option>
+											<option value="tagged">Tagged</option>
+										</select>
+									</div>
+								</div> -->
+							</div>
+
+							<!-- <div class="row">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Port 1</label>
+										<select class="form-control luci2-field-validate" id="port1Id" type="text"
+											placeholder="">
+											<option value="off">OFF</option>
+											<option value="untagged">Untagged</option>
+											<option value="tagged">Tagged</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label>Port 4</label>
+										<select class="form-control luci2-field-validate" id="port4Id" type="text"
+											placeholder="">
+											<option value="off">OFF</option>
+											<option value="untagged">Untagged</option>
+											<option value="tagged">Tagged</option>
+										</select>
+									</div>
+								</div>
+							</div> -->
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-success" id="AddNewPortForward">Add</button>
+							<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<div id="Mansection_vlan_port">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Configurations</h3>
+					</div>
+					<div class="text-right" style="margin: 15px 32px 20px 0px;">
+						<button type="button" title="Add VLAN Interface" data-action="save" id="createdevice" data-toggle="modal"
+							data-target="#exampleModal" class="btn btn-primary">Add
+							Interface</button>
+					</div>
+				</div>
+
+			</div>
+
+		</div>
+
+
+		<div class="tab-pane TabC TabAsr " id="Tagged_based_vlan">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="ipsec" id="tagged_btn_update"
+					title="Update Tagged VLAN">Update</button>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Tagged Port Configurations</h3>
+				</div>
+				<p id="No-TagVLAN-Config"></p>
+				<div class="scrollable-x " id="section_vlan_tag"></div>
+			</div>
+
+			<div id="Mansection_vlan_tag">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Configuration</h3>
+					</div>
+
+					<div class="luci2-field" style="margin-top: 10px;">
+						
+						<label class="col-lg-2 control-label" for="field_vlantag_redirect_newRedirect_new_device">Interface
+							Name</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate"
+								id="field_vlantag_redirect_newRedirect_new_device" type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add Interface" data-action="save" id="AddNewTaggedVlan"
+							class="btn btn-success">Add Interface</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+
+<style>
+	.btnclass {
+		margin: -48px 20px 8px 0px
+	}
+
+	#Update-VLAN-Note {
+		margin: -32px 0px 0px 8px;
+	}
+</style>
+
+

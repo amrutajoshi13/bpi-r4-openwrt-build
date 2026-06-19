@@ -1,0 +1,659 @@
+<div id="bacContentWrapper">
+    <div style="border-bottom: 1px solid #70707038">
+        <h1 class="header">BACnet Configuration</h1>
+    </div>
+    <div class="pagecontent">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">BACnet Configuration</h3>
+            </div>
+            <div class="container">
+                <!-- Add Device Button -->
+                <div class="row">
+                    <button type="button" class="btn btn-primary" id="BACnetdevice" data-toggle="modal"
+                        data-target="#BACnetModal" style="float:right;margin: 0px 28px 0 0;">
+                        Add Device</button>
+                </div>
+
+                <!-- Devices Table -->
+                <div class="table-container">
+                    <table id="devicesTable" class="table table-condensed table-hover">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+            </div>
+
+            <!-- Add Device Modal -->
+            <div class="modal fade" id="BACnetModal" tabindex="-1" aria-labelledby="addDeviceModalLabel"
+                data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog" role="document" style="width: 1400px;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title" id="addDeviceModalLabel">Add New Device</h3>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div id="navbar-example">
+                            <ul class="nav nav-tabs" id="pills-tab" role="tablist">
+                                <li class="nav-item active">
+                                    <a class="nav-link " id="pills-home-tab" data-toggle="pill" href="#BACnetconfig"
+                                        role="tab" aria-controls="pills-home" id="bacnetDeviceid"
+                                        aria-selected="true">BACnet
+                                        Device Configuration</a>
+                                </li>
+                                <li class="nav-item ">
+                                    <a class="nav-link" id="pills-home-tab" data-toggle="pill" href="#groupconfig"
+                                        role="tab" aria-controls="pills-home" id="groupid" aria-selected="true"
+                                        style="margin-left: 50px">Group
+                                        Configuration</a>
+                                </li>
+                                <li class="nav-item ">
+                                    <a class="nav-link" id="pills-home-tab" data-toggle="pill" href="#datapointconfig"
+                                        role="tab" aria-controls="pills-home" id="datapointid" aria-selected="true"
+                                        style="margin-left: 50px">Data Points
+                                        Configuration</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="BACnetconfig" name="attributes" role="tabpanel"
+                                    style="margin-top: 15px;">
+                                    <form id="bacnet-device-config" novalidate>
+                                        <div class="form-row">
+                                            <!-- Device Name -->
+                                            <div class="form-group col-12 col-md-6">
+                                                <label for="deviceName">Device Name</label>
+                                                <input type="text" class="form-control" id="deviceName"
+                                                    placeholder="Enter device name" name="deviceName" required>
+                                            </div>
+                                            <!-- Device Mode -->
+                                            <div class="form-group col-12 col-md-6">
+                                                <label for="deviceMode">Device Mode</label>
+                                                <select class="form-control" id="deviceMode" name="deviceMode" required>
+                                                    <option value="" disabled selected>Select mode</option>
+                                                    <option value="bacnet_ip">BACnet/IP</option>
+                                                    <option value="bacnet_mstp">BACnet MSTP</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <!-- Device IP Address -->
+                                            <div class="form-group col-12 col-md-6">
+                                                <label for="deviceIp">Device IP Address</label>
+                                                <input type="text" class="form-control" id="deviceIp"
+                                                    placeholder="Enter IP address (e.g., 192.168.1.1)" name="deviceIp"
+                                                    required>
+                                            </div>
+                                            <!-- Device Port Number -->
+                                            <div class="form-group col-12 col-md-6">
+                                                <label for="devicePort">Device Port Number</label>
+                                                <input type="number" class="form-control" id="devicePort"
+                                                    placeholder="Enter port number" name="devicePort" required>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col-12 col-md-6">
+                                                <label for="objectInstance">Object Instance</label>
+                                                <input type="number" class="form-control" id="objectInstance"
+                                                    placeholder="Enter object instance" name="objectInstance" required
+                                                    style="width: 530px;">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div class="tab-pane" id="groupconfig" role="tabpanel" style="margin-top: 15px;">
+                                    <h4>Please click on <strong>Add Group </strong>button to add the Group rows. When
+                                        done
+                                        click on
+                                        <strong>Add Tab</strong>.
+                                    </h4>
+                                    <div id='GroupTextBoxes' class="tab-pane"></div>
+                                </div>
+                                <div class="tab-pane" id="datapointconfig" class="dataPointSection"
+                                    style="margin-top: 15px;">
+                                    <span id="excelUploadWrapper" style="cursor:not-allowed;"
+                                        title="Add at least one Group and click on Add Tab to enable Excel upload">
+                                        <button class="btn btn-primary" id="excelUploadBtn"
+                                            style="position: relative; overflow: hidden;" disabled>
+                                            Upload Excel
+                                            <input type="file" id="excelUpload" accept=".xlsx, .xls"
+                                                style="position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;" />
+                                        </button>
+                                    </span>
+                                    <!-- <a href="DataPoints.xlsx" download class="btn btn-secondary"
+                                            style="font-size: 13px; padding: 5px 10px;"
+                                            title="Sheet name should match group name. Columns required: Data Point Name, Data Type, Instance, Description.">
+                                            Download Sample Excel
+                                        </a> -->
+                                    <button class="btn btn-secondary" id="downloadBACnetSampleExcel"
+                                        style="margin-left: 8px;">
+                                        Download Sample Excel
+                                    </button>
+                                    <hr>
+
+                                    <ul class="nav nav-tabs" id="dataPointTabs" role="tablist"></ul>
+                                    <div class="tab-content" id="dataPointTabContent"></div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                    id="closebutton1">Close</button>
+                                <button type="button" class="btn btn-success" id="next">Add Tab</button>
+                                <button type="button" class="btn btn-primary" id='addGroupButton'>Add Group</button>
+                                <button type="submit" class="btn btn-primary" id='saveDeviceButton'
+                                    form="bacnet-device-config">Save
+                                    Device</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="loadingOverlay">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>
+<div id="BACDisabledOverlay" style="display:none;">
+    <div class="bac-overlay-content">
+        <h2>BACnet Configuration is Disabled</h2>
+        <p>
+            Please go to <b>Device Application</b> page and start the
+            <b>BACnet</b> application to enable this configuration.
+        </p>
+    </div>
+</div>
+
+
+
+<style>
+    /* General Styles */
+    /* body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        } */
+
+    h3 {
+        color: #343a40;
+        /* margin-bottom: 20px; */
+        margin-top: 10px;
+    }
+
+    h4 {
+        margin-bottom: 30px;
+    }
+
+    /* span {
+        color: #228BCC;
+    } */
+
+    /* Table Styles */
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+    }
+
+    .panel-heading {
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    thead {
+        background-color: #228BCC;
+        color: white;
+    }
+
+    th,
+    td {
+        text-align: center;
+        padding: 12px 15px;
+    }
+
+
+    tbody tr:nth-child(odd) {
+        background-color: #f2f2f2;
+    }
+
+    tbody tr:hover {
+        background-color: #dceeff;
+    }
+
+    th {
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+
+    /* Button Styles */
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    /* .btn-primary:hover {
+        background-color: #0056b3;
+    } */
+
+    /* .editBtn {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white !important;
+    } */
+
+    /* .editBtn:hover {
+        background-color: #0056b3;
+        color: white;
+    } */
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    /* .btn-danger:hover {
+        background-color: #b02a37;
+    } */
+
+    /* Action Buttons in Table */
+    .action-buttons button {
+        margin-right: 8px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        flex: 1;
+        min-width: 230px;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 3px;
+        font-size: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #228BCC;
+        box-shadow: 0 0 5px rgba(34, 139, 204, 0.5);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #495057;
+    }
+
+    .modal-content {
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 10px;
+    } */
+
+    .modal-title {
+        font-size: 18px;
+        color: #343a40;
+    }
+
+    /* .close {
+        font-size: 35px;
+
+    } */
+
+    button.close {
+        background-color: white;
+    }
+
+    /* .btn-close:hover {
+        color: #dc3545;
+    } */
+
+    /* .btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    } */
+
+    .btn-primary {
+        background-color: #228BCC;
+        color: white;
+        border: none;
+    }
+
+    .pagecontent a {
+        color: white;
+    }
+
+    /* .btn-primary:hover {
+        background-color: #0056b3;
+    } */
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+
+    /* .btn-secondary:hover {
+        color: white;
+    } */
+
+    /* Add hover effects to navigation tabs */
+    .nav-pills .nav-link {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .bacnet-nav {
+        margin-top: 18px;
+    }
+
+    .nav.nav-tabs {
+        margin-bottom: 15px;
+        margin-top: 15px;
+    }
+
+    /* .nav-pills .nav-link:hover {
+        transform: scale(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    } */
+
+    /* Apply active state styling (optional for better UX) */
+    .nav-pills .nav-link.active {
+        transform: scale(1.05);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Slide-in Animation */
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .slide-in {
+        animation: slideIn 0.5s ease-in-out;
+    }
+
+    .nav-item {
+        animation: slideIn 0.5s forwards;
+        /* Adjust the duration of the animation */
+    }
+
+    /* Optional: For smoother transition on switching tabs */
+    .tab-content {
+        transition: opacity 0.5s ease;
+    }
+
+    /* Toast Message */
+    /* Add this CSS for the toast message to ensure it appears on top */
+    .toast-message {
+        position: fixed;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 16px;
+        z-index: 9999;
+        opacity: 0;
+        animation: fadeInOut 3s forwards;
+    }
+
+    #bacnetToast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        /* Blue for success */
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        z-index: 9999;
+        text-align: center;
+        min-width: 250px;
+    }
+
+    /* Make text bolder and more visible */
+    #toastText {
+        font-weight: bold;
+        color: white;
+        /* Ensure white text on dark background */
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+        /* Add slight shadow for better readability */
+    }
+
+    .toast-show {
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .toast-hide {
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+
+    #bacnetToast.error {
+        background: linear-gradient(135deg, #dc3545, #b02a37);
+        /* Red for errors */
+    }
+
+
+    /* Optional: Fade in and out animation for the toast */
+    @keyframes fadeInOut {
+        0% {
+            opacity: 0;
+        }
+
+        20% {
+            opacity: 1;
+        }
+
+        80% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0;
+        }
+    }
+
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+        /* Allow scrolling on small screens */
+        padding: 10px;
+    }
+
+    /*   Table Base Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        /* Soft shadow */
+        border-radius: 10px;
+        overflow: hidden;
+        /* font-family: 'Arial', sans-serif; */
+    }
+
+    /*   Table Header */
+    thead {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        /* Gradient effect */
+        color: white;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /*   Header and Cell Styling */
+    th,
+    td {
+        border: 1px solid #ddd;
+        /* Light gray borders */
+        padding: 12px 15px;
+        text-align: center;
+    }
+
+    /*   Striped Row Effect */
+    tbody tr:nth-child(odd) {
+        background-color: #f8f9fa;
+        /* Light gray */
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #ffffff;
+        /* White */
+    }
+
+    /*   Hover Effect */
+    tbody tr:hover {
+        background-color: #e3f2fd;
+        /* Soft blue */
+        transform: scale(1.01);
+        /* Slight zoom */
+        transition: all 0.2s ease-in-out;
+    }
+
+    /*   Table Borders */
+    table th,
+    table td {
+        border: 1px solid #ccc;
+    }
+
+    /*   Responsive Table */
+    @media (max-width: 768px) {
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+        }
+    }
+
+    #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-top: 5px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Page-scoped overlay */
+    #BACDisabledOverlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Overlay card */
+    .bac-overlay-content {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 14px;
+        max-width: 520px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .bac-overlay-content h2 {
+        color: #dc3545;
+        margin-bottom: 10px;
+    }
+
+    .bac-overlay-content p {
+        color: #444;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .bac-blurred {
+        filter: blur(4px);
+        pointer-events: none;
+        user-select: none;
+    }
+</style>
+<script>
+    function validateIPAddress(ip) {
+        const ipPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        return ipPattern.test(ip);
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<div id="bacnetToast">
+    <span id="toastText"></span>
+</div>

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+UpdateConfigScript="/bin/QueryModemStatus.sh"
+
+
+case "$1" in
+    list)
+        echo '{"configure":{}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+                            response=$(cat /tmp/dhcp.leases | awk '{ print $3 }')
+                         	echo "{\"code\":0,\"output\":\"$response\"}" 
+                                                                                 
+                            ;;
+                            
+                          # response1=$(SystemstartScript)
+                           # echo "{\"code\":0,\"output\":\"$file\"}"
+                                                      
+                           
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

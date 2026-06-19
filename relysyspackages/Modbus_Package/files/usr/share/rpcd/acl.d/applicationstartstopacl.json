@@ -1,0 +1,49 @@
+{
+    "applicationmanager": {
+        "description": "Application Start/Stop",
+            "read": {
+                "ubus" : {
+                    "rpc-applicationmanager":[
+                        "configure",
+                        "init"
+                    ],
+                    "rpc-upgradeversioninfo":[
+                        "installedversion"
+                    ],
+                      "rpc-PortConfig":[
+                        "configure"
+                    ],
+
+                },
+                    "uci": [
+                        "SMSRecieverGeneric",
+                        "portconfig"
+                    ]
+                 
+            },
+                
+                
+            "write": {
+				"ubus" : {
+                    "rpc-applicationmanager":[
+                        "configure",
+                        "init"
+                    ],
+                    "rpc-upgradeversioninfo":[
+                        "installedversion"
+                    ],
+                      "rpc-PortConfig":[
+                        "configure"
+                    ],
+
+                },
+                "uci": [
+                    "SMSRecieverGeneric",
+                    "portconfig"
+                ]
+            }
+                     
+                
+                
+    }
+}

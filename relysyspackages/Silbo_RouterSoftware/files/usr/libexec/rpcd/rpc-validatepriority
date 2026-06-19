@@ -1,0 +1,35 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+UpdateConfigScript="/bin/validate.sh"
+
+SystemstartScript="/root/InterfaceManager/script/SystemStart.sh"
+
+
+case "$1" in
+    list)
+        echo '{"configure":{}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+                            response=$($UpdateConfigScript)
+                            file="$(cat /bin/priorityvalidationoutput.txt)" 
+                         	echo "{\"code\":0,\"output\":\"$file\"}" 
+                                                                                 
+                            ;;
+                            
+                          # response1=$(SystemstartScript)
+                           # echo "{\"code\":0,\"output\":\"$file\"}"
+                                                      
+                           
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

@@ -1,0 +1,30 @@
+{
+    "setmacidacl": {
+        "description": "Set MAC ID",
+        "read": {
+            "cgi-file": [ "download", ],
+            "ubus" : {
+                "rpc-diagnosticutilities":[
+                    "run"
+                ],
+                "file":[
+                    "read"
+                ],
+                "luci2.system":[
+                    "init_action"
+                ]
+            },
+            "uci": [
+                "setmacid",
+                "applist_config"
+            ]
+        },
+        "write": {
+            "cgi-file": [ "upload", ],
+            "uci": [
+                "setmacid",
+                "applist_config"
+            ]
+        }
+    },
+}

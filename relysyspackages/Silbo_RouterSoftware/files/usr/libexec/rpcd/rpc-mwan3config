@@ -1,0 +1,130 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+Updatedconfigmsg="mwan3 updated"
+UpdateConfigScript="/bin/UpdateWanConfig.sh"
+UpdatePriorityScript="/bin/validate.sh"
+
+DeleteFailoverConfigScript="/root/InterfaceManager/script/Delete_Mwan3_Failover.sh"
+DeleteLoadbalancingConfigScript="/root/InterfaceManager/script/Delete_Mwan3_LoadBalancing.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{},"configurefailover":{},"deletefailover":{"FailoverConfigSectionName":"Name"},"configureloadbalancing":{},"deleteloadbalancing":{"LoadBalanceConfigSectionName":"Name"}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+                         response=$($Updatedconfigmsg)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : General Setting Configuration Update\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : General Setting Configuration Update\"}"
+                            fi
+                                                                                 
+                            ;; 
+                       
+                      #configurefailover)
+                         #response=$($UpdateConfigScript)
+							#if [ "$?" -ne 0 ]
+                            #then
+								#echo "{\"code\":1,\"output\":\"FAILURE : Failover Configuration Update\"}"
+                            #else
+                               	#echo "{\"code\":0,\"output\":\"SUCCESS : Failover Configuration Update\"}"
+                            #fi
+                                                                                 
+                            #;;   
+                            
+                     configurefailover)
+                            response=$($UpdatePriorityScript)
+                            if [ "$?" -ne 0 ]
+                            then
+								mwan3status=$(uci get mwan3config.general.select)
+								file="$(cat /bin/priorityvalidationoutput.txt | cut -d " " -f 1)" 
+								if [ "$file" = "Non" ];then
+									echo "{\"code\":0,\"output\":\"Configuration cannot be update as priority is same.Please configure unique priorities for multi-wan to work properly\"}" 
+								else
+									echo "{\"code\":0,\"output\":\"$file\"}" 
+									if [ "$mwan3status" = "failover" ] || [ "$mwan3status" = "balanced" ]
+									then
+										/etc/init.d/mwan3 start 
+									elif [ "$mwan3status" = "none" ] 
+									then
+										mwan3 stop
+									fi
+								fi                           
+                            fi                                                                                
+                            ;;
+                            
+                          # response1=$(SystemstartScript)
+                           # echo "{\"code\":0,\"output\":\"$file\"}"
+                                                                                     
+                      deletefailover)
+                          read -r input;
+		                  json_load "$input" > /dev/null 2>&1
+                          echo "$input" > /tmp/mwan3.txt
+		                  json_get_var Name FailoverConfigSectionName    
+                          #echo "$FailoverConfigSectionName Name $Name" > /tmp/mwan.txt
+                            if [ "$Name" = "CWAN1_0" ] || [ "$Name" = "CWAN1_1" ] || [ "$Name" = "CWAN1" ]
+                            then
+                            #echo "{\"code\":1,\"output\":\"Cannot Delete CWAN1_0 and CWAN1_1\"}"
+                            echo "{\"code\":1,\"output\":\"1\"}"
+                            else
+                            /root/InterfaceManager/script/Delete_Mwan3_Failover.sh
+                            #echo "{\"code\":0,\"output\":\"SUCCESS : Failover Configuration Deleted\"}"
+                            echo "{\"code\":0,\"output\":\"0\"}"
+                             fi
+                                                                                 
+                            ;; 
+                            
+                      configureloadbalancing)
+                           response=$($UpdateConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : LoadBalancing Configuration Update\"}"
+                            else                           
+								mwan3status=$(uci get mwan3config.general.select)
+								if [ "$mwan3status" = "failover" ] || [ "$mwan3status" = "balanced" ]
+								then
+									/etc/init.d/mwan3 start 
+								elif [ "$mwan3status" = "none" ] 
+								then
+									mwan3 stop
+								fi
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : LoadBalancing Configuration Update\"}"
+                            fi                                                                                
+                            ;;     
+                            
+                          
+                      deleteloadbalancing)
+                           read -r input;
+		                   json_load "$input" > /dev/null 2>&1
+                           echo "$input" > /tmp/mwan3l.txt
+		                   json_get_var Name LoadBalanceConfigSectionName    
+                           #echo "$LoadBalanceConfigSectionName Name $Name" > /tmp/mwan1.txt
+                            if [ "$Name" = "CWAN1_0" ] || [ "$Name" = "CWAN1_1" ] || [ "$Name" = "CWAN1" ]
+                            then
+                            #echo "{\"code\":1,\"output\":\"Cannot Delete CWAN1_0 and CWAN1_1\"}"
+                            echo "{\"code\":1,\"output\":\"1\"}"
+                            else
+                            /root/InterfaceManager/script/Delete_Mwan3_LoadBalancing.sh
+                            #echo "{\"code\":0,\"output\":\"SUCCESS : Failover Configuration Deleted\"}"
+                            echo "{\"code\":0,\"output\":\"0\"}"
+                             fi
+                                                                                 
+                            ;;    
+                          
+		             *)
+		                    echo '{"code":"1","output":"invalid method"}'
+		                    exit 1
+		                    ;;
+     
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0
+

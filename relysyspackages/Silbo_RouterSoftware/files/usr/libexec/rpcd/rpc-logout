@@ -1,0 +1,33 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+logoutScript="/bin/sessionlogout.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{"sid":"string","proto":"string","loginip":"string"}}'
+        ;;
+    call)
+        case "$2" in
+            configure)
+                read -r input
+                json_load "$input" 2>/dev/null
+                json_get_var activesid sid
+                json_get_var activeproto proto
+                json_get_var activehost loginip
+                "$logoutScript" "$activesid" "$activeproto" "$activehost"
+                file=$(cat /tmp/logoutresult.txt)
+                    rm  /tmp/logoutresult.txt
+                    echo "{\"code\":0,\"output\":\"$file\"}" 
+                ;;
+            *)
+                echo '{"code":1,"output":"invalid method"}'
+                exit 1
+                ;;
+        esac
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,227 @@
+#!/bin/sh
+. /lib/functions.sh
+
+
+RouterAppCfgDirPath="/root/ConfigFiles/RouterAppConfig"
+
+#Router Local Ping Application Configuration
+RouterApplocalconfigureCfgPath="${RouterAppCfgDirPath}/routerapplocalconfig"
+RouterEventfile="routerapplicationconfig"
+routerlocalconfigureEventSection="routerapplicationlocalconfig"
+
+#Router Remote Ping Application Configuration
+RouterAppRemoteconfigureCfgPath="${RouterAppCfgDirPath}/routerappremoteconfig"
+RouterEventfile="routerapplicationconfig"
+routerRemoteconfigureEventSection="routerapplicationRemoteconfig"
+
+usage()
+{
+    cat <<EOF
+    Usage:  ${0##*/} <ACTION>
+
+    ACTIONS:
+        ucitoappcfg  update application configuration using UCI
+EOF
+}
+
+################################################# Local Ping ################################################
+
+UpdateRouterApplocalCfg()
+{
+    echo "Updating Router Application configuration "
+    echo "Updating '${RouterApplocalconfigureCfgPath}.cfg' configuration"
+    config_load "$RouterEventfile"
+    
+    config_get  enablerouterlocalpingapp      "$routerlocalconfigureEventSection"    enablerouterlocalpingapp
+    config_get  timeintervalforpingcheck      "$routerlocalconfigureEventSection"    timeintervalforpingcheck
+    config_get  noofipaddress                 "$routerlocalconfigureEventSection"    noofipaddress
+    config_get  ipaddress1                    "$routerlocalconfigureEventSection"    ipaddress1
+    config_get  ipaddress2                    "$routerlocalconfigureEventSection"    ipaddress2
+    config_get  ipaddress3                    "$routerlocalconfigureEventSection"    ipaddress3
+    config_get  ipaddress4                    "$routerlocalconfigureEventSection"    ipaddress4
+    config_get  ipaddress5                    "$routerlocalconfigureEventSection"    ipaddress5
+    config_get  ipaddress6                    "$routerlocalconfigureEventSection"    ipaddress6
+    config_get  ipaddress7                    "$routerlocalconfigureEventSection"    ipaddress7
+    config_get  ipaddress8                    "$routerlocalconfigureEventSection"    ipaddress8
+    config_get  failurecriteria               "$routerlocalconfigureEventSection"    failurecriteria
+    config_get  failureaction                 "$routerlocalconfigureEventSection"    failureaction
+    config_get  noofretries                   "$routerlocalconfigureEventSection"    noofretries
+
+      echo "enablerouterlocalpingapp=$enablerouterlocalpingapp"
+      echo "timeintervalforpingcheck=$timeintervalforpingcheck"
+      echo "noofipaddress=$noofipaddress"
+      echo "failurecriteria=$failurecriteria"
+      echo "failureaction=$failureaction"
+      echo "noofretries=$noofretries"
+
+
+
+   # config_get     
+   {
+	   echo "enablerouterlocalpingapp=\"$enablerouterlocalpingapp\""
+	   echo "timeintervalforpingcheck=\"$timeintervalforpingcheck\""
+	   echo "noofipaddress=\"$noofipaddress\""
+	   echo "ipaddress1=\"$ipaddress1\""
+	   echo "ipaddress2=\"$ipaddress2\""
+	   echo "ipaddress3=\"$ipaddress3\""
+	   echo "ipaddress4=\"$ipaddress4\""
+	   echo "ipaddress5=\"$ipaddress5\""
+	   echo "ipaddress6=\"$ipaddress6\""
+	   echo "ipaddress7=\"$ipaddress7\""
+	   echo "ipaddress8=\"$ipaddress8\""
+	   echo "failurecriteria=\"$failurecriteria\""
+	   echo "failureaction=\"$failureaction\""
+	   echo "noofretries=\"$noofretries\""
+
+   } > "${RouterApplocalconfigureCfgPath}.cfg"
+  
+}
+
+
+RouterApplocalCronUpdate()
+{
+	echo "Updating Router Local Ping App configuration "
+    echo "Updating crontab Router Application configuration"
+    config_load "$RouterEventfile"
+    
+    config_get  enablerouterlocalpingapp                "$routerlocalconfigureEventSection"    enablerouterlocalpingapp
+    config_get  timeintervalforpingcheck                "$routerlocalconfigureEventSection"    timeintervalforpingcheck
+    timeintervalforpingcheckval=$(echo "$timeintervalforpingcheck" | sed s'/,$//')
+
+    # add entry to cron file
+     if [ "$enablerouterlocalpingapp" =  "1" ]
+    then
+	    sed -i '/RouterlocalPingApp.sh/d' /etc/crontabs/root
+	   echo "*/$timeintervalforpingcheckval * * * * /bin/RouterlocalPingApp.sh" >> /etc/crontabs/root
+	else
+	    sed -i '/RouterlocalPingApp.sh/d' /etc/crontabs/root
+    fi
+    
+    /etc/init.d/cron restart
+    sleep 2
+    
+	
+}
+
+################################################# Remote Ping ################################################
+
+UpdateRouterAppRemoteCfg()
+{
+    echo "Updating Router Application configuration "
+    echo "Updating '${RouterAppRemoteconfigureCfgPath}.cfg' configuration"
+    config_load "$RouterEventfile"
+    
+    config_get  enablerouterremotepingapp     "$routerRemoteconfigureEventSection"    enablerouterremotepingapp
+    config_get  timeintervalforpingcheck      "$routerRemoteconfigureEventSection"    timeintervalforpingcheck
+    config_get  noofipaddress                 "$routerRemoteconfigureEventSection"    noofipaddress
+    config_get  ipaddress1                    "$routerRemoteconfigureEventSection"    ipaddress1
+    config_get  ipaddress2                    "$routerRemoteconfigureEventSection"    ipaddress2
+    config_get  ipaddress3                    "$routerRemoteconfigureEventSection"    ipaddress3
+    config_get  ipaddress4                    "$routerRemoteconfigureEventSection"    ipaddress4
+    config_get  ipaddress5                    "$routerRemoteconfigureEventSection"    ipaddress5
+    config_get  ipaddress6                    "$routerRemoteconfigureEventSection"    ipaddress6
+    config_get  ipaddress7                    "$routerRemoteconfigureEventSection"    ipaddress7
+    config_get  ipaddress8                    "$routerRemoteconfigureEventSection"    ipaddress8
+    config_get  failurecriteria               "$routerRemoteconfigureEventSection"    failurecriteria
+    config_get  failureaction                 "$routerRemoteconfigureEventSection"    failureaction
+    config_get  noofretries                   "$routerRemoteconfigureEventSection"    noofretries
+
+      echo "enablerouterremotepingapp=$enablerouterremotepingapp"
+      echo "timeintervalforpingcheck=$timeintervalforpingcheck"
+      echo "noofipaddress=$noofipaddress"
+      echo "failurecriteria=$failurecriteria"
+      echo "failureaction=$failureaction"
+      echo "noofretries=$noofretries"
+
+
+
+   # config_get     
+   {
+	   echo "enablerouterremotepingapp=\"$enablerouterremotepingapp\""  
+	   echo "timeintervalforpingcheck=\"$timeintervalforpingcheck\""
+	   echo "noofipaddress=\"$noofipaddress\""
+	   echo "ipaddress1=\"$ipaddress1\""
+	   echo "ipaddress2=\"$ipaddress2\""
+	   echo "ipaddress3=\"$ipaddress3\""
+	   echo "ipaddress4=\"$ipaddress4\""
+	   echo "ipaddress5=\"$ipaddress5\""
+	   echo "ipaddress6=\"$ipaddress6\""
+	   echo "ipaddress7=\"$ipaddress7\""
+	   echo "ipaddress8=\"$ipaddress8\""
+	   echo "failurecriteria=\"$failurecriteria\""
+	   echo "failureaction=\"$failureaction\""
+	   echo "noofretries=\"$noofretries\""
+
+   } > "${RouterAppRemoteconfigureCfgPath}.cfg"
+  
+}
+
+
+RouterAppRemoteCronUpdate()
+{
+	echo "Updating Router Remote Ping App configuration "
+    echo "Updating crontab Router Application configuration"
+    config_load "$RouterEventfile"
+    
+    config_get  enablerouterremotepingapp           "$routerRemoteconfigureEventSection"       enablerouterremotepingapp
+    config_get  timeintervalforpingcheck            "$routerRemoteconfigureEventSection"       timeintervalforpingcheck
+    timeintervalforpingcheckval=$(echo "$timeintervalforpingcheck" | sed s'/,$//')
+
+    # add entry to cron file
+     if [ "$enablerouterremotepingapp" =  "1" ]
+    then
+	    sed -i '/RouterRemotePingApp.sh/d' /etc/crontabs/root
+	   echo "*/$timeintervalforpingcheckval * * * * /bin/RouterRemotePingApp.sh" >> /etc/crontabs/root
+	else
+	    sed -i '/RouterRemotePingApp.sh/d' /etc/crontabs/root
+    fi
+    
+    /etc/init.d/cron restart
+    sleep 2
+    
+	
+}
+		
+UpdateAppCfg()
+{
+     echo "Updating SIA Server configurations..."
+     UpdateRouterApplocalCfg
+     RouterApplocalCronUpdate
+     UpdateRouterAppRemoteCfg
+     RouterAppRemoteCronUpdate
+}
+
+if [ $# -ne 1 ]
+then
+    echo "${0##*/}: missing action"
+    usage
+else
+    action="$1"
+    case "$action" in
+        "reset")
+            ResetConfiguration
+            ;;
+
+        "ucitoappcfg")
+            UpdateAppCfg
+            ;;
+        
+        "appcfgtouci")
+            UpdateUCI
+            ;;
+
+        "listcfg")
+            ListConfigurations
+            ;;
+		
+		"updatemaintenancereboot")
+            UpdateMaintenanceReboot
+            ;;
+        *)
+            usage
+            ;;
+    esac
+fi
+
+exit 0
+

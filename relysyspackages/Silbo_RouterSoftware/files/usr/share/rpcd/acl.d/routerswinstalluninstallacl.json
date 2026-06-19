@@ -1,0 +1,32 @@
+{
+    "routerswinstalluninstallacl": {
+        "description": "Router Software install/uninstall",
+        "read": {
+			"ubus" : {
+                "rpc-routerswinstalluninstall":[
+                "configure",
+                "install",
+                "uninstall"                   
+                ]
+            },
+            "uci": [
+                "routerswinstalluninstall",
+                
+            ]
+        },
+        "write": {
+			"ubus" : {
+                "rpc-routerswinstalluninstall":[
+                "configure",
+                "install",
+                "uninstall"                   
+                ]
+            },
+            "uci": [
+               "routerswinstalluninstall",
+                
+            ]
+        }
+    }
+}
+

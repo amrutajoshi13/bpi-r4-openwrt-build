@@ -1,0 +1,13 @@
+{
+    "firewall": {
+        "title": "Firewall",
+        "index": 5
+    },
+
+    "firewall/settings": {
+        "title": "Settings",
+        "acls": [ "firewall" ],
+        "view": "firewall/settings",
+        "index": 10
+    }
+}

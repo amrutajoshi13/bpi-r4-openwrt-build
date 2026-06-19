@@ -1,0 +1,232 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">Ethernet Configuration</h1>
+</div>
+
+<div class="pagecontent">
+	<div style="text-align: right;">
+		<button type="button" id="btn_update" title="Update Ethernet Configuration"
+			class="btn btn-success">Update</button>
+	</div>
+	<div id="Update-Note"></div>
+
+	<ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+		<li class="TabC TabEth active">
+			<a id=":w" href="#tab_ethernet" data-toggle="tab">Ethernet Settings
+				<span class="badge"></span>
+			</a>
+		</li>
+		<li class="TabC TabDhR">
+			<a id=":w" href="#tab_dhcprelay" data-toggle="tab">DHCP Relay Server
+				<span class="badge"></span>
+			</a>
+		</li>
+		<li class="TabC TabLoop">
+			<a id="sectiontab_loopback" href="#tab_loopback" data-toggle="tab">Loopback IP Settings 
+				<span class="badge"></span>
+			</a>
+		</li>
+	</ul>
+
+	<div class="tab-content" id="tabs">
+
+		<div class="tab-pane TabC TabEth active" id="tab_ethernet">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Ethernet Configurations</h3>
+				</div>
+				<p id="No-Eth-Config"></p>
+				<div id="section_network_interface_port">
+
+				</div>
+			</div>
+			<div id="Mansection_network_interface_port">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Interface</h3>
+					</div>
+					<div class="luci2-field form-group" style="margin-top: 10px;">
+						<label class="col-lg-2 control-label"
+							for="field_netint_redirect_newRedirect_interfacename">Interface Name</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_netint_redirect_newRedirect_interfacename" type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_vlan_redirect_newRedirect_physicaldevice">Physical Device</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_vlan_redirect_newRedirect_physicaldevice" type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_vlan_redirect_newRedirect_type">Type</label>
+						<div class="luci2-field-widget col-lg-4">
+							<select class="form-control luci2-field-validate"
+								id="field_vlan_redirect_newRedirect_type">
+								<option value="LAN">LAN</option>
+								<option value="WAN">WAN</option>
+							</select>
+							<div class="luci2-field-error label label-danger" style="display:none;"></div>
+						</div>
+					</div>
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add Ethernet Config" data-action="save" id="AddNewPortForward"
+							class="btn btn-success">Add Interface</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane TabC TabDhR" id="tab_dhcprelay">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">DHCP Relay Configurations</h3>
+				</div>
+				<p id="No-DHCP-Config"></p>
+				<div id="section_dhcprelay_port"></div>
+			</div>
+			<div id="Mansection_dhcprelay_port">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Interface</h3>
+					</div>
+					<div class="luci2-field form-group" style="margin-top: 10px;">
+						<label class="col-lg-2 control-label"
+							for="field_dhcprelay_redirect_newRedirect_interfacename">Interface</label>
+						<div class="luci2-field-widget  col-lg-4">
+							<select class="form-control luci2-field-validate" id="field_dhcprelay_redirect_newRedirect_interfacename">
+								<option value="eth0.1">eth0.1</option>
+								<option value="ra0">ra0</option>
+							</select>
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_dhcprelay_redirect_newRedirect_startip">Start
+							IP Address </label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_dhcprelay_redirect_newRedirect_startip" oninput="ValidateIPv4(event)"
+								type="text" placeholder="192.168.10.10">
+							<div id="validateIPAddress" class="luci2-field-error label label-danger"
+								style="display:none">
+								Enter a valid IPv4 address </div>
+
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_dhcprelay_redirect_newRedirect_endip">End
+							IP Address</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_dhcprelay_redirect_newRedirect_endip" oninput="ValidateIPv42(event)"
+								type="text" placeholder="192.168.10.250">
+							<div id="validateIPAddress2" class="luci2-field-error label label-danger"
+								style="display:none">
+								Enter a valid IPv4 address </div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_dhcprelay_redirect_newRedirect_netmask">Netmask</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_dhcprelay_redirect_newRedirect_netmask" oninput="ValidateIPv43(event)"
+								type="text" placeholder="255.255.255.0">
+							<div id="validateIPAddress3" class="luci2-field-error label label-danger"
+								style="display:none">
+								Enter a valid Netmask </div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_dhcprelay_redirect_newRedirect_leasetime">Lease
+							Time</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate" id="field_dhcprelay_redirect_newRedirect_leasetime" type="text" placeholder="12">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add DHCP Relay" data-action="save" id="AddNewRelay"
+							class="btn btn-success">Add
+							Interface</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane TabC TabLoop" id="tab_loopback">
+			<div id="section_loopback"></div>
+		</div>
+
+	</div>
+
+</div>
+
+<style>
+	#Update-Note {
+		margin: -64px 0px -2px 0px;
+	}
+</style>
+
+<script>
+	function validateIPv4AddressAdvanced(val) {
+		if (typeof val !== 'string') return false;
+		var ipv4Pattern = /^(\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+		return ipv4Pattern.test(val.trim());
+	}
+
+	function ValidateIPv42(event) {
+		const input = event.target;
+		const value = input.value.trim();
+		const errorDiv = document.getElementById("validateIPAddress2");
+
+		if (value === "" || validateIPv4AddressAdvanced(value)) {
+			errorDiv.style.display = "none";
+			input.classList.remove("is-invalid");
+		} else {
+			errorDiv.style.display = "block";
+			input.classList.add("is-invalid");
+		}
+	}
+
+	function ValidateIPv43(event) {
+		const input = event.target;
+		const value = input.value.trim();
+		const errorDiv = document.getElementById("validateIPAddress3");
+
+		const validNetmasks = [
+			"128.0.0.0", "192.0.0.0", "224.0.0.0", "240.0.0.0", "248.0.0.0",
+			"252.0.0.0", "254.0.0.0", "255.0.0.0", "255.128.0.0", "255.192.0.0",
+			"255.224.0.0", "255.240.0.0", "255.248.0.0", "255.252.0.0", "255.254.0.0",
+			"255.255.0.0", "255.255.128.0", "255.255.192.0", "255.255.224.0",
+			"255.255.240.0", "255.255.248.0", "255.255.252.0", "255.255.254.0",
+			"255.255.255.0", "255.255.255.128", "255.255.255.192",
+			"255.255.255.224", "255.255.255.240", "255.255.255.248",
+			"255.255.255.252", "255.255.255.254", "255.255.255.255"
+		];
+
+		if (value === "") {
+			errorDiv.style.display = "none";
+			input.classList.remove("is-invalid");
+			return;
+		}
+
+		if (validateIPv4AddressAdvanced(value) && validNetmasks.includes(value)) {
+			errorDiv.style.display = "none";
+			input.classList.remove("is-invalid");
+		} else {
+			errorDiv.style.display = "block";
+			input.classList.add("is-invalid");
+		}
+	}
+</script>
+

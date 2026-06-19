@@ -1,0 +1,32 @@
+{
+    "deviceconfigV2": {
+        "description": "Modbus Configuration V2",
+            "read": {
+		"ubus" : {
+                "rpc-Modbus":[
+                "configure"
+                   
+                ]
+            },   "uci": [
+                    "DeviceConfigGeneric",
+                    "blockconfig",
+                    "registerconfig",
+                    "pseudoParamconfig",
+                    "PseudoCloudconfig",
+                    "PseudoRegisterconfig",
+                    
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "DeviceConfigGeneric",
+                    "blockconfig",
+                    "registerconfig",
+                    "pseudoParamconfig",
+                    "PseudoCloudconfig",
+                    "PseudoRegisterconfig",
+                ]
+            }
+    }
+}

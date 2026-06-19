@@ -1,0 +1,790 @@
+<div id="dioContentWrapper">
+    <div style="border-bottom: 1px solid #70707038">
+        <h1 class="header">Digital IO Configuration</h1>
+    </div>
+    <div class="pagecontent">
+        <!-- This container will be shown only if toggle is ON -->
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Digital Input</h3>
+            </div>
+            <div class="panel-body">
+
+                <!-- Input shown when SNMP is enabled -->
+                <div class="form-group">
+                    <label for="dioInput">Overall Periodicity Of DIO Input Readings (In Seconds >= 60)</label>
+                    <input type="number" class="form-control" id="dioInput" placeholder="Enter the value" min="60">
+                </div>
+
+                <div id="customTabs">
+                    <button class="custom-tab-button selected" data-target="dioMasterDiv">DIO Configuration</button>
+                    <button class="custom-tab-button" data-target="sendConfigDiv" id="sendConfigTab">Send
+                        Configuration</button>
+                </div>
+
+                <div id="dioTabContent">
+                    <div id="dioMasterDiv" class="custom-tab-content visible" style="margin-bottom: 100px;">
+                        <div id="main-container">
+
+                            <!-- Tabs Navigation -->
+                            <ul class="digital-io-tabs" id="tabs-nav"></ul>
+                            <div id="tabs"></div>
+
+                            <div class="text-left" style="margin-top: 10px;">
+                                <div class="btn-group">
+                                    <button type="button" title="" data-action="save" id="saveButton"
+                                        class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div id="sendConfigDiv" class="custom-tab-content">
+                        <h5>Data Sender Configuration</h5>
+                        <div style="display: flex; justify-content: flex-end; margin-bottom: 15px; margin-right: 14px;">
+                            <button class="btn btn-success" id="updateAllSendConfigsBtn">
+                                Update Device
+                            </button>
+                        </div>
+                        <!-- Table section (initially hidden) -->
+                        <div class="table-container" id="sendConfigTableContainer" style="display: none;">
+                            <table id="sendConfigTable" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Field Number</th>
+                                        <th>Field Content</th>
+                                        <th>JSON Key Name</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <!-- Add Form -->
+                        <div class="form-row mt-4 align-items-end" style="
+    border: 1px solid #eeeeee;
+    padding: 15px;
+    border-radius: 13px;
+    box-shadow: 0px 1px 8px 4px rgba(0, 0, 0, 0.05);">
+                            <div class="form-group col-md-4">
+                                <label for="fieldContentDropdown">Field Content</label>
+                                <select class="form-control" id="fieldContentDropdown">
+                                    <option value="">Loading...</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="fieldJsonKey">Field JSON Key Name</label>
+                                <input type="text" class="form-control" id="fieldJsonKey"
+                                    placeholder="Enter JSON Key Name">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label>&nbsp;</label>
+                                <button type="button" class="btn btn-primary" id="addSendConfigRow">Add</button>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="editSendConfigModal" tabindex="-1"
+                            aria-labelledby="editSendConfigLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                <div class="modal-content">
+
+                                    <h5 class="modal-title" id="editSendConfigLabel">Update Device</h5>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="editFieldContent">Field Content</label>
+                                            <select class="form-control form-control-sm" id="editFieldContent">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="editFieldJsonKey">JSON Key Name</label>
+                                            <input type="text" class="form-control form-control-sm"
+                                                id="editFieldJsonKey" placeholder="Enter key">
+                                        </div>
+                                        <div class="form-group" id="jsonKeyValueGroup" style="display: none;">
+                                            <label for="editJsonKeyValue">JSON Key Value</label>
+                                            <input type="text" class="form-control form-control-sm"
+                                                id="editJsonKeyValue" placeholder="Enter value">
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary btn-sm"
+                                            data-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary btn-sm"
+                                            id="saveSendConfigChanges">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="sendConfigLoadingOverlay">
+                    <div class="spinner"></div>
+                </div>
+
+                <div id="sendConfigToast" class="toast-container">
+                    <span id="sendToastText"></span>
+                </div>
+                <div id="dioLoadingOverlay">
+                    <div class="spinner"></div>
+                </div>
+
+                <div id="dioToast" class="toast-container">
+                    <span id="dioToastText"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- DIO Disabled Overlay -->
+<div id="dioDisabledOverlay" style="display:none;">
+    <div class="dio-overlay-content">
+        <h2>Digital Input Configuration is Disabled</h2>
+        <p>
+            Please go to <b>Device Application</b> page and start the
+            <b>Digital Input</b> application to enable this configuration.
+        </p>
+    </div>
+</div>
+<style>
+    label {
+        display: block;
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: #333;
+        margin-right: 10px;
+    }
+
+    .modal-dialog {
+        width: 100%;
+        max-width: 1380px;
+    }
+
+    h3 {
+        color: #343a40;
+        margin-top: 10px;
+        font-size: 30px;
+    }
+
+    h4 {
+        margin: 10px 0 10px 16px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .action-buttons button {
+        margin-right: 8px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 0px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        flex: 1;
+        min-width: 139px;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 3px;
+        font-size: 15px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #228BCC;
+        box-shadow: 0 0 5px rgba(34, 139, 204, 0.5);
+    }
+
+
+
+    .modal-content {
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #343a40;
+    }
+
+    .close {
+        font-size: 35px;
+
+    }
+
+    button.close {
+        background-color: white;
+    }
+
+    .btn-close:hover {
+        color: #dc3545;
+    }
+
+    .btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-primary {
+        background-color: #228BCC;
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #565e64;
+        color: white;
+    }
+
+    .snmp-nav {
+        margin-top: 15px;
+    }
+
+    /* Add hover effects to navigation tabs */
+    .nav-pills .nav-link {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .nav-pills .nav-link:hover {
+        transform: scale(1.1);
+        /* Increase size */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        /* Add shadow */
+    }
+
+    /* Apply active state styling (optional for better UX) */
+    .nav-pills .nav-link.active {
+        transform: scale(1.05);
+        /* Slightly larger for active tab */
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Slide-in Animation */
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .slide-in {
+        animation: slideIn 0.5s ease-in-out;
+    }
+
+    .nav-item {
+        animation: slideIn 0.5s forwards;
+        /* Adjust the duration of the animation */
+    }
+
+    /* Optional: For smoother transition on switching tabs */
+    .tab-content {
+        transition: opacity 0.5s ease;
+    }
+
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+        /* Allow scrolling on small screens */
+        padding: 10px;
+    }
+
+    /*  Table Base Styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        /* Soft shadow */
+        border-radius: 10px;
+        overflow: hidden;
+        /* font-family: 'Arial', sans-serif; */
+    }
+
+    /*  Table Header */
+    thead {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        /* Gradient effect */
+        color: white;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /*  Header and Cell Styling */
+    th,
+    td {
+        border: 1px solid #ddd;
+        /* Light gray borders */
+        padding: 12px 15px;
+        text-align: center;
+    }
+
+    /*  Striped Row Effect */
+    tbody tr:nth-child(odd) {
+        background-color: #f8f9fa;
+        /* Light gray */
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #ffffff;
+        /* White */
+    }
+
+    /*  Hover Effect */
+    tbody tr:hover {
+        background-color: #e3f2fd;
+        /* Soft blue */
+        transform: scale(1.01);
+        /* Slight zoom */
+        transition: all 0.2s ease-in-out;
+    }
+
+    /*  Table Borders */
+    table th,
+    table td {
+        border: 1px solid #ccc;
+    }
+
+    /*  Responsive Table */
+    @media (max-width: 768px) {
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+        }
+    }
+
+    #editSendConfigModal .modal-dialog {
+        max-width: 620px;
+        /* custom width */
+    }
+
+    #loadingOverlay {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        top: 0;
+        left: 0;
+        z-index: 10000;
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .required {
+        color: red;
+        font-size: 16px;
+        margin-left: 5px;
+    }
+
+    /* POP UP STYLES */
+
+    #toggleStyle {
+        margin-top: 20px;
+        padding: 16px;
+        border-radius: 20px;
+        background-color: #f8f9fb;
+        display: inline-block;
+        width: 13%;
+        height: 84px;
+        box-shadow: 1px 3px 7px 5px rgba(0, 0, 0, 0.08);
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 28px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider.round {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 28px;
+    }
+
+    .slider.round:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.slider.round {
+        background-color: #007bff;
+    }
+
+    input#dioInput {
+        width: 34%;
+    }
+
+    input:checked+.slider.round:before {
+        transform: translateX(22px);
+    }
+
+    /* Tab button container */
+    #customTabs {
+        margin-top: 30px;
+        display: flex;
+    }
+
+    /* Tab button */
+    .custom-tab-button {
+        padding: 12px 24px;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        font-size: 16px;
+        color: #555;
+        font-weight: 600;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .custom-tab-button:hover {
+        color: #007bff;
+        background-color: #f5faff;
+    }
+
+    .custom-tab-button.selected {
+        color: #007bff;
+        border-bottom: 3px solid #007bff;
+        background-color: #f0f8ff;
+    }
+
+    /* Tab content container */
+    .custom-tab-content {
+        display: none;
+        padding: 25px;
+        background: #fff;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        margin-top: -1px;
+    }
+
+    .custom-tab-content.visible {
+        display: block;
+    }
+
+    /* Optional: Slight fade-in effect */
+    .custom-tab-content.visible {
+        animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .disabled-tab {
+        pointer-events: none;
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(5px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* DIO CONFIG */
+    .digital-io-tabs {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 8px;
+        padding: 0;
+        margin: 0 0 16px 0;
+    }
+
+    .digital-io-tabs li {
+        background: #007bff;
+        padding: 10px 14px;
+        border-radius: 6px;
+        color: white;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.15s;
+        font-size: 16px;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+
+    .digital-io-tabs li:hover {
+        background: #0056b3;
+        transform: scale(1.03);
+    }
+
+    .digital-io-tabs li a {
+        color: white;
+        text-decoration: none;
+    }
+
+    .active-tab {
+        background: #0056b3 !important;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(0, 86, 179, 0.35);
+    }
+
+    /* Main Container */
+    .digital-io-container {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.1);
+        background: white;
+        max-width: 600px;
+        margin: 15px auto 22px auto;
+    }
+
+    /* Sections */
+    .digital-io-section {
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-top: 10px;
+        background: #f9f9f9;
+        display: none;
+    }
+
+    /* Labels */
+    .digital-io-label {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    /* Input & Select */
+    .digital-io-input,
+    .digital-io-select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Save Button */
+    .digital-io-save-btn {
+        display: block;
+        width: 100px;
+        /* Adjust width as needed */
+        padding: 10px;
+        margin: 20px auto;
+        /* Center the button */
+        background: #28a745;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    .digital-io-save-btn:hover {
+        background: #218838;
+        transform: scale(1.05);
+    }
+
+    /* make sendConfigLoadingOverlay act as full-screen overlay */
+    #sendConfigLoadingOverlay {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.45);
+        top: 0;
+        left: 0;
+        z-index: 11000;
+        display: none;
+        /* hidden by default */
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sendConfigLoadingOverlay .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        animation: spin 1s linear infinite;
+    }
+
+    #sendConfigDiv {
+        margin-top: 20px;
+        border-radius: 30px;
+    }
+
+    #dioLoadingOverlay {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.45);
+        top: 0;
+        left: 0;
+        z-index: 12000;
+        /* high so it is above everything */
+        display: none;
+        /* hidden by default */
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* reuse existing .spinner class; if not, include it */
+    #dioLoadingOverlay .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        animation: spin 1s linear infinite;
+    }
+
+
+    #dioMasterDiv {
+        margin-top: 20px;
+        border-radius: 30px;
+    }
+
+    /* Wrapper must be positioning context */
+    #dioContentWrapper {
+        position: relative;
+    }
+
+    /* Page-scoped overlay */
+    #dioDisabledOverlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Overlay card */
+    .dio-overlay-content {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 14px;
+        max-width: 520px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .dio-overlay-content h2 {
+        color: #dc3545;
+        margin-bottom: 10px;
+    }
+
+    .dio-overlay-content p {
+        color: #444;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    .dio-blurred {
+        filter: blur(4px);
+        pointer-events: none;
+        user-select: none;
+    }
+</style>
+<script>
+    // Tab switching logic
+
+    document.querySelectorAll('.custom-tab-button').forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active from all buttons/content
+            document.querySelectorAll('.custom-tab-button').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.custom-tab-content').forEach(div => div.classList.remove('visible'));
+
+            // Activate clicked tab
+            button.classList.add('selected');
+            const target = button.getAttribute('data-target');
+            document.getElementById(target).classList.add('visible');
+        });
+    });
+
+</script>

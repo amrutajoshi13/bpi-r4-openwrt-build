@@ -1,0 +1,1280 @@
+<script src="../view/appconfig.deviceconfiguration.js"></script>
+<div>
+    <div class="row">
+        <button type="button" class="btn btn-primary" id="pseudodevice" data-toggle="modal" data-target="#pseudoModal"
+            style="float:right;margin: 30px 5px 0 0;">
+            Add Pseudo Device</button>
+        <button type="button" class="btn btn-primary" id="createdevice" data-toggle="modal" data-target="#exampleModal"
+            style="float:right; margin: 30px 5px 0 0;">
+            Add Device</button>
+    </div>
+
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item active">
+            <a class="nav-link active" id="modbus-tab" data-toggle="tab" href="#modevice" role="tab"
+                aria-controls="modevice" aria-selected="true">Modbus Device</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="pseudo-tab" data-toggle="tab" href="#pseudo" role="tab" aria-controls="pseudo"
+                aria-selected="false">Pseudo Device </a>
+        </li>
+    </ul>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane active" id="modevice" role="tabpanel" aria-labelledby="modbus-tab">
+                    <h3>Modbus Device Configuration</h3>
+                    <div id="map"></div>
+                </div>
+                <div class="tab-pane" id="pseudo" role="tabpanel" aria-labelledby="pseudo-tab">
+                    <h3>Pseudo Device Configuration</h3>
+                    <div id="map2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document" style="width: 1280px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="addtext">Add New Device</h3>
+                    <div>
+                    </div>
+                    <h3 class="modal-title" id="updatetext">Update Device Configuration</h3>
+                    <div id="navbar-example">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item active">
+                                <a class="nav-link active" data-toggle="tab" href="#communicationconfig"
+                                    id="communicationid" role="tab">Parameters Configuration</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#blockconfig" id="block" role="tab">Block
+                                    config</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#registerconfig" id="register"
+                                    role="tab">Register config</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#alarmconfig" id="alarm"
+                                    role="tab">Alarm/Event
+                                    config</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#cloudconfig" id="cloud" role="tab" style="display: none;">Cloud
+                                    Configuration</a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="communicationconfig" name="attributes" role="tabpanel">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label id="requiredfield">DEVICE NAME</label>
+                                                <input type="text" name="Device Name" class="form-control inputbox"
+                                                    id="devicename">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" id="modbusserialconfig">
+
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label id="requiredfield">Modbus Protocol</label>
+                                                <select name="Protocol" id="protocol" class="form-control"
+                                                    onchange="toggleParity()">
+                                                    <option value="RTU">RTU</option>
+                                                    <option value="TCP">TCP</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="form-group" id="tcpOptions" style="display: none;">
+                                                <label id="requiredfield">Modbus Comm IP:</label>
+                                                <input type="text" name="Modbus Comm IP" id="CommIp"
+                                                    class="form-control inputbox">
+
+                                                <label id="requiredfield">Modbus Comm Port:</label>
+                                                <input type="number" name="Modbus Comm Port" id="CommPort"
+                                                    class="form-control inputbox">
+
+                                                <label id="requiredfield">Modbus Comm Timeout:</label>
+                                                <input type="number" name="Modbus Comm Timeout" id="commT"
+                                                    class="form-control inputbox">
+                                            </div>
+                                            <div id="RTUOptions">
+                                                <div class="form-group" id="parityGroup1">
+                                                    <label id="requiredfield">Baud rate</label>
+                                                    <select name="Baudrate" id="serialbaudrate" class="form-control">
+                                                        <option value="9600">9600</option>
+                                                        <option value="300">300</option>
+                                                        <option value="1200">1200</option>
+                                                        <option value="1800">1800</option>
+                                                        <option value="2400">2400</option>
+                                                        <option value="4800">4800</option>
+                                                        <option value="19200">19200</option>
+                                                        <option value="38400">38400</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div id="ParityOptions">
+                                                <div class="form-group" id="parityGroup2">
+                                                    <label id="requiredfield">Parity</label>
+                                                    <select name="parity" id="serialparity" class="form-control">
+                                                        <option value="0">0-NONE</option>
+                                                        <option value="1">1-ODD</option>
+                                                        <option value="2">2-EVEN</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label id="requiredfield">Meter ID</label>
+                                                <input type="number" class="form-control inputbox" name="Meter ID"
+                                                    id="equipmentid" placeholder="1">
+                                            </div>
+                                            <div class="form-group">
+                                                <label id="requiredfield">Meter Model</label>
+                                                <input type="text" class="form-control inputbox" id="metermodel"
+                                                    name="Meter Model">
+                                            </div>
+                                            <div class="form-group">
+                                                <label id="requiredfield">Slave Address</Address></label>
+                                                <input type="number" class="form-control inputbox" id="serialslaveid"
+                                                    placeholder="1-255" name="Slave Address">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div id="PORTOptions">
+                                                <div class="form-group">
+                                                    <label id="requiredfield">Port number</label>
+                                                    <select name="port" id="serialport1" name="Port Number"
+                                                        class="form-control inputbox">
+                                                        <option value="1">RS485 Port-1</option>
+                                                        <option value="2">RS232 Port</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div id="DATAOptions">
+                                                <div class="form-group" id="parityGroup3">
+                                                    <label id="requiredfield">No.of Databits</label>
+                                                    <select name="databits" id="serialdatabits" class="form-control">
+                                                        <option value="7">7</option>
+                                                        <option value="8">8</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div id="STOPOptions">
+                                                <div class="form-group" id="parityGroup4">
+                                                    <label id="requiredfield">No.of Stopbits</label>
+                                                    <select name="cars" id="serialstopbit" class="form-control">
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label id="requiredfieldTranslation">Standard Modbus Address
+                                                    Translation</label>
+                                                <select name="translation" id="stdModbusEnable" class="form-control"
+                                                    onchange="handleUniversalTranslationChange()">
+                                                    <option value="1">Yes</option>
+                                                    <option value="0">No</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="row" id="modbustcpconfig">
+                            </div>
+                            <div class="tab-pane" id="blockconfig" role="tabpanel">
+                                <!-- <div class="row">
+                                    <div class="col-md-3">
+                                        <label id="requiredfieldTranslation">Standard Modbus Address Translation</label>
+                                        <select name="translation" id="stdModbusEnable0" class="form-control" onchange="handleUniversalTranslationChange()">
+                                            <option value="1">Yes</option>
+                                            <option value="0">No</option>
+                                        </select>
+                                    </div>
+                                </div> -->
+                                <div id='BlockTextBoxesGroup' class="tab-pane">
+                                    <div class="row modusblock">
+                                        <div class="col-md-3">
+                                            <label id="requiredfieldC">Function Code</label>
+                                            <select name="function" id="functionCode0" class="form-control"
+                                                onchange="handleFunctionBlockChange(0)">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label id="requiredfieldAB">Start Register</label>
+                                            <input type='number' id='startRegister0' class="form-control"
+                                                onchange="validateRegBlock(0)">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label id="requiredfieldCountA">Register Count</label>
+                                            <input type='textbox' id='countRegister0' class="form-control">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type='button' value='Delete' id='BlockremoveButton'
+                                                class="btn btn-primary" style="margin-top: 22px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="registerconfig" role="tabpanel">
+                                <!-- Checkbox Row -->
+                                <div class="row" style="margin-bottom:10px">
+                                    <div class="col-md-3">
+                                    </div>
+                                </div>
+                                <div id='TextBoxesGroup' class="tab-pane">
+                                    <div class="row modusregister custom-mapping">
+                                        <div class="col-md-2">
+                                            <label id="requiredfieldN">Register Name</label>
+                                            <input type='textbox' id='registername0' class="form-control">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label id="requiredfieldSR">Start Register</label>
+                                            <input type='textbox' id='startregister0' class="form-control">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label id="requiredfieldCount">Register Count</label>
+                                            <input type='textbox' id='registercount0' class="form-control">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label id="requiredfieldDT">Data Type</label>
+                                            <select type='textbox' id='Datatype0' onchange="handleDatatypeCodeChange(0)"
+                                                class="form-control">
+                                                <option value="">Select</option>
+                                                <option value="0">Hexdecimal</option>
+                                                <option value="1">Floating Point</option>
+                                                <option value="2">Floating Point(Swapped byte)</option>
+                                                <option value="3">16 bit UINT (high byte first)</option>
+                                                <option value="4">16 bit UINT (low byte first)</option>
+                                                <option value="5">16 bit INT (high byte first)</option>
+                                                <option value="6">16 bit INT (low byte first)</option>
+                                                <option value="7">32 bit UINT (byte order 1,2,3,4)</option>
+                                                <option value="8">32 bit UINT ( byte order 4,3,2,1)</option>
+                                                <option value="9">32 bit INT (byte order 1,2,3,4)</option>
+                                                <option value="10">32 bit INT (byte order 4,3,2,1)</option>
+                                                <option value="11">1 bit</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label id="requiredfieldCount">Multiplication factor</label>
+                                            <input type='number' id='multifactor0' class="form-control">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type='button' value='Delete' id='removeButton'
+                                                class="btn btn-primary" style="margin-top: 22px;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <div class="form-group">
+                                            <textarea class="form-control" disabled
+                                                style="margin-top:15px;resize: none;display: none;" cols="12" rows="4"
+                                                id="jsoninfo"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="alarmconfig" role="tabpanel">
+                                <div id='AlarmTextBoxesGroup' class="tab-pane">
+                                    <div class="row modusalarm" style="width: 1283px;">
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldDA">
+                                                <br>Category
+                                            </label>
+                                            <select type='textbox' id='Category0' class="form-control"
+                                                onchange="handleFunctionCodeChange(0)">
+                                                <option value="1">Alarm</option>
+                                                <option value="2">Event</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldDT">
+                                                <br>Status
+                                            </label>
+                                            <select type='textbox' id='alarmEnabled0' class="form-control">
+                                                <option value="0">Disabled</option>
+                                                <option value="1">Enabled</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldAB">
+                                                <br>Name
+                                            </label>
+                                            <input type='textbox' id='alarmName0' class="form-control">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldDB">
+                                                <br>Function Code
+                                            </label>
+                                            <select type='textbox' id='Code0' class="form-control"
+                                                onchange="handleFunctionChange(0)">
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldCountA">
+                                                <br>Start Reg
+                                            </label>
+                                            <input type='number' id='regAlarm0' class="form-control"
+                                                onchange="validateRegAlarm(0)">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldCountA">
+                                                <br>No_of Reg
+                                            </label>
+                                            <input type='number' id='alarmCount0' class="form-control">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldDT">
+                                                <br>Data Type
+                                            </label>
+                                            <select type='textbox' id='alarmDatatype0' class="form-control"
+                                                onchange="handleFunctionCodeChange(0)">
+                                                <option value="">Select</option>
+                                                <option value="0">Hexdecimal</option>
+                                                <option value="1">Floating Point</option>
+                                                <option value="2">Floating Point(Swapped byte)</option>
+                                                <option value="3">16 bit UINT (high byte first)</option>
+                                                <option value="4">16 bit UINT (low byte first)</option>
+                                                <option value="5">16 bit INT (high byte first)</option>
+                                                <option value="6">16 bit INT (low byte first)</option>
+                                                <option value="7">32 bit UINT (byte order 1,2,3,4)</option>
+                                                <option value="8">32 bit UINT ( byte order 4,3,2,1)</option>
+                                                <option value="9">32 bit INT (byte order 1,2,3,4)</option>
+                                                <option value="10">32 bit INT (byte order 4,3,2,1)</option>
+                                                <option value="11">Boolean</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldCountA">Upper Thresh/
+                                                <br>Alarm Value
+                                            </label>
+                                            <input type='number' id='uprThreshold0' class="form-control">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldCountA">
+                                                <br>Upper Hys
+                                            </label>
+                                            <input type='number' id='uprHysteresis0' class="form-control">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldCountA">
+                                                <br>Lower Thresh
+                                            </label>
+                                            <input type='number' id='lowerThreshold0' class="form-control">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <label id="requiredfieldCountA">
+                                                <br>Lower Hys
+                                            </label>
+                                            <input type='number' id='lowerHysteresis0' class="form-control">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <input type='button' value='Delete' id='AlarmremoveButton'
+                                                class="btn btn-primary" style="margin-top: 35px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-pane" id="cloudconfig" name="attributes" role="tabpanel">
+                                <form>
+                                    <!-- <div class="checkboxoptions">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="enableSlaveData">
+                                            <label class="custom-control-label cloudText" for="enableSlaveData">Enable
+                                                Per
+                                                Slave
+                                                Data Sending</label>
+                                        </div>
+
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input"
+                                                id="enableSlaveCloudData">
+                                            <label class="custom-control-label cloudText"
+                                                for="enableSlaveCloudData">Enable
+                                                Slave
+                                                Cloud Configuration</label>
+                                        </div>
+                                    </div> -->
+                                    <div id="slaveCloudConfigFields">
+                                        <div class="container mt-4" style="margin-top: 42px;">
+                                            <div class="form-group row">
+                                                <label class="col-sm-2 col-form-label cloudText">Data Sending
+                                                    Method:</label>
+                                                <div class="col-sm-4">
+                                                    <select class="form-control" id="dataSendingMethod">
+                                                        <option value="1">Primary Server</option>
+                                                        <option value="2">Secondary Server</option>
+                                                        <option value="3">Both</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div id = "hideoptions">
+                                            <div class="form-group row" id="topicNameField">
+                                                <label class="col-sm-2 col-form-label cloudText">Topic Name:</label>
+                                                <div class="col-sm-4">
+                                                    <input type="text" class="form-control" id="topicname">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" id="topicNameTwoField">
+                                                <label class="col-sm-2 col-form-label cloudText">Topic Name 2:</label>
+                                                <div class="col-sm-4">
+                                                    <input type="text" class="form-control" id="topicnametwo">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        </div>
+
+                                        <div class="thirdpart">
+                                            <div class="form-group row align-items-center">
+                                                <div class="col-sm-2">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                            id="enableJsonHeaderKey">
+                                                        <label class="custom-control-label cloudText"
+                                                            for="enableJsonHeaderKey">Enable JSON Header Key</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-right: 0;">
+                                                    <label class="col-form-label cloudText"
+                                                        style="margin-bottom: 0;">JSON
+                                                        Key Name:</label>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-left: 0;">
+                                                    <input type="text" class="form-control" id="jsonHeaderKeyName"
+                                                        style="margin-top: -2px; margin-bottom: -2px;">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row align-items-center">
+                                                <div class="col-sm-2">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                            id="enableCustomField1">
+                                                        <label class="custom-control-label cloudText"
+                                                            for="enableCustomField1">Enable Custom Field-1</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-right: 0;">
+                                                    <label class="col-form-label cloudText"
+                                                        style="margin-bottom: 0;">JSON
+                                                        Key Name:</label>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-left: 0;">
+                                                    <input type="text" class="form-control" id="jsonKeyName1"
+                                                        style="margin-top: -2px; margin-bottom: -2px;">
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-right: 0;">
+                                                    <label class="col-form-label cloudText"
+                                                        style="margin-bottom: 0;">JSON
+                                                        Key Value:</label>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-left: 0;">
+                                                    <input type="text" class="form-control" id="jsonKeyValue1"
+                                                        style="margin-top: -2px; margin-bottom: -2px;">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row align-items-center">
+                                                <div class="col-sm-2">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                            id="enableCustomField2">
+                                                        <label class="custom-control-label cloudText"
+                                                            for="enableCustomField2">Enable Custom Field-2</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-right: 0;">
+                                                    <label class="col-form-label cloudText"
+                                                        style="margin-bottom: 0;">JSON
+                                                        Key Name:</label>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-left: 0;">
+                                                    <input type="text" class="form-control" id="jsonKeyName2"
+                                                        style="margin-top: -2px; margin-bottom: -2px;">
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-right: 0;">
+                                                    <label class="col-form-label cloudText"
+                                                        style="margin-bottom: 0;">JSON
+                                                        Key Value:</label>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-left: 0;">
+                                                    <input type="text" class="form-control" id="jsonKeyValue2"
+                                                        style="margin-top: -2px; margin-bottom: -2px;">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row align-items-center">
+                                                <div class="col-sm-2">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input type="checkbox" class="custom-control-input"
+                                                            id="enableCustomField3">
+                                                        <label class="custom-control-label cloudText"
+                                                            for="enableCustomField3">Enable Custom Field-3</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-right: 0;">
+                                                    <label class="col-form-label cloudText"
+                                                        style="margin-bottom: 0;">JSON
+                                                        Key Name:</label>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-left: 0;">
+                                                    <input type="text" class="form-control" id="jsonKeyName3"
+                                                        style="margin-top: -2px; margin-bottom: -2px;">
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-right: 0;">
+                                                    <label class="col-form-label cloudText"
+                                                        style="margin-bottom: 0;">JSON
+                                                        Key Value:</label>
+                                                </div>
+
+                                                <div class="col-sm-2" style="padding-left: 0;">
+                                                    <input type="text" class="form-control" id="jsonKeyValue3"
+                                                        style="margin-top: -2px; margin-bottom: -2px;">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id='addBlockButton' disabled onclick="AddBlock()">Add
+                        Block</button>
+                    <button type="button" class="btn btn-success" id='addButton' disabled onclick="Add()">Add</button>
+                    <button type="button" class="btn btn-success" id='addAlarmButton' disabled onclick="AddAlarm()">Add
+                        Alarm</button>
+                    <button type="button" class="btn btn-info" id='addJButton' onclick="showJson()">Show JSON</button>
+                    <input type="button" value="Add Device" class="btn btn-primary" id="AddNewEvent">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!------------------------------------------------------- New Modal --------------------------------------------------------------------->
+
+    <div class="modal fade" id="pseudoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document" style="width: 1280px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="addpseudotext">Add New Pseudo Device</h3>
+                    <div>
+                    </div>
+                    <h3 class="modal-title" id="updatepseudotext" style="display: none;">Update Pseudo Device
+                        Configuration</h3>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#pseudocloudconfig" id="pseudocloud"
+                                role="tab">Cloud
+                                Configuration</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#pseudoregisterconfig"
+                                id="pseudoregister" role="tab">Register Config</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane" id="pseudoregisterconfig" name="attributes" role="tabpanel">
+                            <div class="container container-custom">
+                                <div id='PseudoTextBoxesGroup'>
+                                    <div class="row modusblock">
+                                        <div class="col-md-3">
+                                            <label id="requiredfieldAB">Pseudo Register Name</label>
+                                            <input type='text' id='pseudoRegisterName0' class="form-control">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label id="requiredfieldC">Physical slave ID</label>
+                                            <select name="function" id="SlaveId0" class="form-control">
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label id="requiredfieldC">Slave Register Name</label>
+                                            <select name="function" id="pseudoSlaveRegister0" class="form-control">
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type='button' value='Delete' id='pseudoRemoveButton'
+                                                class="btn btn-primary" style="margin-top: 22px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane active" id="pseudocloudconfig" name="attributes" role="tabpanel">
+                            <div class="container container-custom">
+                                <div class="row form-inline row-spacing">
+
+                                    <h3 class="text-center" style="margin-bottom: 50px;">Pseudo Device Configuration
+                                    </h3>
+                                    <div class="col-md-4 form-group">
+                                        <label for="pseudoDeviceName" style="font-size: 14px;">Pseudo Device
+                                            Name</label>
+                                        <input type="text" id="pseudoDeviceName" class="form-control">
+                                    </div>
+                                    <div class="col-md-4 form-group" style="margin-left: 200px;">
+                                        <label for="pseudoSlaveID" style="font-size: 14px;">Pseudo Slave ID</label>
+                                        <input type="text" id="pseudoSlaveID" class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            <form>
+                                <div class="checkboxoptions">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="pseudoSlaveDataStatus">
+                                        <label class="custom-control-label cloudText" for="pseudoSlaveDataStatus">Enable
+                                            Slave
+                                            Data Sending</label>
+                                    </div>
+
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="pseudoSlaveCloudStatus">
+                                        <label class="custom-control-label cloudText"
+                                            for="pseudoSlaveCloudStatus">Enable
+                                            Slave
+                                            Cloud Configuration</label>
+                                    </div>
+                                </div>
+
+                                <div class="container mt-4" style="margin-top: 42px;">
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label cloudText">Data Sending
+                                            Method:</label>
+                                        <div class="col-sm-4">
+                                            <select class="form-control" id="pseudoDataSendingMethod">
+                                                <option value="1">Primary Server</option>
+                                                <option value="2">Secondary Server</option>
+                                                <option value="3">Both</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label class="col-sm-2 col-form-label cloudText">Topic Name:</label>
+                                        <div class="col-sm-4">
+                                            <input type="text" class="form-control" id="pseudoTopicName">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="thirdpart">
+                                    <div class="form-group row align-items-center">
+                                        <div class="col-sm-2">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input"
+                                                    id="pseudoJsonHeaderKeyStatus">
+                                                <label class="custom-control-label cloudText"
+                                                    for="pseudoJsonHeaderKeyStatus">Enable
+                                                    JSON Header Key</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-right: 0;">
+                                            <label class="col-form-label cloudText" for="pseudoJsonHeaderKeyName"
+                                                style="margin-bottom: 0;">JSON Key
+                                                Name:</label>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-left: 0;">
+                                            <input type="text" class="form-control" id="pseudoJsonHeaderKeyName"
+                                                style="margin-top: -2px; margin-bottom: -2px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row align-items-center">
+                                        <div class="col-sm-2">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input"
+                                                    id="pseudoCustomFieldStatus1">
+                                                <label class="custom-control-label cloudText"
+                                                    for="pseudoCustomFieldStatus1">Enable
+                                                    Custom Field-1</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-right: 0;">
+                                            <label class="col-form-label cloudText" for="pseudoJsonKeyName1"
+                                                style="margin-bottom: 0;">JSON Key
+                                                Name:</label>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-left: 0;">
+                                            <input type="text" class="form-control" id="pseudoJsonKeyName1"
+                                                style="margin-top: -2px; margin-bottom: -2px;">
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-right: 0;">
+                                            <label class="col-form-label cloudText" for="pseudoJsonKeyValue1"
+                                                style="margin-bottom: 0;">JSON Key
+                                                Value:</label>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-left: 0;">
+                                            <input type="text" class="form-control" id="pseudoJsonKeyValue1"
+                                                style="margin-top: -2px; margin-bottom: -2px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row align-items-center">
+                                        <div class="col-sm-2">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input"
+                                                    id="pseudoCustomFieldStatus2">
+                                                <label class="custom-control-label cloudText"
+                                                    for="pseudoCustomFieldStatus2">Enable
+                                                    Custom Field-2</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-right: 0;">
+                                            <label class="col-form-label cloudText" for="pseudoJsonKeyName2"
+                                                style="margin-bottom: 0;">JSON Key
+                                                Name:</label>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-left: 0;">
+                                            <input type="text" class="form-control" id="pseudoJsonKeyName2"
+                                                style="margin-top: -2px; margin-bottom: -2px;">
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-right: 0;">
+                                            <label class="col-form-label cloudText" for="pseudoJsonKeyValue2"
+                                                style="margin-bottom: 0;">JSON Key
+                                                Value:</label>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-left: 0;">
+                                            <input type="text" class="form-control" id="pseudoJsonKeyValue2"
+                                                style="margin-top: -2px; margin-bottom: -2px;">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row align-items-center">
+                                        <div class="col-sm-2">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input"
+                                                    id="pseudoCustomFieldStatus3">
+                                                <label class="custom-control-label cloudText"
+                                                    for="pseudoCustomFieldStatus3">Enable
+                                                    Custom Field-3</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-right: 0;">
+                                            <label class="col-form-label cloudText" for="pseudoJsonKeyName3"
+                                                style="margin-bottom: 0;">JSON Key
+                                                Name:</label>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-left: 0;">
+                                            <input type="text" class="form-control" id="pseudoJsonKeyName3"
+                                                style="margin-top: -2px; margin-bottom: -2px;">
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-right: 0;">
+                                            <label class="col-form-label cloudText" for="pseudoJsonKeyValue3"
+                                                style="margin-bottom: 0;">JSON Key
+                                                Value:</label>
+                                        </div>
+
+                                        <div class="col-sm-2" style="padding-left: 0;">
+                                            <input type="text" class="form-control" id="pseudoJsonKeyValue3"
+                                                style="margin-top: -2px; margin-bottom: -2px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id='addPseudoButton' onclick="addPseudoRegister()">Add
+                        Register</button>
+                    <input type="button" value="Add Device" class="btn btn-primary" id="AddNewPseudoEvent">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #deviceid {
+        width: 132px;
+        color: white;
+        height: 40px;
+        background: #13557E 0% 0% no-repeat padding-box;
+        box-shadow: 0px 3px 6px #00000029;
+        border-radius: 5px;
+        opacity: 1;
+        font: normal normal normal 16px/25px Poppins;
+    }
+
+    .cbi-section {
+        width: 95%;
+        margin-bottom: 10px;
+    }
+
+    .table {
+        border: 1px solid #dddd;
+    }
+
+    td,
+    th {
+        border: 1px solid #dddd;
+
+    }
+
+    .modal-dialog {
+        width: 1065px;
+    }
+
+    #requiredfield::after {
+        content: " *";
+        color: red;
+    }
+
+    label {
+        font: normal normal normal 13px/16px Poppins;
+        color: #000000;
+    }
+
+    /* #modbustcpconfig, */
+    #modustcpregister {
+        display: none;
+    }
+
+    .newinput {
+        margin-top: 5px;
+    }
+
+    .table {
+        width: 114.3%;
+    }
+
+    #updatetext,
+    #updatedevice {
+        display: none;
+    }
+
+    #TextBoxesGroup {
+        background: #ffffff;
+        overflow-y: auto;
+        overflow-x: hidden;
+        /* width: 221px; */
+        /* -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 30%); */
+    }
+
+    #BlockTextBoxesGroup {
+        background: #ffffff;
+        overflow-y: auto;
+        overflow-x: hidden;
+        /* width: 221px; */
+        /* -webkit-box-shadow: inset 0 0 6px rgb(0 0 0 / 30%); */
+    }
+
+    .form-control {
+        padding: 6px 6px;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 22px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    input:checked+.slider {
+        background-color: #2196F3;
+    }
+
+    input:focus+.slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+        -webkit-transform: translateX(18px);
+        -ms-transform: translateX(18px);
+        transform: translateX(18px);
+    }
+
+
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .btn-group>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+        margin-right: 8px;
+        padding: 4.9px 20px;
+        border-radius: 4px;
+    }
+
+    .btn-group>.btn:last-child:not(:first-child),
+    .btn-group>.dropdown-toggle:not(:first-child) {
+        border-radius: 4px;
+    }
+
+    #communicationid {
+        text-align: center !important;
+    }
+
+    #serialmqtt,
+    #tcpmqtt,
+    #tcpqueryinterval {
+        text-align: center !important;
+
+    }
+
+    #tcpOptions {
+        display: none;
+    }
+
+    #tcpOptions label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    #tcpOptions input {
+        width: 100%;
+        /* Make the input fields take up 100% of the container width */
+        box-sizing: border-box;
+        /* Include padding and border in the element's total width */
+        margin-bottom: 10px;
+    }
+
+    /* Add Device cloud configuration */
+
+    .cloudText {
+        font-size: 15px;
+    }
+
+    .checkboxoptions {
+        margin-bottom: 20px;
+    }
+
+    .thirdpart {
+        margin-top: 45px;
+    }
+
+    .form-inline .form-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .form-inline .form-group label {
+        margin-right: 10px;
+        min-width: 150px;
+    }
+
+    .row-spacing {
+        margin-bottom: 20px;
+    }
+</style>
+<script>
+    document.getElementById("serialslaveid").onkeyup = function () {
+        var input = parseInt(this.value);
+        console.log(input)
+        if (input == NaN) {
+            $("#serialslaveid").val("");
+        }
+        else {
+            if (input < 1 || input > 255) {
+                $("#serialslaveid").val("");
+                return;
+            }
+        }
+    }
+    document.getElementById("CommPort").onkeyup = function () {
+        var input = parseInt(this.value);
+        console.log(input)
+        if (input == NaN) {
+            $("#CommPort").val("");
+        }
+        else {
+            if (input < 1 || input > 6555) {
+                $("#CommPort").val("");
+                return;
+            }
+        }
+    }
+
+    function handleDatatypeCodeChange(i) {
+        var DataType = document.getElementById('Datatype' + i).value;
+        var Multifactor = document.getElementById('multifactor' + i);
+
+        if (DataType == '0' || DataType == '11') {
+            Multifactor.style.display = 'none';
+        }
+        else {
+            Multifactor.style.display = 'block';
+        }
+    }
+
+
+    function handleFunctionCodeChange(i) {
+        var AfunctionCode = document.getElementById('Category' + i).value;
+        var Afunctiondatatype = document.getElementById('alarmDatatype' + i).value;
+        var UpperInput = document.getElementById('uprHysteresis' + i);
+        var lowerInput = document.getElementById('lowerThreshold' + i);
+        var LOWERHYS = document.getElementById('lowerHysteresis' + i);
+        var UPPERHYS = document.getElementById('uprThreshold' + i);
+
+        if (AfunctionCode == '2') {
+            if (Afunctiondatatype == '11') {
+                UPPERHYS.style.display = 'none';
+                UpperInput.style.display = 'none';
+                lowerInput.style.display = 'none';
+                LOWERHYS.style.display = 'none';
+            } else {
+                UPPERHYS.style.display = 'block';
+                UpperInput.style.display = 'block';
+                lowerInput.style.display = 'block';
+                LOWERHYS.style.display = 'block';
+            }
+        } else {
+            if (Afunctiondatatype == '11') {
+                UPPERHYS.style.display = 'block';
+                UpperInput.style.display = 'none';
+                lowerInput.style.display = 'none';
+                LOWERHYS.style.display = 'none';
+            } else {
+                UPPERHYS.style.display = 'block';
+                UpperInput.style.display = 'block';
+                lowerInput.style.display = 'block';
+                LOWERHYS.style.display = 'block';
+            }
+        }
+    }
+
+    // $('#CommIp').inputmask({
+    //     alias: "ip",
+    //     greedy: false
+    // });
+
+    function handleFunctionChange(index) {
+        const functionCode = document.getElementById('Code' + index).value;
+        const regAlarm = document.getElementById('regAlarm' + index);
+        if (functionCode == "1") {
+            regAlarm.min = 1;
+            regAlarm.max = 9999;
+        } else if (functionCode == "2") {
+            regAlarm.min = 10001;
+            regAlarm.max = 19999;
+        } else if (functionCode == "3") {
+            regAlarm.min = 40001;
+            regAlarm.max = 49999;
+        } else if (functionCode == "4") {
+            regAlarm.min = 30001;
+            regAlarm.max = 39999;
+        }
+
+        validateRegAlarm(index);
+    }
+
+    function validateRegAlarm(index) {
+        const functionCode = document.getElementById('Code' + index).value;
+        const regAlarm = document.getElementById('regAlarm' + index);
+        let regAlarmValue = parseInt(regAlarm.value, 10);
+
+        if (isNaN(regAlarmValue)) {
+            regAlarm.value = '';
+            return;
+        }
+
+        if (functionCode == "1" && (regAlarmValue < 1 || regAlarmValue > 9999)) {
+            alert('For Function Code 1, Start Reg must be between 00001 and 09999.');
+            regAlarm.value = '';
+        } else if (functionCode == "2" && (regAlarmValue < 10001 || regAlarmValue > 19999)) {
+            alert('For Function Code 2, Start Reg must be between 10001 and 19999.');
+            regAlarm.value = '';
+        } else if (functionCode == "3" && (regAlarmValue < 40001 || regAlarmValue > 49999)) {
+            alert('For Function Code 3, Start Reg must be between 40001 and 49999.');
+            regAlarm.value = '';
+        } else if (functionCode == "4" && (regAlarmValue < 30001 || regAlarmValue > 39999)) {
+            alert('For Function Code 4, Start Reg must be between 30001 and 39999.');
+            regAlarm.value = '';
+        } else {
+            // Format the value to be 5 digits
+            regAlarm.value = regAlarmValue.toString().padStart(5, '0');
+        }
+    }
+
+    function handleUniversalTranslationChange() {
+        const translation = document.getElementById('stdModbusEnable').value;
+        // Apply or remove validation for all rows
+        const rows = document.querySelectorAll('.modusblock');
+        rows.forEach((row, index) => {
+            const regAlarm = document.getElementById('startRegister' + index);
+
+            if (translation === "1") { // Yes selected, apply validation
+                handleFunctionBlockChange(index);
+            } else { // No selected, remove validation for Start Register
+                regAlarm.min = '';
+                regAlarm.max = '';
+                regAlarm.value = ''; // Clear existing value
+            }
+        });
+    }
+
+    function handleFunctionBlockChange(index) {
+        const translation = document.getElementById('stdModbusEnable').value;
+        const functionCode = document.getElementById('functionCode' + index).value;
+        const regAlarm = document.getElementById('startRegister' + index);
+
+        if (translation === "1") { // Apply validation only if Yes is selected
+            if (functionCode == "1") {
+                regAlarm.min = 1;
+                regAlarm.max = 9999;
+            } else if (functionCode == "2") {
+                regAlarm.min = 10001;
+                regAlarm.max = 19999;
+            } else if (functionCode == "3") {
+                regAlarm.min = 40001;
+                regAlarm.max = 49999;
+            } else if (functionCode == "4") {
+                regAlarm.min = 30001;
+                regAlarm.max = 39999;
+            }
+        }
+    }
+
+    // Function to toggle the visibility of topic fields based on Data Sending Method selection
+    function toggleTopicFields() {
+        var selectedValue = document.getElementById('dataSendingMethod').value;
+        var topicNameField = document.getElementById('topicNameField');
+        var topicNameTwoField = document.getElementById('topicNameTwoField');
+
+        if (selectedValue === "1") {
+            topicNameField.style.display = 'flex';
+            topicNameTwoField.style.display = 'none';
+        } else if (selectedValue === "2" || selectedValue === "3") {
+            topicNameField.style.display = 'flex';
+            topicNameTwoField.style.display = 'flex';
+        }
+    }
+
+    // // Function to toggle the visibility of all fields below Enable Slave Cloud Configuration
+    // function toggleSlaveCloudConfigFields() {
+    //     var slaveCloudConfigFields = document.getElementById('slaveCloudConfigFields');
+    //     var isChecked = document.getElementById('enableSlaveCloudData').checked;
+
+    //     if (isChecked) {
+    //         slaveCloudConfigFields.style.display = 'block';
+    //     } else {
+    //         slaveCloudConfigFields.style.display = 'none';
+    //     }
+    // }
+
+    // // Attach event listeners
+    document.getElementById('dataSendingMethod').addEventListener('change', toggleTopicFields);
+    // document.getElementById('enableSlaveCloudData').addEventListener('change', toggleSlaveCloudConfigFields);
+
+    // // Initialize visibility on page load based on the default selection and checkbox state
+    toggleTopicFields();
+    // toggleSlaveCloudConfigFields();
+
+
+    function validateRegBlock(index) {
+        const translation = document.getElementById('stdModbusEnable').value;
+        const functionCode = document.getElementById('functionCode' + index).value;
+        const regAlarm = document.getElementById('startRegister' + index);
+        let regAlarmValue = parseInt(regAlarm.value, 10);
+        if (translation === "1") { // Apply validation only if Yes is selected
+            if (isNaN(regAlarmValue)) {
+                regAlarm.value = '';
+                return;
+            }
+            if (functionCode == "1" && (regAlarmValue < 1 || regAlarmValue > 9999)) {
+                alert('For Function Code 1, Start Reg must be between 00001 and 09999.');
+                regAlarm.value = '';
+            } else if (functionCode == "2" && (regAlarmValue < 10001 || regAlarmValue > 19999)) {
+                alert('For Function Code 2, Start Reg must be between 10001 and 19999.');
+                regAlarm.value = '';
+            } else if (functionCode == "3" && (regAlarmValue < 40001 || regAlarmValue > 49999)) {
+                alert('For Function Code 3, Start Reg must be between 40001 and 49999.');
+                regAlarm.value = '';
+            } else if (functionCode == "4" && (regAlarmValue < 30001 || regAlarmValue > 39999)) {
+                alert('For Function Code 4, Start Reg must be between 30001 and 39999.');
+                regAlarm.value = '';
+            } else {
+                // Format the value to be 5 digits
+                regAlarm.value = regAlarmValue.toString().padStart(5, '0');
+            }
+        }
+    }
+</script>

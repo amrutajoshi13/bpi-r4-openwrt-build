@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="15.5" height="22.5" viewBox="0 0 15.5 22.5">
+  <g id="System_log" data-name="System log" transform="translate(-21.25 -96.25)">
+    <path id="Vector" d="M0,0V3" transform="translate(29 111)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path id="Vector-2" data-name="Vector" d="M4,2A2,2,0,1,1,2,0,2,2,0,0,1,4,2Z" transform="translate(27 114)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path id="Vector-3" data-name="Vector" d="M4,0H0" transform="translate(31 116)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path id="Vector-4" data-name="Vector" d="M4,0H0" transform="translate(23 116)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path id="Vector-5" data-name="Vector" d="M14,6.3v4.2c0,2.8-.7,3.5-3.5,3.5h-7C.7,14,0,13.3,0,10.5v-7C0,.7.7,0,3.5,0H4.55A1.657,1.657,0,0,1,6.23.84l1.05,1.4A1.113,1.113,0,0,0,8.4,2.8h2.1C13.3,2.8,14,3.5,14,6.3Z" transform="translate(22 97)" fill="none" stroke="#14213d" stroke-width="1.5"/>
+  </g>
+</svg>

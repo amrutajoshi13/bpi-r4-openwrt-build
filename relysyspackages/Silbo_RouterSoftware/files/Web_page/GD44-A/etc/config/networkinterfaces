@@ -1,0 +1,18 @@
+
+config redirect 'SW_LAN'
+        option interface 'SW_LAN'
+        option ifname 'eth0.1'
+        option type 'LAN'
+        option staticIP '192.168.10.1'
+        option staticnetmask '255.255.255.0'
+        option enable_dns '1'
+        list ServerStaticDnsServer '8.8.8.8'
+        option enable_dhcpserver '1'
+        option ServerDHCPlimit '100'
+        option leasetime_duration 'h'
+		option leasetimehr '12'
+        option enable_zoneforward '1'
+        option internetoverinterface '1'
+        option protocol_lan 'static_lan'
+        option ServerDHCPrange '50'
+

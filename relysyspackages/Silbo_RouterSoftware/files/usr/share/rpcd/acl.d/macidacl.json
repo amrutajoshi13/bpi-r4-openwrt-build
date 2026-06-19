@@ -1,0 +1,24 @@
+{
+    "macidconfig": {
+        "description": "Mac Address Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updatemacidconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "macidconfig",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "macidconfig",
+                
+            ]
+        }
+    }
+}

@@ -1,0 +1,78 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Routing Debug</h1>
+</div>
+
+<div class="pagecontent">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Routing Utilities</h3>
+        </div>
+        <div id="map"></div>
+    </div>
+</div>
+
+<div class="pagecontent" id="output-section">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Output</h3>
+        </div>
+        <div class="panel-body">
+            <pre style="display: none;" id="routing_debug_output"></pre>
+        </div>
+    </div>
+</div>
+
+<style>
+    .panel-body pre {
+        display: block;
+        width: 100%;
+        padding: 18px 20px;
+        background: linear-gradient(145deg, #24263a, #2c2f44);
+        color: #e5e9f0;
+        font-family: "Consolas", "Courier New", monospace;
+        font-size: 14px;
+        border-radius: 10px;
+        line-height: 1.65;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        /* box-shadow:
+            inset 0 0 10px rgba(0, 0, 0, 0.35),
+            0 3px 10px rgba(0, 0, 0, 0.25); */
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.3s ease;
+        scrollbar-width: thin;
+        scrollbar-color: #1f66d7 #f1f5f9;
+    }
+
+
+    .panel-body pre::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    .panel-body pre::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #1f66d7, #0b4aa3);
+        border-radius: 8px;
+        border: 2px solid #f8fafc;
+        transition: background 0.3s ease;
+    }
+
+    .panel-body pre::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #2b7ff0, #0d58c1);
+    }
+
+    .panel-body pre::-webkit-scrollbar-track {
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+
+
+    .panel-body pre:hover {
+        background: linear-gradient(145deg, #2a2c42, #323654);
+        box-shadow:
+            inset 0 0 14px rgba(0, 0, 0, 0.4),
+            0 4px 12px rgba(0, 0, 0, 0.25);
+        transform: translateY(-1px);
+    }
+</style>

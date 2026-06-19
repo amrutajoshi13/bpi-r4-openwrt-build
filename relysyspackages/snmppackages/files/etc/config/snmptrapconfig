@@ -1,0 +1,9 @@
+
+config snmptrapconfig 'snmptrapconfig'
+	option snmptrapsecurity '2'
+	option community 'public'
+	option porttrap '162'
+	option signalstrength '-115'
+	option enablesignalstrengthtrap '0'
+	option enablenetworktypetrap '0'
+	option enablesnmptrap '0'

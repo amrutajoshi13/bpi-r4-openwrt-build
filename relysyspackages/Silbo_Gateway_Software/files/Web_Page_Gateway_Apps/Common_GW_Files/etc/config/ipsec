@@ -1,0 +1,33 @@
+
+config ipsec 'general'
+	option uniqueids 'on'
+	option interface 'EWAN2'
+
+config remote 'securico'
+	option enabled '1'
+	option gateway 'x.x.x.x'
+	option authentication_method 'psk'
+	option pre_shared_key '1234567890'
+	option exchange_mode 'default'
+	option local_identifier 'g300'
+	option remote_identifier 'sophos'
+	option p1_proposal 'securico_proposel_one'
+	list tunnel 'securico_1_1_tunnel'
+
+config p1_proposal 'securico_proposel_one'
+	option encryption_algorithm 'p1aes128'
+	option hash_algorithm 'sha256'
+	option dh_group 'modp1536'
+
+config p2_proposal 'securico_proposel_two'
+	option encryption_algorithm 'aes128'
+	option authentication_algorithm 'sha256'
+	option pfs_group 'modp1536'
+
+config tunnel 'securico_1_1_tunnel'
+	option mode 'start'
+	option local_subnet '192.168.11.1/24'
+	option remote_subnet '192.168.10.0/24'
+	option p2_proposal 'securico_proposel_two'
+	option keyexchange 'ikev1'
+

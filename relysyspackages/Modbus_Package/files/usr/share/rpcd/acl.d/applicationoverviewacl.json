@@ -1,0 +1,35 @@
+
+
+
+
+{
+    "ioutilities": {
+        "description": "Misc Utilities",
+        "read": {
+            "cgi-file": [ "download", ],
+            "ubus" : {
+                "rpc-applicationoverview":[
+                    "run"
+                ],
+                "file":[
+                    "read"
+                ],
+                "luci2.system":[
+                    "init_action"
+                ]
+            },
+            "uci": [
+                "applicationoverviewconfig",
+                "applist_config"
+            ]
+        },
+        "write": {
+            "cgi-file": [ "upload", ],
+            "uci": [
+                "applicationoverviewconfig",
+                "applist_config"
+            ]
+        }
+    },
+}
+

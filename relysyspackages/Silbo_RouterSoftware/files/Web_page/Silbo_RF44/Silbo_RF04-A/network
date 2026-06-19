@@ -1,0 +1,25 @@
+
+config interface 'loopback'
+	option ifname 'lo'
+	option proto 'static'
+
+config interface 'VPN'
+	option proto 'none'
+	option ifname 'tun0'
+
+config interface 'VPN1'
+	option proto 'none'
+	option ifname 'tun1'
+
+config interface 'LAN'
+	option ifname 'eth0'
+	option proto 'static'
+	option ipaddr '192.168.9.1'
+	option netmask '255.255.255.0'
+	list dns '8.8.8.8'
+
+config interface 'CWAN1'
+	option ifname 'usb0'
+	option proto 'dhcp'
+	option metric '1'
+

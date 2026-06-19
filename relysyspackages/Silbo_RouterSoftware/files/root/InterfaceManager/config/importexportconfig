@@ -1,0 +1,8 @@
+
+config importexportconfig 'importexportconfig'
+	option enableretainboardconfig '1'
+
+config ftpconfig 'ftpconfig'
+	option enableftp '0'
+	option username 'User1'
+	option password '12345678'

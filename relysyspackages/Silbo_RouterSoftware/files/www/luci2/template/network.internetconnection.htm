@@ -1,0 +1,274 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">
+		Multi-Wan Configuration</h1>
+</div>
+
+<div class="pagecontent">
+
+	<!-- <div id="WAN-Note" class="tab-note">
+		<div class="refresh-icon" title="Refresh" tabindex="0" id="WANRefresh-btn">
+				<img src="/luci2/icons/refresh-icon.svg" alt="Refresh icon" />
+		</div>
+	</div> -->
+    <div id="Genral-Note" class="tab-note" style="display:none;">
+		<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" id="btn_update_multiwan" title="Update general">Update</button>
+		</div>
+	</div>
+    <div id="Failover-Note" class="tab-note" style="display:none;">
+		<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" id="btn_internet_update" title="Update failover">Update</button>
+		</div>
+	</div>
+    <div id="loadover-Note" class="tab-note" style="display:none;">
+		<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" id="btn_internet_loadbalance_update" title="Update loadbalance">Update</button>
+		</div>
+	</div>
+
+	<ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+
+		<li class="TabC Tabsn active">
+			<a id="sectiontab_status" href="#tab_status" data-toggle="tab">Status
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabGn">
+			<a id="sectiontab_general" href="#tab_general" data-toggle="tab">General Settings
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabFO">
+			<a id=":w" href="#tab_failover" data-toggle="tab">Failover
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabLB">
+			<a id=":w" href="#tab_loadbalancing" data-toggle="tab">Load Balancing
+				<span class="badge"></span>
+			</a>
+		</li>
+
+	</ul>
+
+	<div class="tab-content" id="tabs">
+
+		<div class="tab-pane TabC Tabsn active" id="tab_status">
+			<div class="refresh-icon" title="Refresh" tabindex="0" id="WANRefresh-btn">
+				<img src="/luci2/icons/refresh-icon.svg" alt="Refresh icon" />
+			</div>
+			<div id="WAN-Note"></div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">WAN Overview</h3>
+				</div>
+				<div id="section_firewall_port"></div>
+			</div>
+			
+		</div>
+
+		<div class="tab-pane TabC TabGn" id="tab_general">
+			<div id="section_internet_connection"></div>
+		</div>
+
+		<div class="tab-pane TabC Tabfo" id="tab_failover">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Failover Configurations</h3>
+				</div>
+				<p id="No-Failover-Config"></p>
+				<div id="section_internet_failover"></div>
+			</div>
+
+			<div id="Mansection_internet_failover">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Interface</h3>
+					</div>
+
+					<div class="luci2-field form-group" style="margin-top: 10px;">
+						<label class="col-lg-2 control-label" for="field_failover_redirect_newRedirect_name">Interface
+							Name</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate"
+								id="field_failover_redirect_newRedirect_name" type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_failover_redirect_newRedirect_wanpriority">Priority</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate"
+								id="field_failover_redirect_newRedirect_wanpriority" type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="" data-action="save" id="AddNewConnectionfailover"
+							class="btn btn-success">Add Interface</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane TabC TabLB" id="tab_loadbalancing">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Load Balancing Configurations</h3>
+				</div>
+				<p id="No-loadbalanc-Config"></p>
+				<div id="section_internet_loadbalancing"></div>
+			</div>
+
+			<div id="Mansection_internet_loadbalancing">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Interface</h3>
+					</div>
+					<div class="luci2-field" style="margin-top: 10px;">
+						<label class="col-lg-2 control-label" for="field_loadbalancing_rule_newRule_name">Interface
+							Name</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate" id="field_loadbalancing_rule_newRule_name"
+								type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+					<div class="luci2-field">
+						<label class="col-lg-2 control-label" for="field_loadbalancing_rule_newRule_weight">Traffic
+							Distribution Ratio <br> </label>
+						<div class="luci2-field-widget ">
+							<input class="form-control luci2-field-validate"
+								id="field_loadbalancing_rule_newRule_weight" type="text" placeholder="">
+
+						</div>
+						<div class="luci-fancy-tooltip">
+							<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"
+								xmlns="http://www.w3.org/2000/svg">
+								<circle cx="12" cy="12" r="10" fill="currentColor"></circle>
+								<rect x="11" y="6.5" width="2" height="2" rx="0.4" fill="#fff"></rect>
+								<rect x="11" y="10" width="2" height="6" rx="0.4" fill="#fff"></rect>
+							</svg>
+							<span class="tooltip-text">
+								<h4>Traffic Distribution Ratio</h4>
+								The ratio must be the same for <strong>CWAN1_0</strong><br>
+								and <strong>CWAN1_1</strong> &nbsp; <span style="color:#ff4d4f;font-weight: 500;">(Total
+									sum must be
+									100)</span>
+							</span>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="" data-action="save" id="AddNewConnectionLoadBalancing"
+							class="btn btn-success">Add Interface</button>
+					</div>
+
+
+
+
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</div>
+
+<style>
+	.tab-note {
+		display: flex;
+		flex-direction: row-reverse;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		margin: -15px 0px 0px 0px;
+		padding: 10px 0;
+		background: #ffffff;
+		font-size: 14px;
+	}
+
+	.luci-fancy-tooltip {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		color: #0b63d1;
+		margin-top: -20px;
+	}
+
+	.luci-fancy-tooltip svg {
+		width: 20px;
+		height: 35px;
+	}
+
+	.luci-fancy-tooltip .tooltip-text {
+		visibility: hidden;
+		opacity: 0;
+		margin-left: 5px;
+		top: 125%;
+		left: 0;
+		transform: translateY(-6px);
+		min-width: 200px;
+		max-width: 300px;
+		background: #fff;
+		color: #243449;
+		border: 1px solid rgba(16, 40, 80, 0.12);
+		border-radius: 8px;
+		padding: 8px 12px;
+		font-size: 13px;
+		line-height: 1.4;
+		white-space: normal;
+		box-shadow: 0 4px 12px rgba(6, 28, 64, 0.12);
+		z-index: 1000;
+		transition: opacity 0.2s ease, transform 0.2s ease;
+	}
+
+	.tooltip-text h4 {
+		margin: 0 0 6px 0;
+		font-size: 13px;
+		color: #0b63d1;
+		font-weight: 600;
+	}
+
+	.luci-fancy-tooltip:hover .tooltip-text,
+	.luci-fancy-tooltip:focus-within .tooltip-text {
+		visibility: visible;
+		opacity: 1;
+	}
+</style>
+
+<script>
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+
+    $('.tab-note').hide();
+
+    switch ($(e.target).attr('href')) {
+        case '#tab_status':
+            $('#WAN-Note').show();
+            break;
+        case '#tab_general':
+            $('#Genral-Note').show();
+            break;
+        case '#tab_failover':
+            $('#Failover-Note').show();
+            break;
+        case '#tab_loadbalancing':
+            $('#loadover-Note').show();
+            break;
+    }
+});
+</script>
+

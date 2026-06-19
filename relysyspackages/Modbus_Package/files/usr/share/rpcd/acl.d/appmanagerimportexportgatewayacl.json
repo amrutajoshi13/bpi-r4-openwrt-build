@@ -1,0 +1,55 @@
+
+	
+	
+	{                                                                  
+        "AppmanagerBackup": {                                       
+                        "description": "Backup and Restore",       
+                        "read": {                                   
+                                "luci-io": [                       
+                                        "AppmanagerBackup"          
+                                ],                                 
+                                "ubus": {                           
+                                        "luci2.system": [          
+                                                "backup_config_get",
+                                                "backup_list"       
+                                        ],                       
+                                        "rpc-importexportgateway":[ 
+                                         "rebootsys",            
+                                         "testarchive",             
+                                         "resetgateway"          
+                                        ],                          
+                                                                 
+                                },                                  
+                                "uci": [                         
+                                "importexportgatewayconfig"         
+                                ]                                
+                        },                                          
+                                                                 
+                        "write": {                                  
+                                "ubus": {                        
+                                        "luci2.system": [           
+                                                "backup_clean",  
+                                                "backup_config_set",
+                                                "backup_restore",
+                                                "reboot"           
+                                        ],             
+                                        "rpc-importexportgateway":[
+                                         "rebootsys",  
+                                         "testarchive", 
+                                          "resetgateway"          
+                                        ],                          
+                                                                 
+                                },                                  
+                                "uci": [                         
+                                "importexportgatewayconfig"         
+                                ],                               
+                        }                                           
+                                                                 
+                                                                    
+                                                                 
+                }                                                   
+                                                                 
+}                                                                  
+                                         
+
+	

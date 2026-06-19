@@ -1,0 +1,26 @@
+{
+    "routingconfig": {
+	"description": "Static IPV4 Routes",
+        "read": {
+			"ubus" : {
+                "rpc-updateroutingconfig":[
+                "configure",
+                "delete"
+                   
+                ]
+            },
+            "uci": [
+                "routingconfig",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "routingconfig",
+                
+            ]
+        }
+    }
+}
+

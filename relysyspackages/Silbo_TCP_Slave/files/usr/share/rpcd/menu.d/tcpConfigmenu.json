@@ -1,0 +1,15 @@
+{
+    "features": {
+        "title": "Features",
+        "index": 70
+    },
+    
+	"features/tcp": {
+        "title": "TCP Slave configration",
+        "acls": [ "tcpconfig" ],
+        "view": "features/tcp",
+        "index": 30
+         
+    },       
+
+}

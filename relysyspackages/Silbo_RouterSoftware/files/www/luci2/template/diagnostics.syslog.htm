@@ -1,0 +1,141 @@
+<div style="border-bottom: 1px solid #70707038">
+  <h1 class="header">System Log</h1>
+</div>
+
+<div class="pagecontent">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">System Trace Logs</h3>
+    </div>
+    <div class="panel-body">
+      <pre id="syslog"></pre>
+    </div>
+  </div>
+</div>
+<button onclick="topFunction()" id="myBtn" title="Go to top">
+  <img src="/luci2/icons/arrow-up-solid-full.svg" alt="up-arrow" />
+</button>
+
+<style>
+  .panel-body pre {
+    display: block;
+    width: 100%;
+    padding: 18px 20px;
+    background: linear-gradient(145deg, #24263a, #2c2f44);
+    color: #e5e9f0;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 14px;
+    border-radius: 10px;
+    line-height: 1.65;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    /* box-shadow:
+            inset 0 0 10px rgba(0, 0, 0, 0.35),
+            0 3px 10px rgba(0, 0, 0, 0.25); */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
+    scrollbar-width: thin;
+    scrollbar-color: #1f66d7 #f1f5f9;
+  }
+
+
+  .panel-body pre::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  .panel-body pre::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #1f66d7, #0b4aa3);
+    border-radius: 8px;
+    border: 2px solid #f8fafc;
+    transition: background 0.3s ease;
+  }
+
+  .panel-body pre::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #2b7ff0, #0d58c1);
+  }
+
+  .panel-body pre::-webkit-scrollbar-track {
+    background: #f8fafc;
+    border-radius: 8px;
+  }
+
+
+  .panel-body pre:hover {
+    background: linear-gradient(145deg, #2a2c42, #323654);
+    box-shadow:
+      inset 0 0 14px rgba(0, 0, 0, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-1px);
+  }
+
+  #myBtn {
+    position: fixed;
+    bottom: 45px;
+    right: 45px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #1f66d7, #0b4aa3);
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.25),
+      0 0 8px rgba(31, 102, 215, 0.4);
+    display: none;
+    cursor: pointer;
+    transition: all 0.25s ease-in-out;
+    padding: 5px;
+    z-index: 99;
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  #myBtn.show {
+    display: block;
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  #myBtn:hover {
+    transform: scale(1.1);
+    background: linear-gradient(145deg, #2b7ff0, #0d58c1);
+    box-shadow:
+      0 4px 10px rgba(0, 0, 0, 0.3),
+      0 0 10px rgba(31, 102, 215, 0.6);
+  }
+
+  #myBtn img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: filter 0.3s ease;
+  }
+
+  #myBtn:hover img {
+    filter: brightness(1.3) invert(1);
+  }
+</style>
+
+
+
+<script>
+  let mybutton = document.getElementById("myBtn");
+  let maincontent = document.getElementById("maincontent");
+  maincontent.addEventListener("scroll", function () {
+    if (maincontent.scrollTop > 100) {
+      mybutton.classList.add("show");
+    } else {
+      mybutton.classList.remove("show");
+    }
+  });
+
+  function topFunction() {
+    maincontent.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
+</script>

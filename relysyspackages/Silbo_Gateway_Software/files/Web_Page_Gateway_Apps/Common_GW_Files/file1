@@ -1,0 +1,67 @@
+#!/usr/bin/haserl
+<%
+ROOT_DIR="/root"
+INCLUDE_FILE="/root/includegw.txt"
+EXCLUDE_FILE="/root/excludegw.txt"
+TAR_OUT="/tmp/configs_backup.tar.gz"
+
+TMP_ALL="/tmp/all_files.txt"
+TMP_FINAL="/tmp/final_files.txt"
+TMP_REL="/tmp/rel_paths.txt"
+
+rm -f "$TMP_ALL" "$TMP_FINAL" "$TAR_OUT" "$TMP_REL"
+
+# read include.txt
+if [ -f "$INCLUDE_FILE" ]; then
+    while IFS= read -r path; do
+        [ -z "$path" ] && continue
+        FULL_PATH="$ROOT_DIR/$path"
+
+        if [ -d "$FULL_PATH" ]; then
+            find "$FULL_PATH" -type f >> "$TMP_ALL"
+        elif [ -f "$FULL_PATH" ]; then
+            echo "$FULL_PATH" >> "$TMP_ALL"
+        fi
+    done < "$INCLUDE_FILE"
+fi
+
+
+#exclude logic
+cp "$TMP_ALL" "$TMP_FINAL"
+
+if [ -f "$EXCLUDE_FILE" ]; then
+    while IFS= read -r block; do
+        [ -z "$block" ] && continue
+
+        FULL_EXCLUDE="$ROOT_DIR/$block"
+
+        if [ -d "$FULL_EXCLUDE" ]; then
+            grep -v "^$FULL_EXCLUDE" "$TMP_FINAL" > "${TMP_FINAL}_tmp"
+            mv "${TMP_FINAL}_tmp" "$TMP_FINAL"
+        elif [ -f "$FULL_EXCLUDE" ]; then
+            grep -v "^$FULL_EXCLUDE$" "$TMP_FINAL" > "${TMP_FINAL}_tmp"
+            mv "${TMP_FINAL}_tmp" "$TMP_FINAL"
+        else
+            grep -v "$block" "$TMP_FINAL" > "${TMP_FINAL}_tmp"
+            mv "${TMP_FINAL}_tmp" "$TMP_FINAL"
+        fi
+    done < "$EXCLUDE_FILE"
+fi
+
+#tar.gz logic
+cd "$ROOT_DIR"
+
+# add root dir path
+sed "s|$ROOT_DIR/||" "$TMP_FINAL" > "$TMP_REL"
+
+# Create tar.gz file
+tar -czf "$TAR_OUT" -T "$TMP_REL"
+
+#download
+
+echo "Content-Type: application/gzip"
+echo "Content-Disposition: attachment; filename=configs_backup.tar.gz"
+echo ""
+cat "$TAR_OUT"
+exit 0
+%>

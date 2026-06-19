@@ -1,0 +1,29 @@
+{
+    "portconfig": {
+        "description": "Port Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-PortConfig":[
+                "configure",
+                "delete"
+                   
+                ]
+            },
+            "uci": [
+                "portconfig",
+                "networkinterfaces",
+                "dhcprelayconfig"
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "portconfig",
+               "networkinterfaces",
+               "dhcprelayconfig"
+             
+            ]
+        }
+    }
+}

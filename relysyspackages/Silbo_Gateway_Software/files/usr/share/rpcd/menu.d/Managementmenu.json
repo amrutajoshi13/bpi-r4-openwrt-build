@@ -1,0 +1,27 @@
+{
+    "management": {
+        "title": "Management",
+        "index":105
+    },
+
+     "management/autoupgrademanager": {
+        "title": "Auto Upgrade",
+        "acls": [ "upgrademanager" ],
+        "view": "management/autoupgrademanager",
+        "index": 10
+    },
+
+     "management/Utilitymanagement": {
+        "title": "Utility Management",
+        "acls": [ "rs485utilityconfig" ],
+        "view": "management/Utilitymanagement",
+        "index": 35
+    },
+     "management/importexportgatewayconfig": {
+        "title": "Import Export Gateway",
+        "acls": [ "backup" ],
+        "view": "management/importexportgatewayconfig",
+        "index": 40
+    }
+  
+} 

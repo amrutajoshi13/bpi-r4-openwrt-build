@@ -1,0 +1,31 @@
+
+config redirect 'EWAN5'
+	option name 'EWAN5'
+	option interface_status 'online'
+	option internet_status 'online'
+	option trackingstatus 'active'
+
+config redirect 'WAN4'
+	option name 'WAN4'
+	option interface_status 'offline'
+	option internet_status 'offline'
+	option trackingstatus 'active'
+
+config redirect 'WAN5'
+	option name 'WAN5'
+	option interface_status 'offline'
+	option internet_status 'offline'
+	option trackingstatus 'down'
+
+config redirect 'CWAN1_0'
+	option name 'CWAN1_0'
+	option interface_status 'offline'
+	option internet_status 'offline'
+	option trackingstatus 'down'
+
+config redirect 'CWAN1_1'
+	option name 'CWAN1_1'
+	option interface_status 'offline'
+	option internet_status 'offline'
+	option trackingstatus 'down'
+

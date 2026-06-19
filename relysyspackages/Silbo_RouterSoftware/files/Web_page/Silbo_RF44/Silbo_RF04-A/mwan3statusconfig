@@ -1,0 +1,16 @@
+
+config redirect 'EWAN2'
+	option name 'EWAN2'
+	option status 'offline'
+	option trackingstatus 'down'
+
+config redirect 'CWAN1'
+	option name 'CWAN1'
+	option status 'online'
+	option trackingstatus 'active'
+
+config redirect 'CWAN1_1'
+	option name 'CWAN1_1'
+	option status 'offline'
+	option trackingstatus 'down'
+

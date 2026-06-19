@@ -1,0 +1,11 @@
+
+config command 'appconfig'
+        option name 'APPLICATIONS'
+        option command '/etc/ReAP/ReAPMonit/script/Start_Stop_Apps'
+        option running '0'
+        option wifiudhcpcconfig '0'
+	    option retainconfigflag '0'
+	    option retainconfigflag1 '0'
+	    option gwretainconfigflag '0'
+	    option watchdogenabledisable '0'
+        option guestwififlag '0'

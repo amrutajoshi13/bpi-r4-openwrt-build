@@ -1,0 +1,399 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Device Application Management</h1>
+</div>
+
+<div class="pagecontent">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Application Status Overview</h3>
+        </div>
+        <div class="page">
+            <div class="table-panel">
+                <div class="panel-header">
+                    <!-- <div class="panel-title">
+                        <h1>Device Applications</h1>
+                        <p>Start, stop and configure communication services</p>
+                    </div> -->
+                    <div class="search">
+                        <input type="text" id="search" placeholder="Search by name or description…" />
+                    </div>
+                </div>
+                <div class="table-header" role="row">
+                    <div role="columnheader">Application</div>
+                    <div role="columnheader">Status</div>
+                    <div role="columnheader">Message</div>
+                    <div role="columnheader">Actions</div>
+                </div>
+                <div id="apps" role="rowgroup"></div>
+
+            </div>
+        </div>
+        </div>
+</div>
+<!-- ===== Global Overlay Loader ===== -->
+<div id="globalLoader" class="global-loader hidden">
+    <div class="loader-card">
+        <div class="spinner"></div>
+        <div class="loader-text">Applying changes…</div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary: #0b84ff;
+        --primary-soft: rgba(11, 132, 255, .08);
+        --success: #22c55e;
+        --danger: #ef4444;
+        --warning: #f59e0b;
+        --bg: #f4f7fb;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+    }
+
+    * {
+        box-sizing: border-box;
+        font-family: "Segoe UI", system-ui, sans-serif;
+    }
+
+    .page {
+        max-width: 1150px;
+        margin: auto;
+        padding: 26px;
+    }
+
+    /* ===== Disabled entire row ===== */
+    .app-row.row-disabled {
+        opacity: 0.55;
+        pointer-events: none;
+        background: #f8fafc;
+    }
+
+    .app-row.row-disabled:hover {
+        background: #f8fafc;
+    }
+
+    /* ===== Lock note ABOVE row ===== */
+    .lock-note-row {
+        margin: 10px 4px 6px;
+        padding: 10px 14px;
+        background: #fff7ed;
+        color: #92400e;
+        font-size: 13px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 42%;
+    }
+
+
+    .table-panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(15, 23, 42, .06);
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 18px 22px;
+        background: linear-gradient(180deg, #f8fbff, #ffffff);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title h1 {
+        margin: 0;
+        font-size: 24px;
+        color: var(--text);
+        font-weight: 700;
+    }
+
+    .panel-title p {
+        margin-top: 4px;
+        font-size: 13px;
+        color: var(--muted);
+    }
+
+    .search input {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        font-size: 14px;
+        width: 260px;
+    }
+
+    .table-header {
+        display: grid;
+        grid-template-columns: 1fr 140px 1.5fr 225px;
+        column-gap: 24px;
+        padding: 12px 22px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        text-transform: uppercase;
+        background: rgb(254 254 255);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 5;
+    }
+
+    .state-message {
+        padding: 40px;
+        text-align: center;
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .app-row {
+        display: grid;
+        grid-template-columns: 1fr 140px 1.5fr 260px;
+        column-gap: 24px;
+        align-items: center;
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        transition: background .15s ease;
+    }
+
+    .app-row:hover {
+        background: #f8fafc;
+    }
+
+    .app-row:last-child {
+        border-bottom: none;
+    }
+
+    .app-row::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+    }
+
+    .running-row::before {
+        background: var(--success);
+    }
+
+    .disabled-row::before {
+        background: #cbd5f5;
+    }
+
+    .card-center-message {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 14px;
+        color: var(--muted);
+        padding: 20px;
+    }
+
+    .app-name {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+    }
+
+    .icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: rgba(11, 132, 255, .12);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    .app-title {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .app-desc {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .status {
+        display: inline-flex;
+        align-items: center;
+        justify-self: flex-start;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 6px 14px;
+        border-radius: 999px;
+    }
+
+    .status .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    .disabled-status {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+
+    .running {
+        background: rgba(34, 197, 94, .15);
+        color: var(--success);
+    }
+
+    .stopping {
+        background: rgba(245, 158, 11, .2);
+        color: var(--warning);
+    }
+
+    .message {
+        font-size: 13px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: default;
+        position: relative;
+    }
+
+    .message:hover::after {
+        content: attr(data-full);
+        position: absolute;
+        left: 0;
+        top: 130%;
+        background: #0f172a;
+        color: #fff;
+        padding: 6px 10px;
+        border-radius: 6px;
+        white-space: normal;
+        max-width: 300px;
+        font-size: 12px;
+        z-index: 10;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    button {
+        border: none;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+
+    .enable {
+        background: var(--success);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(34, 197, 94, .35);
+    }
+
+    .disable {
+        background: var(--danger);
+        color: #fff;
+    }
+
+    .config {
+        background: #eef2ff;
+        color: #1e3a8a;
+    }
+
+    .running-row::before {
+        background: var(--success);
+    }
+
+    .processing-row::before {
+        background: #f59e0b;
+    }
+
+    @media (max-width: 900px) {
+
+        .table-header,
+        .app-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .panel-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .search input {
+            width: 100%;
+        }
+    }
+
+    /* ===== Global Overlay Loader ===== */
+    .global-loader {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .global-loader.hidden {
+        display: none;
+    }
+
+    .loader-card {
+        background: #ffffff;
+        padding: 28px 34px;
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .spinner {
+        width: 26px;
+        height: 26px;
+        border: 3px solid #e5e7eb;
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+    }
+
+    .loader-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>

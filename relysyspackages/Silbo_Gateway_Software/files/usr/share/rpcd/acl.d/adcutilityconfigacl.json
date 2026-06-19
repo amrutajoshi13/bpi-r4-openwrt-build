@@ -1,0 +1,21 @@
+{
+    "adcutilityconfig": {
+        "description": "ADC Utility Configuration",
+            "read": {
+                "ubus" : {
+                "rpc-adcutilityupdate":[
+                    "configure"
+                ],
+},
+                "uci": [
+                    "ADCUtilityConfigGeneric"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "ADCUtilityConfigGeneric"
+                ]
+            }
+    }
+}

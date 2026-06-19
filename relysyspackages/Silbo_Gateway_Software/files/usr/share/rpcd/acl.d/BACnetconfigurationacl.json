@@ -1,0 +1,16 @@
+{
+    "BACnetConfig": {
+        "description": "BACnet Configuration",
+            "read": {
+                "uci": [
+                    "BACnetConfig",
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "BACnetConfig",
+                ]
+            }
+    }
+}

@@ -1,0 +1,52 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+installscript="/bin/installuninstall.sh install"
+uninstallscript="/bin/installuninstall.sh uninstall"
+
+case "$1" in
+    list)
+        echo '{"install":{},"uninstall":{}}'
+        ;;
+    call)
+        case "$2" in
+                    install)
+							response=$($installscript)
+                            if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":0,\"output\":\"Failure : Router Software Install\"}"
+
+                            else
+						        echo "{\"code\":1,\"output\":\"Success : Router Software Install. Rebooting the board\"}"
+
+								response=$(/root/usrRPC/script/Board_Recycle_12V_Script.sh)
+
+
+                            fi                                                                                 
+                            ;;
+                            
+                      uninstall)
+							response=$($uninstallscript)
+                            if [ "$?" -ne 0 ]
+                            then
+                            	echo "{\"code\":0,\"output\":\"Failure : Router Software Uninstall\"}"
+
+                            else
+                            echo "{\"code\":1,\"output\":\"Success : Router Software Uninstall\"}"
+								response=$(/root/usrRPC/script/Board_Recycle_12V_Script.sh)
+
+
+                            fi
+                                                                                 
+                            ;;  
+                           
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

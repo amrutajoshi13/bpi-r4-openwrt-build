@@ -1,0 +1,26 @@
+{
+    "watchdogconfig": {
+        "description": "Watchdog config",
+        "read": {
+			"ubus" : {
+                "rpc-diagnosticutilities":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "watchdogconfig",
+                
+            ]
+        },
+        "write": {
+						"ubus" : {
+                "rpc-diagnosticutilities":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "watchdogconfig",                
+            ]
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+	"newCloudConfigv2": {
+	"description": "Cloud Configuration",
+
+		"read": {
+			"ubus" : {
+                "rpc-cloudconfig":[
+                 "configure",
+                 "update",
+                 "testarchive",
+                 "delete",
+                 "getvalue",
+                "countkeyfiles"          
+               ]
+		   },
+			"uci": [
+				"newCloudConfigv2"
+			]
+		},
+	
+	   "write": {
+		   "ubus" : {
+                "rpc-cloudconfig":[
+                 "configure",
+                 "update",
+                 "testarchive",
+                  "getvalue",
+                "delete",
+                "countkeyfiles"          
+               ]
+		   },
+			"uci": [
+				"newCloudConfigv2"
+			]
+		}
+    }
+}

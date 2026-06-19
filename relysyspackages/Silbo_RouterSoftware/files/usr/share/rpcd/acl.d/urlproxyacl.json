@@ -1,0 +1,24 @@
+{
+    "urlproxyconfig": {
+        "description": "Parental Control Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updatemacconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "urlproxyconfig",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "urlproxyconfig",
+                
+            ]
+        }
+    }
+}

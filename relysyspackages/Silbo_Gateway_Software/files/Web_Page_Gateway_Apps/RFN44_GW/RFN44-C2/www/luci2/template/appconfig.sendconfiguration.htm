@@ -1,0 +1,122 @@
+<div class="row">
+	<div class="col-md-2">
+		<input type="radio" name="modbus" onchange="handlechange(event)" checked id="json"
+			value="json">
+		<label>JSON</label>
+	</div>
+	<div class="col-md-2">
+		<input type="radio" name="modbus" onchange="handlechange(event)" id="csv" value="csv">
+		<label>CSV</label>
+	</div>
+</div>
+<div id="senderconfig">
+
+<div class="tab-content" id="tabs" id="senderconfig">
+	<ul class="nav nav-tabs" id="my_tab"  data-tabs="tabs">
+		
+		<!-- Removed 'active' from commented-out Modbus Sender tab -->
+		<!--
+        <li class="TabC TabZf active">
+            <a id="sectiontab_firewall_zonefor" href="#tab_zonefor" data-toggle="tab">Modbus Sender 
+				<span class="badge"></span>
+			</a>
+        </li>
+		-->
+
+		<!-- ✅ Added 'active' here -->
+		<li class="TabC Tabdio active">
+			<a id="sectiontab_dio" href="#tab_diosender" data-toggle="tab">DIO Sender 
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<!-- Other tabs remain as-is -->
+	</ul>
+	
+	<!-- DIO Sender Tab Content -->
+	<!-- ✅ Added 'active' here as well -->
+	<div class="tab-pane TabC Tabdio active" id="tab_diosender">
+		<div id="sectiontab_dio_sender"></div>	
+		<div id="Mansectiontab_dio_sender" class="panel panel-default" >
+			<div class="panel-heading">
+				<h3 class="panel-title">DIO Sender Configuration :</h3>
+			</div>
+			
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+						<th class="cbi-section-table-cell">Field Content</th>
+						<th class="cbi-section-table-cell">Field JSON Key Name</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectiontab_dio_sender_newZone" data-luci2-sid="newZone">
+		    <td>
+				<div class="luci2-field">
+				<div class="luci2-field-widget">
+					<select class="form-control luci2-field-validate" id="field_dio_sender_zone_src">
+						<option value="SiteID">SiteID</option>
+						<option value="ReadTimeStamp">ReadTimeStamp</option>
+						<option value="EpochTimeStamp">EpochTimeStamp</option>
+						<option value="DIRecordNumber">RecordNumber</option>
+						<option value="DIRequestId">RequestId</option>
+						<option value="DIRecordType">Recordtype</option>
+						<option value="DIValues1">DIInput1</option>
+<!--
+						<option value="DIValues2">DIInput2</option>
+						<option value="DIValues3">DIInput3</option>
+						<option value="DIValues4">DIInput4</option>
+-->
+						<option value="DIOCustomfield1">DIOCustomfield1</option>
+						<option value="DIOCustomfield2">DIOCustomfield2</option>
+						<option value="DIOCustomfield3">DIOCustomfield3</option>
+						<option value="DIOCustomfield4">DIOCustomfield4</option>
+						<option value="DIOCustomfield5">DIOCustomfield5</option>
+					</select>
+						<input type="text" class="form-control luci2-field-validate custom-value-input" id="field_dio_sender_zone_srczone"  style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+				</div>
+				</div>
+			</td>	
+			<td>
+				<div class="luci2-field">
+				<div class="luci2-field-widget">
+					<input type="text" class="form-control luci2-field-validate custom-value-input2" id="field_dio_sender_zone_destzone" type="text" placeholder="">
+					<div class="luci2-field-error label label-danger" style="display: none;"></div>
+				</div>
+				</div>
+			</td>	
+			<td class="text-right" style="width: 1%;">
+				<div class="btn-group">
+					<button type="button" id="AddNewdiosenderconfiguration" title="" class="btn btn-success">Add</button>
+				</div>
+			</td>
+			</tr>
+		</tbody>
+	</table>
+    </div>
+</div>
+
+<!-- Other tab panes (AI, RS232, SNMP, etc.) remain unchanged -->
+
+</div>
+</div>
+
+<div id="displayfixedpocket">
+	<div  id="fixedpocket" ></div>
+</div>
+
+<style>
+#section_firewall_snat,#section_firewall_rules,#section_firewall_zone{
+border-color: #dddddd;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 25px 30px #0000001a;
+    border: 1px solid #70707038;
+    border-radius: 10px;
+    width:95%;
+    padding: 17px;
+    margin-bottom: 10px;
+}
+</style>

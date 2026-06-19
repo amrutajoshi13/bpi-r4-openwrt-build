@@ -1,0 +1,38 @@
+{
+    "healthconfig": {
+        "description": "Health Monitoring",
+            "read": {
+                "ubus" : {
+                    "rpc-cloudconfigNH":[
+                    "configure",
+                    "update",
+                    "testarchive",
+                    "delete",
+                    "countkeyfiles",
+                    "save"          
+                ]
+		       },
+                "uci": [
+                    "Health_Jsonconfig",
+                    "cloudconfigNH"
+                ]
+            },
+ 
+            "write": {
+                "ubus" : {
+                "rpc-cloudconfigNH":[
+                 "configure",
+                 "update",
+                 "testarchive",
+                 "delete",
+                 "countkeyfiles",
+                 "save"         
+                ]
+		     },
+                "uci": [
+                    "Health_Jsonconfig",
+                    "cloudconfigNH"
+                ]
+            }
+    }
+}

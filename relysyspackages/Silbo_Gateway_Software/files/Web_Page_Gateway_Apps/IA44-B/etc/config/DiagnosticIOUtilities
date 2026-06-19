@@ -1,0 +1,10 @@
+	
+config IOUtilities                          
+        option utility 'Copy Database to USB'
+        option action 'COPY'                
+        option inputs '1'               
+        option input1Element 'selection'
+        option input1Name 'Database/File'               
+        option input1Type 'string'   
+        list input1Values 'EnergyMeterRS485'
+   

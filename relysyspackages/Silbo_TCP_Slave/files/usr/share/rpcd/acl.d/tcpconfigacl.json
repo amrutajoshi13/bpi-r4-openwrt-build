@@ -1,0 +1,24 @@
+{
+    "tcpconfig": {
+        "description": "TCP Slave configration",
+        "read": {
+			"ubus" : {
+                "rpc-updatemacconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "tcpconfig",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "tcpconfig",
+                
+            ]
+        }
+    }
+}

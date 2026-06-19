@@ -1,0 +1,47 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+UpdateConfigScript="/bin/snmp/snmpagent_shell.sh"
+#updateTrapScript="/bin/UpdateSNMPtrapcfg.sh"
+#updateTrapScript="/bin/snmptrap_shell.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{"application":"ApplicationName","action":"ActionName"}}'
+        ;;
+    call)
+        case "$2" in
+                   configure)
+		                # read the arguments
+		                read -r input;
+		                json_load "$input" > /dev/null 2>&1
+		                json_get_var ApplicationName application
+		                json_get_var ActionName action
+	                    case "$ApplicationName" in
+	                        "Update")
+	                            case "$ActionName" in
+	                                "updateinterface")
+		                                    response=$($UpdateConfigScript)
+		                                    RetVal=$?
+		                                    echo "{\"code\":\"0\",\"output\":\"Updated Configurations\"}"                                   
+		                                     ;;
+	                                  *)
+	                                    echo '{"code":"1","output":"invalid action"}'
+	                                    exit 1
+	                                    ;;
+	                            esac #application action
+	                            ;;
+	                    esac #application name
+	                    ;;
+	                    
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+            ;;
+esac # ubus method
+
+exit 0
+

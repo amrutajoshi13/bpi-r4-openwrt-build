@@ -1,0 +1,27 @@
+/tmp/Log/HealthMsgLog {
+    size 5k
+    rotate 3
+    missingok
+    create 0644 root root 
+}
+
+/tmp/Log/RespHealthMsgLog {
+    size 5k
+    rotate 3
+    missingok
+    create 0644 root root 
+}
+
+/tmp/Log/GPSMsgLog {
+    size 5k
+    rotate 3
+    missingok
+    create 0644 root root 
+}
+
+/tmp/Log/RespGPSMsgLog {
+    size 5k
+    rotate 3
+    missingok
+    create 0644 root root 
+}

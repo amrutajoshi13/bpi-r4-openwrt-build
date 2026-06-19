@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="vuesax_linear_rotate-left" data-name="vuesax/linear/rotate-left" transform="translate(-300 -380)">
+    <g id="rotate-left">
+      <path id="Vector" d="M5.25,15h4.5C13.5,15,15,13.5,15,9.75V5.25C15,1.5,13.5,0,9.75,0H5.25C1.5,0,0,1.5,0,5.25v4.5C0,13.5,1.5,15,5.25,15Z" transform="translate(302 387)" fill="none" stroke="#292d32" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-2" data-name="Vector" d="M7,7A7,7,0,0,0,0,0L1.05,1.75" transform="translate(315 382)" fill="none" stroke="#292d32" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-3" data-name="Vector" d="M0,0H24V24H0Z" transform="translate(300 380)" fill="none" opacity="0"/>
+    </g>
+  </g>
+</svg>

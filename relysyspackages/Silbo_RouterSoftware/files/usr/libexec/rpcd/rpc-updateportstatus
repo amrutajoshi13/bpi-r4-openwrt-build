@@ -1,0 +1,39 @@
+#!/bin/sh
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+case "$1" in
+    list)
+        # advertise the method name "configuregre"
+        echo '{"configurelan":{}}'
+        ;;
+
+    call)
+        case "$2" in
+            configurelan)
+                cd /root/
+
+                # capture the JSON returned by your script
+                json_data="$(sh /root/Ports_Details.sh 2>/dev/null)"
+                rc="$?"
+
+                if [ "$rc" -ne 0 ] || [ -z "$json_data" ]; then
+                    echo '{"code":1,"output":"Failed to get port details"}'
+                else
+                    # Return a valid JSON object
+                    echo "{"
+                    echo "\"code\":0,"
+                    echo "\"lanports\": $json_data"
+                    echo "}"
+                fi
+                ;;
+
+            *)
+                echo '{"code":1,"output":"invalid method"}'
+                exit 1
+                ;;
+        esac
+        ;;
+esac
+
+exit 0

@@ -1,0 +1,122 @@
+#!/bin/sh
+# Copyright (C) 2015 PIVA Software <www.pivasoftware.com>
+# 	Author: MOHAMED Kallel <mohamed.kallel@pivasoftware.com>
+
+#common_execute_method_param "$parameter" "$permission" "$get_cmd" "$set_cmd" "xsd:$type" "$forcedinform"
+#  $forcedinform should be set to 1 if the parameter is included in the inform message otherwise empty
+#  Default of $type = string
+
+#############################
+#   Entry point functuons   #
+#############################
+
+prefix_list="$prefix_list $DMROOT.DeviceInfo."
+entry_execute_method_list="$entry_execute_method_list entry_execute_method_root_DeviceInfo"
+entry_execute_method_list_forcedinform="$entry_execute_method_list_forcedinform  entry_execute_method_root_DeviceInfo"
+source /tmp/InterfaceManager/status/ports.txt
+########################
+#RSSI
+#Servingcell=$(/bin/at-cmd $ComPort at+qeng=\"servingcell\" | awk -F"," 'NR==2') 
+RSSI=$(uci get modemstatus.modemstatus.RSSI)
+MCC=$(uci get modemstatus.modemstatus.MCC)
+MNC=$(uci get modemstatus.modemstatus.MNC)
+UBW=$(uci get modemstatus.modemstatus.ULBAND)
+DBW=$(uci get modemstatus.modemstatus.DLBAND)
+RSRP=$(uci get modemstatus.modemstatus.RSRP)
+RSRQ=$(uci get modemstatus.modemstatus.RSRQ)
+SINR=$(uci get modemstatus.modemstatus.SINR)
+WifiOnoffstatus=$(uci get sysconfig.wificonfig.wifi1enable)
+if [ "$WifiOnoffstatus" = "1" ]
+then
+    WifiOnoffstatus=ON
+elif [ "$WifiOnoffstatus" = "0" ]
+then
+    WifiOnoffstatus=OFF
+fi
+Activesimnumber=$(uci get system.system.simNum)
+IMEI=$(uci get boardconfig.board.imei)
+Operator=$(uci get modemstatus.modemstatus.Operator)
+CellID=$(uci get modemstatus.modemstatus.CellID)
+Connected=$(uci get modemstatus.modemstatus.Connected)
+MODE=$(uci get modemstatus.modemstatus.MODE)
+Plan=${Connected}-${MODE}
+formatted_uptime=$(cat /proc/uptime | awk '{ printf "%dd:%02dh:%02dm:%02ds\n", $1 / 86400, ($1 % 86400) / 3600, ($1 % 3600) / 60, $1 % 60 }')
+firmware_version=$(uci get boardconfig.board.FirmwareVer)
+#IpaddressFile="/usr/share/easycwmp/functions/IPaddress.txt"
+#Ethernet_Wan_Mac=$(uci get boardconfig.board.wanmacid)
+#Ethernet_Lan_Mac=$(uci get boardconfig.board.lanmacid)
+#ifnamelan=$(uci get network.SW_LAN.ifname 2>/dev/null)
+#lanIP=$(uci get network.SW_LAN.ipaddr)
+#ifnameEWAN=$(uci get network.EWAN5.ifname 2>/dev/null)
+#EWANIP=$(ifconfig "$ifnameEWAN" 2>/dev/null | grep -oE 'inet addr:[0-9.]+' | grep -oE '[0-9.]+')
+
+#{
+	#echo ""Ethernet_WAN_MAC_ID": "$Ethernet_Wan_Mac""
+	#echo ""Ethernet_LAN_MAC_ID": "$Ethernet_Lan_Mac""
+	#echo ""LAN_IP": "$lanIP""
+	#echo ""EWAN_IP": "$EWANIP""
+#} >> "$IpaddressFile" 
+
+#######################
+
+entry_execute_method_root_DeviceInfo() {
+	case "$1" in ""|"$DMROOT."|"$DMROOT.DeviceInfo."*)
+		common_execute_method_obj "$DMROOT.DeviceInfo." "0"
+		common_execute_method_param "$DMROOT.DeviceInfo.SpecVersion" "0" "echo 1.0" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.ProvisioningCode" "1" "$UCI_GET easycwmp.@local[0].provisioning_code" "device_info_set_provisioningcode" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.Manufacturer" "0" "$UCI_GET easycwmp.@device[0].manufacturer" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.ManufacturerOUI" "0" "$UCI_GET easycwmp.@device[0].oui" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.ProductClass" "0" "echo CPE-LTE" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.SerialNumber" "0" "$UCI_GET easycwmp.@device[0].serial_number" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.HardwareVersion" "0" "$UCI_GET easycwmp.@device[0].hardware_version" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.SoftwareVersion" "0" "$UCI_GET easycwmp.@device[0].software_version" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.RSSI" "0" "echo $RSSI" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.WifiStatus" "0" "echo $WifiOnoffstatus" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.ActiveSIMNumber" "0" "echo $Activesimnumber" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.IMEI" "0" "echo $IMEI" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.Operator" "0" "echo $Operator" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.CellID" "0" "echo $CellID" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.Plan" "0" "echo $Plan" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.UpTime" "0" "echo $formatted_uptime" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.DeviceLog" "0" "echo $(dmesg | tail -n1)"
+		common_execute_method_obj "$DMROOT.DeviceInfo.MemoryStatus." "0"
+		common_execute_method_param "$DMROOT.DeviceInfo.MemoryStatus.Total" "0" "device_info_get_total_memory"
+		common_execute_method_param "$DMROOT.DeviceInfo.MemoryStatus.Free" "0" "device_info_get_free_memory"
+		common_execute_method_param "$DMROOT.DeviceInfo.MCC" "0" "echo $MCC" "" "" "1"
+		common_execute_method_param "$DMROOT.DeviceInfo.MNC" "0" "echo $MNC" "" "" "1"  
+		common_execute_method_param "$DMROOT.DeviceInfo.UBW" "0" "echo $UBW" "" "" "1"  
+		common_execute_method_param "$DMROOT.DeviceInfo.DBW" "0" "echo $DBW" "" "" "1"  
+		common_execute_method_param "$DMROOT.DeviceInfo.RSRP" "0" "echo $RSRP" "" "" "1"  
+		common_execute_method_param "$DMROOT.DeviceInfo.RSRQ" "0" "echo $RSRQ" "" "" "1"  
+		common_execute_method_param "$DMROOT.DeviceInfo.SINR" "0" "echo $SINR" "" "" "1"    
+		#common_execute_method_param "$DMROOT.DeviceInfo.Firmware_Version" "0" "echo $firmware_version" "" "" "1"        
+		return 0;
+		;;
+	esac
+	return $E_INVALID_PARAMETER_NAME;
+}
+
+#######################################
+#   Data model parameters functions   #
+#######################################
+
+device_info_get_total_memory() {
+		cut -d: -f 2 /proc/meminfo | head -n 1| tail -n 1 |  tr -d " kKbB"
+}
+
+device_info_get_free_memory() {
+		cut -d: -f 2 /proc/meminfo | head -n 2| tail -n 1 | tr -d " kKbB" 
+}
+
+device_info_set_provisioningcode() {
+	local val="$1"
+	$UCI_SET easycwmp.@local[0].provisioning_code="$val"
+	return 0
+}
+
+device_info_get_uptime() {
+	awk -F '.' '{ print $1 }' /proc/uptime
+}
+
+
+

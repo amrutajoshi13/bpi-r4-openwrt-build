@@ -1,0 +1,14 @@
+{
+
+    "appmanager": {
+     "title": "Appmanager",
+        "index": 75
+    },      
+    
+    "appmanager/IOUtilities": {
+        "title": "IO Utilities",
+        "acls": [ "ioutilities" ],
+        "view": "appmanager/IOUtilities",
+        "index": 40
+    },
+}

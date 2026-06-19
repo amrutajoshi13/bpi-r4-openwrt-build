@@ -1,0 +1,64 @@
+{
+    "diagnostics": {
+        "title": "Status",
+        "index": 50
+    },
+    "diagnostics/interfaces": {
+        "title": "Interfaces",
+        "acls": [ "network" ],
+        "view": "diagnostics/interfaces",
+        "index": 10
+    },
+   /*  "diagnostics/wanstatus": {
+        "title": "Internet",
+        "acls": [ "mwan3statusacl" ],
+        "view": "diagnostics/wanstatus",
+        "index": 20
+    },
+    "diagnostics/modemanalytics": {
+        "title": "Modem",
+        "acls": [ "interfacemanager" ],
+        "view": "diagnostics/modemanalytics",
+        "index": 30
+    },*/
+         "diagnostics/routes": {
+        "title": "Routes",
+        "acls": [ "status" ],
+        "view": "diagnostics/routes",
+        "index": 40
+    },
+    /*     "diagnostics/miscUtilities": {
+        "title": "Others",
+        "acls": [ "miscutilities" ],
+        "view": "diagnostics/miscUtilities",
+        "index": 50
+    },*/
+      "diagnostics/additionalcommands": {
+        "title": "Additional Commands",
+        "acls": [ "additionalcommands" ],
+        "view": "diagnostics/additionalcommands",
+        "index": 60
+    },
+    
+        "diagnostics/testapp": {
+        "title": "Test App",
+        "acls": [ "testapp" ],
+        "view": "diagnostics/testapp",
+        "index": 70
+    },
+    
+	 "diagnostics/uploadtestapp": {
+	"title": "Upload Test App",
+	"acls": [ "uploadtestappacl" ],
+	"view": "diagnostics/uploadtestapp",
+	"index": 80
+    },
+    
+       "diagnostics/updatecustomconfig": {
+		"title": "Custom Config",
+		"acls": [ "updatecustomconfig" ],
+		"view": "diagnostics/updatecustomconfig",
+		"index": 85
+    },
+    
+} 

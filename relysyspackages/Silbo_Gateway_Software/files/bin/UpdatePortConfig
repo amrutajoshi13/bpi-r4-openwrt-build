@@ -1,0 +1,305 @@
+#!/bin/sh
+
+. /lib/functions.sh
+. /root/SourceAppComponent/etc/Config/app_run_status.cfg
+
+PortsUCIPath=/etc/config/portconfig
+PortsConfigSection1="portconfig1"
+PortsConfigSection2="portconfig2"
+
+ser2netConfigFile=/etc/ser2net.conf
+ser2netConfigFile2=/etc/ser2net2.conf
+
+LogFilePath=/var/log/ser2net
+LogrotateConfigFile=/etc/logrotate.d/SertoNetLogrotateConfig
+
+STATUS_FILE="/tmp/updateconfigoutput.txt"
+APP_STATUS_FILE="/root/SourceAppComponent/etc/Config/app_run_status.cfg"
+
+date=$(date +"%Y-%m-%d %H:%M:%S")
+
+# --------------------------------------------------
+# Function : UpdatePortStatus
+# --------------------------------------------------
+UpdatePortStatus()
+{
+    local enable="$1"
+    local tmp_file="${APP_STATUS_FILE}.tmp"
+
+    # Ensure source file exists
+    touch "$APP_STATUS_FILE"
+
+    # Single-pass awk rewrite:
+    # - Skips ALL existing port_Enable and port_time lines (handles duplicates/missing)
+    # - Tracks whether each key was already written to prevent duplicates
+    # - At END, appends any key that was never seen in the file
+    # - Writes to tmp file first, then atomically moves to original
+    awk -v enable="$enable" -v ts="$date" '
+        /^port_Enable=/ { next }
+        /^port_time=/   { next }
+        { print }
+        END {
+            print "port_Enable=" enable
+            print "port_time=\"" ts "\""
+        }
+    ' "$APP_STATUS_FILE" > "$tmp_file"
+
+    # Only replace original if tmp was written successfully and is non-empty
+    if [ $? -eq 0 ] && [ -s "$tmp_file" ]; then
+        mv "$tmp_file" "$APP_STATUS_FILE"
+    else
+        echo "WARNING: Failed to write $tmp_file — original file left unchanged"
+        rm -f "$tmp_file"
+        return 1
+    fi
+
+    # Verify exactly one port_Enable entry exists
+    local count
+    count=$(grep -c '^port_Enable=' "$APP_STATUS_FILE" 2>/dev/null || echo 0)
+    if [ "$count" -ne 1 ]; then
+        echo "WARNING: port_Enable has $count entries in $APP_STATUS_FILE (expected 1)"
+    fi
+}
+
+# --------------------------------------------------
+# Function : ValidateRS485Config
+# --------------------------------------------------
+ValidateRS485Config()
+{
+    . /root/SourceAppComponent/etc/Config/DataSourcesConfig.cfg
+
+    uci_ser2netEnable1=$(uci get portconfig.portconfig1.Ser2netEnable1)
+
+    echo "uci_ser2netEnable1 = $uci_ser2netEnable1"
+    echo "EMeterRS485Line1DataSourceEnable = $EMeterRS485Line1DataSourceEnable"
+    echo "EMeterRS485Line2DataSourceEnable = $EMeterRS485Line2DataSourceEnable"
+
+    # Valid case 1: DataSource disabled — all Ser2net modes (0,1,2,3,4) are valid
+    # port_Enable=0 when Ser2netEnable1=2, port_Enable=1 for all other modes
+    if [ "$EMeterRS485Line1DataSourceEnable" = "0" ]; then
+        echo "Validation Success"
+        case "$uci_ser2netEnable1" in
+            2)  UpdatePortStatus 0 ;;
+            *)  UpdatePortStatus 1 ;;
+        esac
+        return 0
+
+    # Valid case 2: DataSource enabled — Ser2net must be 2, port_Enable=0
+    elif [ "$EMeterRS485Line1DataSourceEnable" = "1" ] && \
+         [ "$uci_ser2netEnable1" = "2" ]; then
+        echo "Validation Success"
+        UpdatePortStatus 0
+        return 0
+
+    # Invalid: DataSource enabled but Ser2net is not 2 — do NOT update port status
+    else
+        echo "Validation Failure"
+        return 1
+    fi
+}
+
+# --------------------------------------------------
+# Function : PortsConfigParameters
+# --------------------------------------------------
+PortsConfigParameters()
+{
+    config_load "$PortsUCIPath"
+
+    config_get Ser2netEnable1 "$PortsConfigSection1" Ser2netEnable1
+    config_get tcpport1 "$PortsConfigSection1" tcpport1
+    config_get Baudrate1 "$PortsConfigSection1" Baudrate1
+    config_get NoOfStopbits1 "$PortsConfigSection1" NoOfStopbits1
+    config_get Databits1 "$PortsConfigSection1" Databits1
+    config_get Parity1 "$PortsConfigSection1" Parity1
+    config_get Flowcontrol1 "$PortsConfigSection1" Flowcontrol1
+    config_get portmode1 "$PortsConfigSection1" portmode1
+    config_get timeout1 "$PortsConfigSection1" timeout1
+    config_get readtraceenable1 "$PortsConfigSection1" readtraceenable1
+    config_get writetraceenable1 "$PortsConfigSection1" writetraceenable1
+
+    config_get Ser2netEnable2 "$PortsConfigSection2" Ser2netEnable2
+    config_get tcpport2 "$PortsConfigSection2" tcpport2
+    config_get Baudrate2 "$PortsConfigSection2" Baudrate2
+    config_get NoOfStopbits2 "$PortsConfigSection2" NoOfStopbits2
+    config_get Databits2 "$PortsConfigSection2" Databits2
+    config_get Parity2 "$PortsConfigSection2" Parity2
+    config_get Flowcontrol2 "$PortsConfigSection2" Flowcontrol2
+    config_get portmode2 "$PortsConfigSection2" portmode2
+    config_get timeout2 "$PortsConfigSection2" timeout2
+    config_get readtraceenable2 "$PortsConfigSection2" readtraceenable2
+    config_get writetraceenable2 "$PortsConfigSection2" writetraceenable2
+
+    PortsInterfaceToSer2net
+}
+
+# --------------------------------------------------
+# Function : PortsInterfaceToSer2net
+# --------------------------------------------------
+PortsInterfaceToSer2net()
+{
+    # --------------------------------------------------
+    # Board Detection Logic
+    # --------------------------------------------------
+
+    flash_val_f020=$(dd if=/dev/mtd2 bs=1 skip=$((0xF020)) count=1 2>/dev/null | hexdump -v -e '1/1 "%02X"')
+    flash_val_f021=$(dd if=/dev/mtd2 bs=1 skip=$((0xF021)) count=1 2>/dev/null | od -An -tu1 | tr -d ' ')
+
+    [ -z "$flash_val_f020" ] && flash_val_f020="FF"
+    [ -z "$flash_val_f021" ] && flash_val_f021="255"
+
+    case "$flash_val_f020" in
+        0B)
+            board_name="IDB54-C-GW"
+            ;;
+        0F)
+            board_name="IDF54-C-GW"
+            ;;
+        47)
+            case "$flash_val_f021" in
+                88)
+                    board_name="silbo-IDG50-GW"
+                    ;;
+                99)
+                    board_name="silbo-RVWG50-GW"
+                    ;;
+                *)
+                    board_name="silbo-RVWG50-GW"
+                    ;;
+            esac
+            ;;
+        *)
+            board_name=$(cat /tmp/sysinfo/board_name)
+            ;;
+    esac
+
+    echo "Detected Board Name : $board_name"
+
+    if echo "$board_name" | grep -qE "(IDG|RVWG)"
+    then
+        InternalPort1="ttyUSB0"
+    else
+        InternalPort1="ttyS1"
+    fi
+
+    InternalPort2="ttyS2"
+
+    # --------------------------------------------------
+    # Port 1 Config
+    # --------------------------------------------------
+
+    if [ "$Ser2netEnable1" = '1' ] || [ "$Ser2netEnable1" = '3' ]
+    then
+        if [ "$portmode1" != "off" ]
+        then
+            DEV="$InternalPort1"
+
+            sed -i "/\/dev\/$DEV/d" "$ser2netConfigFile"
+
+            echo "$tcpport1:$portmode1:$timeout1:/dev/$DEV:$Baudrate1 ${Databits1}DATABITS $Parity1 ${NoOfStopbits1}STOPBIT $Flowcontrol1" >> "$ser2netConfigFile"
+        else
+            echo "Port1 Mode is off"
+        fi
+    fi
+
+    ## --------------------------------------------------
+    ## Port 2 Config
+    ## --------------------------------------------------
+
+    #if [ "$Ser2netEnable2" = '1' ] || [ "$Ser2netEnable2" = '3' ]
+    #then
+        #if [ "$portmode2" != "off" ]
+        #then
+            #DEV="$InternalPort2"
+
+            #sed -i "/\/dev\/$DEV/d" "$ser2netConfigFile2"
+
+            #echo "$tcpport2:$portmode2:$timeout2:/dev/$DEV:$Baudrate2 ${Databits2}DATABITS $Parity2 ${NoOfStopbits2}STOPBIT $Flowcontrol2" >> "$ser2netConfigFile2"
+        #else
+            #echo "Port2 Mode is off"
+        #fi
+    #fi
+}
+
+# --------------------------------------------------
+# MAIN
+# --------------------------------------------------
+
+# Validation FIRST
+ValidateRS485Config
+
+# If validation fails, stop here
+if [ $? -ne 0 ]
+then
+    echo "Port configuration skipped due to validation failure"
+    exit 1
+fi
+
+# --------------------------------------------------
+# Stop Existing processes (unconditional)
+# --------------------------------------------------
+
+Ser2netEnable1=$(uci get portconfig.portconfig1.Ser2netEnable1 2>/dev/null)
+
+if pidof mbusd >/dev/null 2>&1
+then
+    killall mbusd > /dev/null 2>&1
+    echo "Modbus TCP to RTU stopped"
+    sleep 1
+fi
+
+if pidof rtumd >/dev/null 2>&1
+then
+    killall rtumd > /dev/null 2>&1
+    echo "Modbus RTU Master to Modbus TCP Slave stopped"
+fi
+
+if pidof ser2net >/dev/null 2>&1
+then
+    killall ser2net > /dev/null 2>&1
+    echo "ser2net stopped"
+    sleep 1
+fi
+
+# --------------------------------------------------
+# Apply Configurations
+# --------------------------------------------------
+
+if [ "$Ser2netEnable1" = '1' ]
+then
+    # ser2net
+    PortsConfigParameters
+
+    echo "Starting Transparent Serial to Remote Client..."
+    mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_ser2net2 /etc/monit.d/
+    /usr/sbin/ser2net -c /etc/ser2net.conf > /dev/null 2>&1 &
+    echo "Port 1 : Transparent Serial Mode started"
+
+elif [ "$Ser2netEnable1" = '0' ]
+then
+    # Mbusd
+    sh /bin/UpdateModbusConfig.sh
+
+    echo "Starting Modbus TCP to RTU..."
+    mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_Mbusd1 /etc/monit.d/
+    /usr/bin/mbusd -c /etc/mbusdconfig.conf -v0 > /dev/null 2>&1 &
+
+elif [ "$Ser2netEnable1" = '3' ]
+then
+    # ser2net + socat
+    echo "Starting Transparent Serial to Remote Server..."
+    mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_socat /etc/monit.d/
+    /bin/runsocat.sh
+
+elif [ "$Ser2netEnable1" = '4' ]
+then
+    # rtumd
+    /bin/SerialToTCP.sh
+
+    echo "Starting Modbus RTU Master to Modbus TCP Slave..."
+    mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_rtumd /etc/monit.d/
+    /root/rtumd/rtumd > /dev/null 2>&1 &
+fi
+
+logrotate "$LogrotateConfigFile"
+
+exit 0

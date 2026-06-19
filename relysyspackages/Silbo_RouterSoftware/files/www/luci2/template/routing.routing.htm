@@ -1,0 +1,910 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">Routing</h1>
+</div>
+
+
+<div class="pagecontent">
+
+	<div style="text-align: right;" class="btnclass">
+		<button type="button" class="btn btn-success btn-update" data-type="routing" title="Update Routing"
+			id="btn_update">Update</button>
+	</div>
+	<div id="Update-Routing-Note"></div>
+
+	<ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+		<li class="TabC Tabsr active">
+			<a id=":w" href="#Static_routes" data-toggle="tab">Custom IPv4 Routes
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC Tabsr6">
+			<a id="section_advanced_static_routes_ipv6" href="#Static_routes_ipv6" data-toggle="tab">Custom IPv6
+				Routes
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabAsr">
+			<a id="section_advanced_static_routes" href="#Advanced_Static_routes" data-toggle="tab">Custom Tables &
+				Rules
+				<span class="badge"></span>
+			</a>
+		</li>
+
+	</ul>
+
+
+	<div class="tab-content" id="tabs">
+		<div class="tab-pane TabC Tabsr active" id="Static_routes">
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">IPv4 Custom Routes</h3>
+				</div>
+				<p id="No-IPv4-Config"></p>
+
+				<div class="scrollable-x " id="section_staticroutes_port"></div>
+
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Custom Route</h3>
+				</div>
+
+				<div class="panel-body">
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_staticroutes_routes_newRoutes_name">Route
+							Name</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_name" type="text" placeholder="Route1">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_staticroutes_routes_newRoutes_routetype">Route
+							Type</label>
+						<div class="luci2-field-widget col-lg-4">
+							<select class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_routetype">
+								<option value="unicast">Unicast</option>
+								<option value="blackhole">Blackhole</option>
+								<option value="prohibit">Prohibit</option>
+								<option value="unreachable">Unreachable</option>
+								<option value="throw">Throw</option>
+								<option value="broadcast">Broadcast</option>
+								<option value="multicast">Multicast</option>
+							</select>
+							<input type="text" style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_staticroutes_routes_newRoutes_Table">Table
+							ID</label>
+						<div class="luci2-field-widget col-lg-4">
+							<select class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_Table" onchange="handle_table_Selection()">
+								<option value="main">Table main</option>
+								<option value="custom">custom</option>
+							</select>
+							<input type="text" class="form-control luci2-field-validate custom-value-input3"
+								id="field_staticroutes_routes_newRoutes_Table1" style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_staticroutes_routes_newRoutes_target">Target</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate luci2-field-ipv4"
+								id="field_staticroutes_routes_newRoutes_target" type="text" placeholder="0.0.0.0">
+							<div class="luci2-field-error label label-danger" style="display: none;"
+								id="validationResult"></div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_staticroutes_routes_newRoutes_ipv4netmask">IPv4
+							Netmask</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_ipv4netmask" type="text"
+								placeholder="255.255.255.255">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_staticroutes_routes_newRoutes_ipv4gateway">IPv4
+							Gateway</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_ipv4gateway" type="text" placeholder="0.0.0.0">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_staticroutes_routes_newRoutes_interface">Interface</label>
+						<div class="luci2-field-widget col-lg-4">
+							<select class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_interface"
+								onchange="handleInterfaceSelection()">
+								<option value="SW_LAN">SW_LAN</option>
+								<option value="EWAN5">EWAN5</option>
+								<option value="ra0">ra0</option>
+								<option value="wlan0">wlan0</option>
+								<option value="CWAN1_0">CWAN1_0</option>
+								<option value="CWAN1">CWAN1</option>
+								<option value="custom">custom</option>
+							</select>
+							<input type="text" class="form-control luci2-field-validate custom-value-input"
+								id="field_staticroutes_routes_newRoutes_inter" style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_staticroutes_routes_newRoutes_metric">Metric</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate small-input"
+								id="field_staticroutes_routes_newRoutes_metric" type="text" placeholder="0"
+								oninput="validatePositiveIntegerInput(this)">
+							<div class="luci2-field-error label label-danger" id="metricError" style="display: none;">
+								Positive integers
+							</div>
+						</div>
+					</div>
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add Custom Route" data-action="save" id="AddNewStaticRoutes"
+							class="btn btn-success">Add Rule</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+
+		<div class="tab-pane TabC Tabsr6" id="Static_routes_ipv6">
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">IPv6 Custom Routes</h3>
+				</div>
+				<p id="No-IPv6-Config"></p>
+				<div class="scrollable-x " id="section_staticroutes6_port"></div>
+
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Custom Route</h3>
+				</div>
+
+
+				<div class="panel-body">
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_staticroutes_routes_newRoutes_name_ipv6">Route
+							Name</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_name_ipv6" type="text" placeholder="Route1">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_staticroutes_routes_newRoutes_routetype_ipv6">Route
+							Type</label>
+						<div class="luci2-field-widget col-lg-4">
+							<select class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_routetype_ipv6">
+								<option value="unicast">Unicast</option>
+								<option value="blackhole">Blackhole</option>
+								<option value="prohibit">Prohibit</option>
+								<option value="unreachable">Unreachable</option>
+								<option value="throw">Throw</option>
+								<option value="broadcast">Broadcast</option>
+								<option value="multicast">Multicast</option>
+							</select>
+							<input type="text" style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_staticroutes_routes_newRoutes_target_ipv6">Target</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate luci2-field-ipv6"
+								id="field_staticroutes_routes_newRoutes_target_ipv6" type="text">
+							<div class="luci2-field-error label label-danger" style="display: none;"
+								id="validationResultIpv6"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_staticroutes_routes_newRoutes_ipv6prefix">IPv6
+							Prefix</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_ipv6prefix" type="text" placeholder="64">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_staticroutes_routes_newRoutes_ipv6gateway">IPv6
+							Gateway</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_ipv6gateway" type="text">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_staticroutes_routes_newRoutes_interface_ipv6">Interface</label>
+						<div class="luci2-field-widget col-lg-4">
+							<select class="form-control luci2-field-validate"
+								id="field_staticroutes_routes_newRoutes_interface_ipv6"
+								onchange="handleInterfaceSelectionIpv6()">
+								<!-- <option value="eth0">eth0</option> -->
+								<option value="SW_LAN">SW_LAN</option>
+								<option value="EWAN5">EWAN5</option>
+								<option value="ra0">ra0</option>
+								<option value="wlan0">wlan0</option>
+								<option value="CWAN1_0">CWAN1_0</option>
+								<option value="CWAN1">CWAN1</option>
+								<option value="custom">custom</option>
+							</select>
+							<input type="text" class="form-control luci2-field-validate custom-value-inputipv6"
+								id="field_staticroutes_routes_newRoutes_inter" style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label"
+							for="field_staticroutes_routes_newRoutes_ipv6_metric">Metric</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate small-input"
+								id="field_staticroutes_routes_newRoutes_ipv6_metric" type="text" placeholder=""
+								oninput="validatePositiveIntegerInputIpv6(this)">
+							<div class="luci2-field-error label label-danger" id="metricError" style="display: none;">
+								Positive integers
+							</div>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add IPv6 Routes" data-action="save" id="AddNewipv6_StaticRoutes"
+							class="btn btn-success">Add Rule</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="tab-pane TabC TabAsr" id="Advanced_Static_routes">
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">IPv4 Custom Tables & Rules</h3>
+				</div>
+				<p id="No-customtableRules-Config"></p>
+				<div class="scrollable-x " id="section_advancedstaticroutes_Asr"></div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Custom Table/Rule</h3>
+				</div>
+				<div class="panel-body">
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="section_advancedstaticroutes_Asr_name">Rule
+							Name</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate" id="section_advancedstaticroutes_Asr_name"
+								type="text" placeholder="Rule1">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="section_advancedstaticroutes_Asr_ruletype">Rule
+							Type</label>
+						<div class="luci2-field-widget col-lg-4">
+							<select class="form-control luci2-field-validate"
+								id="section_advancedstaticroutes_Asr_ruletype">
+								<option value="unicast">Unicast</option>
+								<option value="prohibit">Prohibit</option>
+								<option value="blackhole">Blackhole</option>
+								<option value="unreachable">Unreachable</option>
+							</select>
+							<input type="text" class="form-control luci2-field-validate custom-value-input1"
+								id="section_advancedstaticroutes_Asr_ruletype" style="display: none;">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="section_advancedstaticroutes_Asr_table">Table ID
+						</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate" id="section_advancedstaticroutes_Asr_table"
+								type="text" placeholder="100">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="section_advancedstaticroutes_Asr_to">Target(To)
+						</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate" id="section_advancedstaticroutes_Asr_to"
+								type="text" placeholder="0.0.0.0">
+							<div class="luci2-field-error label label-danger" style="display: none;"
+								id="validationResult2">
+							</div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="section_advancedstaticroutes_Asr_ipv4netmask">IPv4
+							Netmask
+						</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="section_advancedstaticroutes_Asr_ipv4netmask" type="text"
+								placeholder="255.255.255.255">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="section_advancedstaticroutes_Asr_from">From
+						</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate" id="section_advancedstaticroutes_Asr_from"
+								type="text" placeholder="0.0.0.0">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="section_advancedstaticroutes_Asr_priority">Priority
+						</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="section_advancedstaticroutes_Asr_priority" type="text" placeholder="0"
+								oninput="validatePriorityAdvanced(this)">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+								Positive integers
+							</div>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add Advance routing" data-action="save"
+							id="AddNewAdvancedstaticRule" class="btn btn-success">Add Rule</button>
+					</div>
+
+
+				</div>
+
+
+
+			</div>
+		</div>
+
+	</div>
+</div>
+<style>
+	#Update-Routing-Note {
+		margin: -64px 0px 0px 8px;
+	}
+</style>
+
+<script>
+
+	/* ---- IPv4 Section validate Functions ---- */
+	function isValidIPv4Simple(value) {
+		// basic 0-255 check for each octet
+		var parts = value.split('.');
+		if (parts.length !== 4) return false;
+		for (var i = 0; i < parts.length; i++) {
+			if (!/^\d+$/.test(parts[i])) return false;
+			var n = parseInt(parts[i], 10);
+			if (n < 0 || n > 255) return false;
+		}
+		return true;
+	}
+
+	function isValidNetmask(value) {
+
+		var maskPattern = /^(\b(255|254|252|248|240|224|192|128|0)\.){3}(255|254|252|248|240|224|192|128|0)$/;
+		return maskPattern.test(value);
+	}
+
+
+	function handleTableSelection() {
+		var dropdown = document.getElementById("field_staticroutes_routes_newRoutes_Table");
+		var customInput = document.querySelector(".custom-value-input3");
+		if (!dropdown || !customInput) return;
+
+		var selectedOption = dropdown.value;
+		if (selectedOption === "custom") {
+			dropdown.style.display = "none";
+			customInput.style.display = "block";
+			customInput.focus();
+		} else {
+			dropdown.style.display = "block";
+			customInput.style.display = "none";
+		}
+	}
+
+
+	function handleInterfaceSelection() {
+		var dropdown = document.getElementById("field_staticroutes_routes_newRoutes_interface");
+		var customInput = document.querySelector(".custom-value-input");
+		if (!dropdown || !customInput) return;
+
+		var selectedOption = dropdown.value;
+		if (selectedOption === "custom") {
+			dropdown.style.display = "none";
+			customInput.style.display = "block";
+			customInput.focus();
+		} else {
+			dropdown.style.display = "block";
+			customInput.style.display = "none";
+		}
+	}
+
+
+	function validatePositiveIntegerInput(el) {
+		if (!el) return;
+		el.value = el.value.replace(/[^0-9]/g, '');
+		var num = el.value === '' ? 0 : parseInt(el.value, 10);
+		var errorLabel = document.getElementById("metricError");
+		if (!errorLabel) return;
+		if (isNaN(num) || num <= 0) {
+			errorLabel.style.display = "block";
+		} else {
+			errorLabel.style.display = "none";
+		}
+		checkButtonState();
+	}
+
+
+	function validateTargetField() {
+		var inputField = document.getElementById('field_staticroutes_routes_newRoutes_target');
+		var validationResult = document.getElementById('validationResult');
+		if (!inputField || !validationResult) return;
+
+		var value = inputField.value.trim();
+		if (value === '' || isValidIPv4Simple(value)) {
+			validationResult.style.display = 'none';
+			validationResult.innerText = '';
+		} else {
+			validationResult.style.display = 'block';
+			validationResult.innerText = 'Invalid IPv4 address';
+		}
+		checkButtonState();
+	}
+
+
+	function validateNetmaskField() {
+		var inputField = document.getElementById('field_staticroutes_routes_newRoutes_ipv4netmask');
+		if (!inputField) return;
+		var parentErr = inputField.parentNode ? inputField.parentNode.querySelector('.luci2-field-error') : null;
+		if (!parentErr) return;
+
+		var value = inputField.value.trim();
+		if (value === '' || isValidNetmask(value)) {
+			parentErr.style.display = 'none';
+			parentErr.innerText = '';
+		} else {
+			parentErr.style.display = 'block';
+			parentErr.innerText = 'Invalid netmask';
+		}
+		checkButtonState();
+	}
+
+
+	function validateGatewayField() {
+		var inputField = document.getElementById('field_staticroutes_routes_newRoutes_ipv4gateway');
+		if (!inputField) return;
+		var parentErr = inputField.parentNode ? inputField.parentNode.querySelector('.luci2-field-error') : null;
+		if (!parentErr) return;
+
+		var value = inputField.value.trim();
+		if (value === '' || isValidIPv4Simple(value)) {
+			parentErr.style.display = 'none';
+			parentErr.innerText = '';
+		} else {
+			parentErr.style.display = 'block';
+			parentErr.innerText = 'Invalid IPv4 address';
+		}
+		checkButtonState();
+	}
+
+	/* ---- attach listeners safely ---- */
+	// Table select
+	var tableSelect = document.getElementById("field_staticroutes_routes_newRoutes_Table");
+	if (tableSelect) {
+		tableSelect.addEventListener('change', handleTableSelection);
+		handleTableSelection();
+	}
+
+	// Interface select
+	var ifaceSelect = document.getElementById("field_staticroutes_routes_newRoutes_interface");
+	if (ifaceSelect) {
+		ifaceSelect.addEventListener('change', handleInterfaceSelection);
+		handleInterfaceSelection();
+	}
+
+	// Metric input
+	var metricInput = document.getElementById("field_staticroutes_routes_newRoutes_metric");
+	if (metricInput) {
+		metricInput.addEventListener('input', function () { validatePositiveIntegerInput(metricInput); });
+		// validatePositiveIntegerInput(metricInput);
+	}
+
+	// Target IPv4
+	var targetInput = document.getElementById('field_staticroutes_routes_newRoutes_target');
+	if (targetInput) {
+		targetInput.addEventListener('input', validateTargetField);
+		validateTargetField();
+	}
+
+	// Netmask
+	var netmaskInput = document.getElementById('field_staticroutes_routes_newRoutes_ipv4netmask');
+	if (netmaskInput) {
+		netmaskInput.addEventListener('input', validateNetmaskField);
+		validateNetmaskField();
+	}
+
+	// Gateway
+	var gatewayInput = document.getElementById('field_staticroutes_routes_newRoutes_ipv4gateway');
+	if (gatewayInput) {
+		gatewayInput.addEventListener('input', validateGatewayField);
+		validateGatewayField();
+	}
+
+	/* ---- button disable logic ---- */
+	function checkButtonState() {
+		var btn = document.getElementById('AddNewStaticRoutes');
+		if (!btn) return;
+
+		var errors = document.querySelectorAll('.luci2-field-error');
+		var hasError = false;
+
+		errors.forEach(function (err) {
+			if (err.style.display === 'block' && err.innerText.trim() !== '') {
+				hasError = true;
+			}
+		});
+
+		var targetErr = document.getElementById('validationResult');
+		if (targetErr && targetErr.style.display === 'block' && targetErr.innerText.trim() !== '') {
+			hasError = true;
+		}
+
+		btn.disabled = hasError;
+	}
+
+	/* ---- END IPv4 Section validate Functions ---- */
+
+
+
+
+
+	/* ---- IPv6 Section validate Functions  ---- */
+
+	function isValidIPv6Simple(value) {
+		if (!value || typeof value !== 'string') return false;
+		value = value.trim();
+		var ipv6Pattern = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|(([0-9a-fA-F]{1,4}:){1,7}:)|(([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4})|(([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2})|(([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3})|(([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4})|(([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5})|([0-9a-fA-F]{1,4}:)((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:))(\/\d{1,3})?$/;
+		return ipv6Pattern.test(value);
+	}
+
+	function isValidIPv6PrefixLength(value) {
+		if (value === null || value === undefined) return false;
+		var n = parseInt(String(value).trim(), 10);
+		return !isNaN(n) && n >= 0 && n <= 128;
+	}
+
+
+	function handleInterfaceSelectionIpv6() {
+		var dropdown = document.getElementById("field_staticroutes_routes_newRoutes_interface_ipv6");
+		var customInput = document.querySelector(".custom-value-inputipv6");
+		if (!dropdown || !customInput) return;
+		if (dropdown.value === "custom") {
+			dropdown.style.display = "none";
+			customInput.style.display = "block";
+			customInput.focus();
+		} else {
+			dropdown.style.display = "block";
+			customInput.style.display = "none";
+		}
+	}
+
+
+	function validatePositiveIntegerInputIpv6(el) {
+		if (!el) return;
+		el.value = el.value.replace(/[^0-9]/g, '');
+		var num = el.value === '1' ? 0 : parseInt(el.value, 10);
+
+		var parentErr = el && el.parentNode ? el.parentNode.querySelector('.luci2-field-error') : null;
+		if (!parentErr) return;
+		if (isNaN(num) || num <= 0) {
+			parentErr.style.display = "block";
+			parentErr.innerText = 'Positive integers';
+		} else {
+			parentErr.style.display = "none";
+			parentErr.innerText = '';
+		}
+		checkButtonStateIpv6();
+	}
+
+
+	function validateIpv6TargetField() {
+		var inputField = document.getElementById('field_staticroutes_routes_newRoutes_target_ipv6');
+		var validationResult = document.getElementById('validationResultIpv6');
+		if (!inputField || !validationResult) return;
+		var value = inputField.value.trim();
+		if (value === '' || isValidIPv6Simple(value)) {
+			validationResult.style.display = 'none';
+			validationResult.innerText = '';
+		} else {
+			validationResult.style.display = 'block';
+			validationResult.innerText = 'Invalid IPv6 address';
+		}
+		checkButtonStateIpv6();
+	}
+
+
+	function validateIpv6PrefixField() {
+		var inputField = document.getElementById('field_staticroutes_routes_newRoutes_ipv6prefix');
+		if (!inputField) return;
+		var parentErr = inputField.parentNode ? inputField.parentNode.querySelector('.luci2-field-error') : null;
+		if (!parentErr) return;
+		var value = inputField.value.trim();
+		if (value === '' || isValidIPv6PrefixLength(value)) {
+			parentErr.style.display = 'none';
+			parentErr.innerText = '';
+		} else {
+			parentErr.style.display = 'block';
+			parentErr.innerText = 'Invalid IPv6 prefix';
+		}
+		checkButtonStateIpv6();
+	}
+
+
+	function validateIpv6GatewayField() {
+		var inputField = document.getElementById('field_staticroutes_routes_newRoutes_ipv6gateway');
+		if (!inputField) return;
+		var parentErr = inputField.parentNode ? inputField.parentNode.querySelector('.luci2-field-error') : null;
+		if (!parentErr) return;
+		var value = inputField.value.trim();
+		if (value === '' || isValidIPv6Simple(value)) {
+			parentErr.style.display = 'none';
+			parentErr.innerText = '';
+		} else {
+			parentErr.style.display = 'block';
+			parentErr.innerText = 'Invalid IPv6 address';
+		}
+		checkButtonStateIpv6();
+	}
+
+	/* ---- attach listeners ---- */
+	var ifaceSelectIpv6 = document.getElementById("field_staticroutes_routes_newRoutes_interface_ipv6");
+	if (ifaceSelectIpv6) {
+		ifaceSelectIpv6.addEventListener('change', handleInterfaceSelectionIpv6);
+		handleInterfaceSelectionIpv6();
+	}
+
+	var metricIpv6 = document.getElementById("field_staticroutes_routes_newRoutes_ipv6_metric");
+	if (metricIpv6) {
+		metricIpv6.addEventListener('input', function () { validatePositiveIntegerInputIpv6(metricIpv6); });
+		// validatePositiveIntegerInputIpv6(metricIpv6);
+	}
+
+	var targetIpv6 = document.getElementById('field_staticroutes_routes_newRoutes_target_ipv6');
+	if (targetIpv6) {
+		targetIpv6.addEventListener('input', validateIpv6TargetField);
+		validateIpv6TargetField();
+	}
+
+	var prefixIpv6 = document.getElementById('field_staticroutes_routes_newRoutes_ipv6prefix');
+	if (prefixIpv6) {
+		prefixIpv6.addEventListener('input', validateIpv6PrefixField);
+		validateIpv6PrefixField();
+	}
+
+	var gatewayIpv6 = document.getElementById('field_staticroutes_routes_newRoutes_ipv6gateway');
+	if (gatewayIpv6) {
+		gatewayIpv6.addEventListener('input', validateIpv6GatewayField);
+		validateIpv6GatewayField();
+	}
+
+	/* ---- button disable logic for ipv6 ---- */
+	function checkButtonStateIpv6() {
+		var btn = document.getElementById('AddNewipv6_StaticRoutes');
+		if (!btn) return;
+
+		var errors = document.querySelectorAll('.panel-body .luci2-field-error'); // checks in the panel(s)
+		var hasError = false;
+		errors.forEach(function (err) {
+			if (err.style.display === 'block' && err.innerText.trim() !== '') {
+				var container = err.closest ? err.closest('.panel-body') : null;
+				var ipv6Anchor = container && container.querySelector('#field_staticroutes_routes_newRoutes_target_ipv6');
+				if (ipv6Anchor) hasError = true;
+			}
+		});
+
+		var vr = document.getElementById('validationResultIpv6');
+		if (vr && vr.style.display === 'block' && vr.innerText.trim() !== '') hasError = true;
+
+		btn.disabled = hasError;
+	}
+
+
+	/* ---- END IPv6 Section validate Functions  ---- */
+
+
+
+
+	/* ---- Advanced custom table/rule Section validate Functions ---- */
+
+
+	function validateIPv4AddressAdvanced(val) {
+		if (typeof val !== 'string') return false;
+		var ipv4Pattern = /^(\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+		return ipv4Pattern.test(val.trim());
+	}
+
+
+	function handleToFieldAdvanced() {
+		var inputField = document.getElementById('section_advancedstaticroutes_Asr_to');
+		var validationResult2 = document.getElementById('validationResult2');
+		if (!inputField || !validationResult2) return;
+
+		var inputValue = inputField.value;
+		if (inputValue === '' || validateIPv4AddressAdvanced(inputValue)) {
+			validationResult2.style.display = 'none';
+			validationResult2.innerText = '';
+		} else {
+			validationResult2.style.display = 'block';
+			validationResult2.innerText = 'Invalid IPv4 address';
+		}
+		checkButtonStateAdvanced();
+	}
+
+
+	function validateNetmaskAdvanced() {
+		var inputField = document.getElementById('section_advancedstaticroutes_Asr_ipv4netmask');
+		if (!inputField) return;
+		var errorLabel = inputField.parentNode ? inputField.parentNode.querySelector('.luci2-field-error') : null;
+		if (!errorLabel) return;
+
+		var inputValue = inputField.value;
+		if (inputValue === '' || validateIPv4AddressAdvanced(inputValue)) {
+			errorLabel.style.display = 'none';
+			errorLabel.innerText = '';
+		} else {
+			errorLabel.style.display = 'block';
+			errorLabel.innerText = 'Invalid Netmask address';
+		}
+		checkButtonStateAdvanced();
+	}
+
+
+	function validateFromFieldAdvanced() {
+		var inputField = document.getElementById('section_advancedstaticroutes_Asr_from');
+		if (!inputField) return;
+		var errorLabel = inputField.parentNode ? inputField.parentNode.querySelector('.luci2-field-error') : null;
+		if (!errorLabel) return;
+
+		var inputValue = inputField.value;
+		if (inputValue === '' || validateIPv4AddressAdvanced(inputValue)) {
+			errorLabel.style.display = 'none';
+			errorLabel.innerText = '';
+		} else {
+			errorLabel.style.display = 'block';
+			errorLabel.innerText = 'Invalid IPv4 address';
+		}
+		checkButtonStateAdvanced();
+	}
+
+
+	function validatePriorityAdvanced(el) {
+		if (!el) return;
+		el.value = el.value.replace(/[^0-9]/g, '');
+		var errorLabel = el.parentElement ? el.parentElement.querySelector('.luci2-field-error') : null;
+		if (!errorLabel) return;
+
+		if (el.value === '' || parseInt(el.value, 10) <= 0) {
+			errorLabel.style.display = 'block';
+			errorLabel.innerText = 'Positive integers only';
+		} else {
+			errorLabel.style.display = 'none';
+			errorLabel.innerText = '';
+		}
+		checkButtonStateAdvanced();
+	}
+
+
+	function validatePositiveInteger(input) {
+		validatePriorityAdvanced(input);
+	}
+
+	/*  attach listeners */
+
+	var toField = document.getElementById('section_advancedstaticroutes_Asr_to');
+	if (toField) {
+		toField.addEventListener('input', handleToFieldAdvanced);
+		handleToFieldAdvanced();
+	}
+
+	var netmaskField = document.getElementById('section_advancedstaticroutes_Asr_ipv4netmask');
+	if (netmaskField) {
+		netmaskField.addEventListener('input', validateNetmaskAdvanced);
+		validateNetmaskAdvanced();
+	}
+
+	var fromField = document.getElementById('section_advancedstaticroutes_Asr_from');
+	if (fromField) {
+		fromField.addEventListener('input', validateFromFieldAdvanced);
+		validateFromFieldAdvanced();
+	}
+
+	var priorityField = document.getElementById('section_advancedstaticroutes_Asr_priority');
+	if (priorityField) {
+		priorityField.addEventListener('input', function () { validatePriorityAdvanced(priorityField); });
+		// validatePriorityAdvanced(priorityField);
+	}
+
+
+
+
+	/* ---- button disable logic ---- */
+	function checkButtonStateAdvanced() {
+
+		var btn = document.getElementById('AddNewAdvancedstaticRule');
+		if (!btn) return;
+
+		var errors = document.querySelectorAll('.panel-body .luci2-field-error'); // checks in the panel(s)
+		var hasError = false;
+		errors.forEach(function (err) {
+			if (err.style.display === 'block' && err.innerText.trim() !== '') {
+				var container = err.closest ? err.closest('.panel-body') : null;
+				var ipv6Anchor = container && container.querySelector('#section_advancedstaticroutes_Asr_to');
+				if (ipv6Anchor) hasError = true;
+			}
+		});
+
+		var vr = document.getElementById('validationResult2');
+		if (vr && vr.style.display === 'block' && vr.innerText.trim() !== '') hasError = true;
+
+		btn.disabled = hasError;
+
+	}
+
+	/* ---- END Advanced custom table/rule Section validate Functions ---- */
+
+
+
+
+
+
+</script>

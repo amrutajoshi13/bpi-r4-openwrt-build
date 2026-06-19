@@ -1,0 +1,54 @@
+#!/usr/bin/haserl
+
+<?
+/usr/bin/printf "Status: 200 OK\r\n"
+
+if [ "x$FORM_DownloadFile" = "x" ]
+then
+    TarFileName=config.txt
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+	
+	touch /tmp/config.txt
+
+	for i in $(/bin/ls /etc/config/)
+	do
+		flag=0
+		n=$(cat /root/include.txt | wc -l)
+		for j in $(seq $n)
+		do 
+			ExcludeFileName=$(cat /root/include.txt | head -$j | tail -1)
+			if [ "$i" = "$ExcludeFileName" ]
+			then
+				echo "file $i" >> /tmp/config.txt  
+			cat /etc/config/$i >> /tmp/config.txt
+		
+			fi
+		done
+		
+	done
+
+	/bin/dd if=/tmp/config.txt
+	/bin/rm -rf /tmp/config.txt
+
+    #/usr/bin/printf "Content-Type:application/octet-stream; name=\"config.txt\"\r\n";
+    #/usr/bin/printf "Content-Disposition: attachment; filename=\"config.txt\"\r\n\n";
+    #/bin/echo "no file"
+    exit 1
+fi
+
+SessionAccess=$(/bin/ubus call session access "{\"ubus_rpc_session\":\"$FORM_sessionid\",\"scope\":\"cgi-file\",\"object\":\"download\",\"function\":\"read\"}" 2>&1)
+Permission=$(/bin/echo "$SessionAccess" | /usr/bin/awk -F":" '/access/{print $2}')
+if ! /bin/echo "$Permission" | /bin/grep -qw "true"
+then
+    /usr/bin/printf "Content-Type:application/octet-stream; name=\"error.txt\"\r\n";
+    /usr/bin/printf "Content-Disposition: attachment; filename=\"error.txt\"\r\n\n";
+    /bin/echo "Download permission denied"
+    exit 1
+fi
+
+exit 0
+
+?> 
+

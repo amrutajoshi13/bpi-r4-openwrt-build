@@ -1,0 +1,17 @@
+{
+    "storageconfig": {
+        "description": "Storage Configuration",
+            "read": {
+                "uci": [
+                    "Storageconfig"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "Storageconfig"
+                ]
+            }
+    }
+}
+

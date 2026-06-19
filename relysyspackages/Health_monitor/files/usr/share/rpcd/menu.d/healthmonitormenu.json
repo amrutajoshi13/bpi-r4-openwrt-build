@@ -1,0 +1,13 @@
+{
+   "applications": {
+        "title": "Applications",
+        "index": 80
+    },
+
+    "applications/healthconfiguration": {
+        "title": "Health Monitoring",
+        "acls": [ "healthconfig" ],
+        "view": "applications/healthconfiguration",
+        "index": 7
+    }
+}

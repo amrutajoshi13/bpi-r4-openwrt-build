@@ -1,0 +1,7 @@
+#!/bin/sh
+
+
+Route_Value=$(route -n | sed -n '1!p')
+
+
+echo "$Route_Value"

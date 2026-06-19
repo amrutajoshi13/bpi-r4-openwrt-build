@@ -1,0 +1,16 @@
+{
+    "logout": {
+        "title": "Logout",
+        "index": 90
+    },
+        
+	"logout/logout": {
+        "title": "Logout",
+        "acls": [ "logoutacl" ],
+        "view": "logout/logout",
+        "index": 10	 
+    }
+        
+}
+
+

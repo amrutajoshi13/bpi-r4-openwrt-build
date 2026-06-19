@@ -1,0 +1,3 @@
+check process DataCollectorApp with matching "DataCollectorApp" every 1 cycles
+    start program = "/root/DataCollectorAppComponent/DataCollectorApp > /dev/null 2>&1 &"
+    stop program = "/usr/bin/killall DataCollectorApp > /dev/null 2>&1"

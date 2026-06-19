@@ -1,0 +1,31 @@
+<div id="map">
+
+</div>
+<div class="tab-content">
+	<div class="tab-pane active" id="actions">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title"><%:Import / Export Gateway%></h3>
+			</div>
+			<div class="panel-body">
+				
+				<p><%:Click "Export Config" to export current device configuration & settings to a text file%></p>
+				<p>
+					<form action="/cgi-bin/file1" method="post" style="display:inline">
+						<input type="hidden" name="sessionid" />
+						<input class="btn btn-primary" type="button" id="btn_backup" value="<%:Export Config%>" />
+					</form>
+				</p>
+
+				<p><%:Click "Import Config" to import device configuration & settings from a previously exported text file.%></p>
+				<p>
+					<input class="btn btn-primary" type="button" id="btn_restore" value="<%:Import Config%>" />
+				</p>
+				
+				<p><%:Click "Reset Config" to reset device configuration.%></p>
+				<p>
+					<input class="btn btn-primary" type="button" id="btn_reset" value="<%:Reset Config%>" />
+				</p>
+				
+			</div>
+		</div>

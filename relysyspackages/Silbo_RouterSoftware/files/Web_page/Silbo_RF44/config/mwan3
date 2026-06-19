@@ -1,0 +1,39 @@
+
+config globals 'globals'
+	option mmx_mask '0x3F00'
+	option rtmon_interval '5'
+
+config rule 'default_rule_v6'
+	option dest_ip '::/0'
+	option use_policy 'balanced'
+	option family 'ipv6'
+
+config member 'ewan2_m10_w1'
+	option interface 'EWAN2'
+	option metric '1'
+	option weight '1'
+
+config policy 'balanced'
+	list use_member 'cwan1_m10_w1'
+
+config interface 'CWAN1'
+	option enabled '1'
+	list track_ip '8.8.8.8'
+	list track_ip '8.8.4.4'
+	option family 'ipv4'
+	option reliability '2'
+	option count '3'
+	option timeout '1'
+	option interval '5'
+	option down '3'
+	option up '3'
+
+config member 'cwan1_m10_w1'
+	option interface 'CWAN1'
+	option metric '1'
+	option weight '1'
+
+config policy 'cwan1_only'
+	list use_member 'cwan1_m10_w1'
+	option last_resort 'default'
+

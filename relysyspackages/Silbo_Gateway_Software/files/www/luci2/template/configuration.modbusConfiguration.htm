@@ -1,0 +1,1216 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Modbus Configuration</h1>
+</div>
+<div class="pagecontent">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Modbus Config</h3>
+        </div>
+        <div id="deviceContentWrapper" style="margin-top: 20px; padding: 22px;">
+
+            <div class="toggleInputBox">
+
+                <div style="width: 35%;">
+                    <label for="deviceInput" style="display: inline-block; width: 52%;">
+                        Overall Periodicity Of Modbus Input Readings (In Seconds >= 15)
+                    </label>
+                    <input type="number" class="form-control" id="deviceInput">
+                </div>
+
+                <div style="width: 20%;">
+                    <label for="deviceDelay" style="display: block; margin-top: 35px;">
+                        Delay (in ms)
+                    </label>
+                    <input type="number" class="form-control" id="deviceDelay">
+                </div>
+
+            </div>
+
+
+
+            <ul class="nav nav-tabs" id="pills-tab" role="tablist" style="margin-top: 20px;">
+                <li class="nav-item active">
+                    <a class="nav-link active" id="pills-modevice-tab" data-toggle="pill" href="#pills-modevice"
+                        role="tab" aria-controls="pills-modevice" aria-selected="true">Modbus Configuration</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="pills-sendconfig-tab" data-toggle="pill" href="#pills-sendconfig" role="tab"
+                        aria-controls="pills-sendconfig" aria-selected="false">Send Configuration</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane active" id="pills-modevice" role="tabpanel" aria-labelledby="pills-modevice-tab">
+
+                    <div class="container" style="margin-top: 20px;">
+
+                        <!-- <h3>Modbus Device Configuration</h3> -->
+
+
+                        <div class="row">
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-primary" id="AddNewModbus" data-toggle="modal"
+                                data-target="#Modbus-Model" style="float:right;margin: 0px 28px 0 0;">
+                                Add Device
+                            </button>
+                        </div>
+
+                        <div class="table-container" style="display:none; margin-top: 20px;">
+                            <table id="DeviceConfigTable" class="table table-striped">
+                                <thead></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="Modbus-Model" tabindex="-1" role="dialog"
+                        aria-labelledby="Modbus-ModelLabel" data-backdrop="static" data-keyboard="false">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="Modbus-ModelLabel" name="add_modbus">Add Modbus
+                                        Configuration
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span class="cross">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                        <li class="nav-item active">
+                                            <a class="nav-link active" id="parameterconfig-tab" data-toggle="tab"
+                                                href="#parameterconfig" role="tab" aria-controls="parameterconfig"
+                                                aria-selected="true">Parameter Configuration</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="block_config-tab" data-toggle="tab"
+                                                href="#block_config" role="tab" aria-controls="block_config"
+                                                aria-selected="false">Block
+                                                Configuration</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="register_config-tab" data-toggle="tab"
+                                                href="#register_config" role="tab" aria-controls="register_config"
+                                                aria-selected="false">Register
+                                                Configuration</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" id="cloud_config-tab" data-toggle="tab"
+                                                href="#cloud_config" role="tab" aria-controls="cloud_config"
+                                                aria-selected="false" style="display: none;">Cloud
+                                                Configuration</a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content" id="myTabContent">
+                                        <div class="tab-pane active" id="parameterconfig" role="tabpanel"
+                                            aria-labelledby="parameterconfig-tab">
+
+                                            <form>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label id="requiredfield">DEVICE NAME</label>
+                                                            <input type="text" name="Device Name"
+                                                                class="form-control inputbox" id="devicename"
+                                                                oninput="validateDeviceName()" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div id="modbusserialconfig">
+                                                    <div class="row">
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label id="requiredfield">Modbus Protocol</label>
+                                                                <select name="Protocol" id="protocol"
+                                                                    class="form-control" onchange="toggleParity()"
+                                                                    required>
+                                                                    <option value="RTU">RTU</option>
+                                                                    <option value="TCP">TCP</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label id="requiredfield">Meter ID</label>
+                                                                <input type="number" class="form-control inputbox"
+                                                                    name="Meter ID" id="equipmentid" placeholder="1"
+                                                                    required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label id="requiredfield">Meter Model</label>
+                                                                <input type="text" class="form-control inputbox"
+                                                                    id="metermodel" name="Meter Model" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label id="requiredfield">Slave Address</Address>
+                                                                </label>
+                                                                <input type="number" class="form-control inputbox"
+                                                                    id="serialslaveid" placeholder="1-255"
+                                                                    name="Slave Address" required>
+                                                            </div>
+                                                            <div id="updateMessage"
+                                                                style="display: none; color: red; font-weight: bold;">
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="row" id="ModbusRTU_Paramters">
+                                                        <div class="col-md-3">
+                                                            <div class="form-group" id="parityGroup1">
+                                                                <label id="requiredfield">Baud rate</label>
+                                                                <select name="Baudrate" id="serialbaudrate"
+                                                                    class="form-control" required>
+                                                                    <option value="9600">9600</option>
+                                                                    <option value="115200">115200</option>
+                                                                    <option value="110">110</option>
+                                                                    <option value="300">300</option>
+                                                                    <option value="600">600</option>
+                                                                    <option value="1200">1200</option>
+                                                                    <option value="1800">1800</option>
+                                                                    <option value="2400">2400</option>
+                                                                    <option value="4800">4800</option>
+                                                                    <option value="14400">14400</option>
+                                                                    <option value="19200">19200</option>
+                                                                    <option value="38400">38400</option>
+                                                                    <option value="57600">57600</option>
+                                                                    <option value="128000">128000</option>
+                                                                    <option value="256000">256000</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group" id="parityGroup2">
+                                                                <label id="requiredfield">Parity</label>
+                                                                <select name="parity" id="serialparity"
+                                                                    class="form-control" required>
+                                                                    <option value="0">0-NONE</option>
+                                                                    <option value="1">1-ODD</option>
+                                                                    <option value="2">2-EVEN</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group" id="parityGroup3">
+                                                                <label id="requiredfield">No.of Databits</label>
+                                                                <select name="databits" id="serialdatabits"
+                                                                    class="form-control" required>
+                                                                    <option value="7">7</option>
+                                                                    <option value="8">8</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group" id="parityGroup4">
+                                                                <label id="requiredfield">No.of Stopbits</label>
+                                                                <select name="cars" id="serialstopbit"
+                                                                    class="form-control" required>
+                                                                    <option value="1">1</option>
+                                                                    <option value="2">2</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row" id="ModbusRTU_Common_Parameters">
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label id="requiredfield">Port number</label>
+                                                                <select name="port" id="serialport1" name="Port Number"
+                                                                    class="form-control inputbox" required>
+                                                                    <option value="1">RS485 Port-1</option>
+                                                                    <!--<option value="2">RS485 Port-2</option>-->
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label id="requiredfieldTranslation">Standard Modbus
+                                                                    Address
+                                                                    Translation</label>
+                                                                <select name="translation" id="stdModbusEnable"
+                                                                    class="form-control"
+                                                                    onchange="handleFunctionBlockConfig()" required>
+                                                                    <option value="1">Yes</option>
+                                                                    <option value="0">No</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row" id="TCP_Paramters" style="display: none;">
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label id="requiredfield">Modbus Comm
+                                                                    IP:</label>
+                                                                <input type="text" name="Modbus Comm IP" id="CommIp"
+                                                                    class="form-control inputbox" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group"> <label id="requiredfield">Modbus
+                                                                    Comm
+                                                                    Port:</label>
+                                                                <input type="number" name="Modbus Comm Port"
+                                                                    id="CommPort" class="form-control inputbox"
+                                                                    required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group"> <label id="requiredfield">Modbus
+                                                                    Comm
+                                                                    Timeout:</label>
+                                                                <input type="number" name="Modbus Comm Timeout"
+                                                                    id="commT" class="form-control inputbox" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-group">
+                                                                <label id="requiredfieldTranslation">Standard Modbus
+                                                                    Address
+                                                                    Translation</label>
+                                                                <select name="translation" id="stdModbusEnable1"
+                                                                    class="form-control"
+                                                                    onchange="handleFunctionBlockConfig()" required>
+                                                                    <option value="1">Yes</option>
+                                                                    <option value="0">No</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane " id="block_config" role="tabpanel"
+                                            aria-labelledby="block_config-tab">
+                                            <p>Please Click on <b>Add Block</b> button to add New Block Config</p>
+                                            <button type="button" class="btn btn-primary" data-toggle="tooltip"
+                                                data-placement="top" title="Add Block Config" id="AddBlock-btn">Add
+                                                Block</button>
+                                            <div id="Blockregistersection"></div>
+                                        </div>
+                                        <div class="tab-pane" id="register_config" role="tabpanel"
+                                            aria-labelledby="register_config-tab">
+                                            <p>Please Click on <b>Add Register</b> button to add New Register Config</p>
+                                            <div
+                                                style="margin-top:10px; padding: 8px 12px; background-color: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px; font-size: 13px; color: #856404;">
+                                                <strong>Note:</strong> Adding more than 100 registers may take
+                                                additional time to save.
+                                            </div>
+                                            <div
+                                                style="display: flex; justify-content: space-between;align-items: center; margin-top: 10px;">
+
+                                                <!-- LEFT -->
+                                                <button type="button" class="btn btn-primary" id="AddRegister-btn">
+                                                    Add Register
+                                                </button>
+
+                                                <!-- RIGHT -->
+                                                <div>
+                                                    <button class="btn btn-primary"
+                                                        style="position: relative; overflow: hidden;">
+                                                        Upload Excel
+                                                        <input type="file" id="modbusExcelUpload" accept=".xlsx, .xls"
+                                                            style="position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;" />
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-secondary"
+                                                        id="downloadSampleExcel" style="margin-left: 8px;">
+                                                        Download Sample Excel
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-success"
+                                                        id="downloadCurrentExcel" style="margin-left: 8px;">
+                                                        Download Current Excel
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                            <div id="Registersection"></div>
+                                            <div class="row">
+                                                <div class="col-md-9" style="width: 75%;">
+                                                    <div class="form-group">
+                                                        <!-- <textarea class="form-control" disabled
+                                                style="margin-top: 15px; resize: none;" cols="12" rows="4"
+                                                id="jsoninfo"></textarea> -->
+                                                        <textarea class="form-control" disabled
+                                                            style="margin-top: 15px; resize: none; display: none;"
+                                                            cols="12" rows="4" id="jsoninfo"></textarea>
+
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3" style="width: 25%; text-align: center;">
+                                                    <div class="form-group">
+                                                        <button type="button" class="btn btn-primary"
+                                                            data-toggle="tooltip" data-placement="top" title="Show JSON"
+                                                            id="addJButton" onclick="showJson()"
+                                                            style="margin-top: 50px;">
+                                                            Show JSON
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="cloud_config" role="tabpanel"
+                                            aria-labelledby="cloud_config-tab">
+                                            <form>
+                                                <div id="slaveCloudConfigFields">
+                                                    <div class="container mt-4" style="margin-top: 42px;">
+                                                        <div class="form-group row">
+                                                            <label class="col-sm-2 col-form-label cloudText">Data
+                                                                Sending
+                                                                Method:</label>
+                                                            <div class="col-sm-4">
+                                                                <select class="form-control" id="dataSendingMethod">
+                                                                    <option value="1">Primary Server</option>
+                                                                    <option value="2">Secondary Server</option>
+                                                                    <option value="3">Both</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div id="hideoptions">
+                                                            <div class="form-group row" id="topicNameField">
+                                                                <label class="col-sm-2 col-form-label cloudText"
+                                                                    id="requiredfield">Topic
+                                                                    Name:</label>
+                                                                <div class="col-sm-4">
+                                                                    <input type="text" class="form-control"
+                                                                        id="topicname" name="Topic Name:">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row" id="topicNameTwoField">
+                                                                <label class="col-sm-2 col-form-label cloudText"
+                                                                    id="requiredfield">Topic Name
+                                                                    2:</label>
+                                                                <div class="col-sm-4">
+                                                                    <input type="text" class="form-control"
+                                                                        id="topicnametwo" name="Topic Name 2:">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="thirdpart">
+                                                        <div class="form-group row align-items-center">
+                                                            <div class="col-sm-2">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input"
+                                                                        id="enableJsonHeaderKey">
+                                                                    <label class="custom-control-label cloudText"
+                                                                        for="enableJsonHeaderKey">Enable JSON Header
+                                                                        Key</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-right: 0;">
+                                                                <label class="col-form-label cloudText"
+                                                                    style="margin-bottom: 0;">JSON
+                                                                    Key Name:</label>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-left: 0;">
+                                                                <input type="text" class="form-control"
+                                                                    id="jsonHeaderKeyName"
+                                                                    style="margin-top: -2px; margin-bottom: -2px;">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group row align-items-center">
+                                                            <div class="col-sm-2">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input"
+                                                                        id="enableCustomField1">
+                                                                    <label class="custom-control-label cloudText"
+                                                                        for="enableCustomField1">Enable Custom
+                                                                        Field-1</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-right: 0;">
+                                                                <label class="col-form-label cloudText"
+                                                                    style="margin-bottom: 0;">JSON
+                                                                    Key Name:</label>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-left: 0;">
+                                                                <input type="text" class="form-control"
+                                                                    id="jsonKeyName1"
+                                                                    style="margin-top: -2px; margin-bottom: -2px;">
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-right: 0;">
+                                                                <label class="col-form-label cloudText"
+                                                                    style="margin-bottom: 0;">JSON
+                                                                    Key Value:</label>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-left: 0;">
+                                                                <input type="text" class="form-control"
+                                                                    id="jsonKeyValue1"
+                                                                    style="margin-top: -2px; margin-bottom: -2px;">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group row align-items-center">
+                                                            <div class="col-sm-2">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input"
+                                                                        id="enableCustomField2">
+                                                                    <label class="custom-control-label cloudText"
+                                                                        for="enableCustomField2">Enable Custom
+                                                                        Field-2</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-right: 0;">
+                                                                <label class="col-form-label cloudText"
+                                                                    style="margin-bottom: 0;">JSON
+                                                                    Key Name:</label>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-left: 0;">
+                                                                <input type="text" class="form-control"
+                                                                    id="jsonKeyName2"
+                                                                    style="margin-top: -2px; margin-bottom: -2px;">
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-right: 0;">
+                                                                <label class="col-form-label cloudText"
+                                                                    style="margin-bottom: 0;">JSON
+                                                                    Key Value:</label>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-left: 0;">
+                                                                <input type="text" class="form-control"
+                                                                    id="jsonKeyValue2"
+                                                                    style="margin-top: -2px; margin-bottom: -2px;">
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group row align-items-center">
+                                                            <div class="col-sm-2">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input type="checkbox" class="custom-control-input"
+                                                                        id="enableCustomField3">
+                                                                    <label class="custom-control-label cloudText"
+                                                                        for="enableCustomField3">Enable Custom
+                                                                        Field-3</label>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-right: 0;">
+                                                                <label class="col-form-label cloudText"
+                                                                    style="margin-bottom: 0;">JSON
+                                                                    Key Name:</label>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-left: 0;">
+                                                                <input type="text" class="form-control"
+                                                                    id="jsonKeyName3"
+                                                                    style="margin-top: -2px; margin-bottom: -2px;">
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-right: 0;">
+                                                                <label class="col-form-label cloudText"
+                                                                    style="margin-bottom: 0;">JSON
+                                                                    Key Value:</label>
+                                                            </div>
+
+                                                            <div class="col-sm-2" style="padding-left: 0;">
+                                                                <input type="text" class="form-control"
+                                                                    id="jsonKeyValue3"
+                                                                    style="margin-top: -2px; margin-bottom: -2px;">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                                        id="closebutton1">Close</button>
+                                    <button type="button" class="btn btn-primary" name="submit"
+                                        id="Modbus_Submit">Submit</button>
+                                </div>
+                                <div id="loadingOverlay">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Register-wise Alarm Config Modal -->
+                <div class="modal fade" id="RegisterAlarmModal" tabindex="-1" role="dialog"
+                    aria-labelledby="RegisterAlarmModalLabel" aria-hidden="true" data-backdrop="static"
+                    data-keyboard="false">
+                    <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 480px;">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="RegisterAlarmModalLabel">Add Alarm</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+                                <form id="registerAlarmForm">
+
+                                    <!-- Alarm Name -->
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Alarm Name</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="alarmNameModal">
+                                        </div>
+                                    </div>
+
+                                    <!-- Register Name (read-only) -->
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Register Name</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="alarmRegisterNameModal"
+                                                disabled>
+                                        </div>
+                                    </div>
+
+                                    <!-- Category -->
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Category</label>
+                                        <div class="col-sm-8">
+                                            <select id="alarmCategoryModal" class="form-control" -
+                                                onchange="handleAlarmCategoryChange()">
+                                                <option value="1">Alarm</option>
+                                                <option value="2">Event</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status -->
+                                    <div class="form-group row">
+                                        <label class="col-sm-4 col-form-label">Status</label>
+                                        <div class="col-sm-8">
+                                            <select id="alarmStatusModal" class="form-control">
+                                                <option value="0">Disabled</option>
+                                                <option value="1">Enabled</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Upper Threshold -->
+                                    <div class="form-group row" id="rowAlarmUpperThreshold">
+                                        <label class="col-sm-4 col-form-label">Upper Threshold</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" class="form-control" id="alarmUpperThresholdModal">
+                                        </div>
+                                    </div>
+
+                                    <!-- Lower Threshold -->
+                                    <div class="form-group row" id="rowAlarmLowerThreshold">
+                                        <label class="col-sm-4 col-form-label">Lower Threshold</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" class="form-control" id="alarmLowerThresholdModal">
+                                        </div>
+                                    </div>
+
+                                    <!-- Upper Hysteresis -->
+                                    <div class="form-group row" id="rowAlarmUpperHys">
+                                        <label class="col-sm-4 col-form-label">Upper Hysteresis</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" class="form-control" id="alarmUpperHysModal">
+                                        </div>
+                                    </div>
+
+                                    <!-- Lower Hysteresis -->
+                                    <div class="form-group row" id="rowAlarmLowerHys">
+                                        <label class="col-sm-4 col-form-label">Lower Hysteresis</label>
+                                        <div class="col-sm-8">
+                                            <input type="number" class="form-control" id="alarmLowerHysModal">
+                                        </div>
+                                    </div>
+
+
+                                </form>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="saveRegisterAlarmBtn">Save
+                                    Alarm</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="pills-sendconfig" role="tabpanel" aria-labelledby="pills-sendconfig-tab">
+                    <div id="sendConfigDiv">
+                        <div class="container" style="margin-top: 20px;">
+
+                            <h5>Data Sender Configuration</h5>
+
+                            <div
+                                style="display: flex; justify-content: flex-end; margin-bottom: 15px; margin-right: 14px;">
+                                <button class="btn btn-success" id="deviceUpdateAllSendConfigsBtn">
+                                    Update Device
+                                </button>
+                            </div>
+
+                            <!-- Table section (initially hidden) -->
+                            <div class="table-container" id="deviceSendConfigTableContainer" style="display: none;">
+                                <table id="deviceSendConfigTable" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Field Number</th>
+                                            <th>Field Content</th>
+                                            <th>JSON Key Name</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+
+                            <!-- Add Form -->
+                            <div class="row mt-4 align-items-end" style="
+        border: 1px solid #eeeeee;
+        padding: 15px;
+        border-radius: 13px;
+        box-shadow: 0px 1px 8px 4px rgba(0, 0, 0, 0.05);
+        margin: 0 14px 20px 14px; ">
+                                <div class="form-group col-md-4">
+                                    <label for="deviceFieldContentDropdown">Field Content</label>
+                                    <select class="form-control" id="deviceFieldContentDropdown">
+                                        <option value="">Loading...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="deviceFieldJsonKey">Field JSON Key Name</label>
+                                    <input type="text" class="form-control" id="deviceFieldJsonKey"
+                                        placeholder="Enter JSON Key Name">
+                                </div>
+                                <div class="form-group col-md-4" style="margin-top: 30px;">
+                                    <label>&nbsp;</label>
+                                    <button type="button" class="btn btn-primary" id="addSendConfigRow">Add</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Edit Modal -->
+                        <div class="modal fade" id="deviceEditSendConfigModal" tabindex="-1"
+                            aria-labelledby="deviceEditSendConfigLabel" aria-hidden="true" data-backdrop="static"
+                            data-keyboard="false">
+                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                <div class="modal-content">
+                                    <h5 class="modal-title" id="deviceEditSendConfigLabel" style="margin: 20px;">Update
+                                        Device
+                                    </h5>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="deviceEditFieldContent">Field Content</label>
+                                            <select class="form-control form-control-sm" id="deviceEditFieldContent">
+                                                <option value="">Select</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="deviceEditFieldJsonKey">JSON Key Name</label>
+                                            <input type="text" class="form-control form-control-sm"
+                                                id="deviceEditFieldJsonKey" placeholder="Enter key">
+                                        </div>
+                                        <div class="form-group" id="deviceJsonKeyValueGroup" style="display: none;">
+                                            <label for="deviceEditJsonKeyValue">JSON Key Value</label>
+                                            <input type="text" class="form-control form-control-sm"
+                                                id="deviceEditJsonKeyValue" placeholder="Enter value">
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer d-flex justify-content-between">
+                                        <button type="button" class="btn btn-secondary btn-sm"
+                                            data-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary btn-sm"
+                                            id="saveSendConfigChanges">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Loading + Toast, separate from SNMP ones -->
+            <div id="deviceSendConfigLoadingOverlay">
+                <div class="spinner"></div>
+            </div>
+
+            <div id="deviceSendConfigToast" class="toast-container">
+                <span id="deviceSendToastText"></span>
+            </div>
+            <div id="deviceToast" class="toast-container">
+                <span id="deviceToastText"></span>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div id="deviceDisabledOverlay" style="display:none;">
+    <div class="device-overlay-content">
+        <h2>Device Configuration is Disabled</h2>
+        <p>
+            Please go to <b>Device Application</b> page and start the
+            <b>Device Configuration</b> application.
+        </p>
+    </div>
+</div>
+
+<style>
+    .toggleInputBox {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    #deviceEditSendConfigModal .modal-dialog {
+        max-width: 620px;
+        /* custom width */
+    }
+
+    input#deviceInput {
+        width: 34%;
+    }
+
+    input#deviceDelay {
+        width: 54%;
+    }
+
+    h3 {
+        color: #343a40;
+        /* margin-bottom: 20px; */
+        margin-top: 10px;
+        font-size: 30px;
+    }
+
+
+    span.cross {
+        color: rgb(124, 124, 124);
+    }
+
+    .modal-dialog {
+        width: 1280px;
+    }
+
+    #deviceDisabledOverlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .device-overlay-content {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 14px;
+        max-width: 520px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .device-overlay-content h2 {
+        color: #dc3545;
+        margin-bottom: 10px;
+    }
+
+    .btn-info {
+        background-color: #002D62 !important;
+        border-color: none !important;
+        border: none !important;
+    }
+
+    #Alarm_Event_section .col-sm-1>label {
+        font: normal normal normal 12px / 16px "Poppins";
+    }
+
+    .cbi-section {
+        width: 95%;
+        margin-bottom: 10px;
+    }
+
+    .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-warning {
+        background-color: #228bcc;
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    #requiredfield::after {
+        content: " *";
+        color: red;
+    }
+
+    button.close {
+        background: none !important;
+        color: #000000 !important;
+        opacity: 1.5 !important;
+    }
+
+    .toast-container {
+        position: fixed;
+        top: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white !important;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-size: 18px;
+        font-weight: bold;
+        text-align: center;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 10000;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+
+    .toast-container.toast-show {
+        display: block !important;
+        opacity: 1 !important;
+    }
+
+    .toast-container.toast-hide {
+        opacity: 0 !important;
+        transform: translateX(-50%) translateY(-20px) !important;
+    }
+
+    /* Table Styles */
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+        /* Allow scrolling on small screens */
+        padding: 10px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    thead {
+        background-color: #228BCC;
+        color: white;
+    }
+
+    th,
+    td {
+        text-align: center;
+        padding: 12px 15px;
+    }
+
+    tbody tr:nth-child(odd) {
+        background-color: #f2f2f2;
+    }
+
+    th {
+        text-transform: uppercase;
+        font-size: 14px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        /* Soft shadow */
+        border-radius: 10px;
+        overflow: hidden;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /*  Table Header */
+    thead {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        /* Gradient effect */
+        color: white;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /*  Header and Cell Styling */
+    th,
+    td {
+        border: 1px solid #ddd;
+        /* Light gray borders */
+        padding: 12px 15px;
+        text-align: center;
+    }
+
+    /*  Striped Row Effect */
+    tbody tr:nth-child(odd) {
+        background-color: #f8f9fa;
+        /* Light gray */
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #ffffff;
+        /* White */
+    }
+
+    #Registersection .row {
+        flex-wrap: nowrap;
+    }
+
+    /*  Hover Effect */
+    tbody tr:hover {
+        background-color: #e3f2fd;
+        /* removed transform: scale(1.01) */
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    /*  Table Borders */
+    table th,
+    table td {
+        border: 1px solid #ccc;
+    }
+
+    /*  Responsive Table */
+    @media (max-width: 768px) {
+        table {
+            font-size: 14px;
+        }
+
+        th,
+        td {
+            padding: 8px;
+        }
+    }
+
+    #deviceToast,
+    #deviceToastText {
+        color: #ffffff !important;
+    }
+
+    #loadingOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        display: none;
+        /* hidden by default */
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        /* higher than Bootstrap modal/backdrop */
+    }
+
+    #loadingOverlay .spinner {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #007bff;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Top Device tabs (Modbus  / Send Config) */
+    .device-nav {
+        margin-top: 20px;
+        padding: 6px;
+        border-radius: 999px;
+        display: inline-flex;
+        background: #f8f9fb;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .device-nav .nav-item {
+        margin: 0 4px;
+    }
+
+    .device-nav .nav-link {
+        border-radius: 999px;
+        padding: 8px 20px;
+        color: #555;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+    /* .device-nav .nav-link:hover {
+        background-color: #f5faff;
+        color: #007bff;
+    } */
+
+    .device-nav .nav-link.active {
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: #fff !important;
+        box-shadow: 0 3px 10px rgba(0, 123, 255, 0.35);
+    }
+
+    /* Toggle container (matching SNMP style but for Device) */
+    #deviceToggleStyle {
+        margin-top: 20px;
+        padding: 16px;
+        border-radius: 20px;
+        background-color: #f8f9fb;
+        display: inline-block;
+        width: 14%;
+        height: 84px;
+        box-shadow: 1px 3px 7px 5px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Reuse the same .switch / .slider.round styles as SNMP */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 28px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider.round {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 28px;
+    }
+
+    .slider.round:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.slider.round {
+        background-color: #007bff;
+    }
+
+    input:checked+.slider.round:before {
+        transform: translateX(22px);
+    }
+
+    /* make sendConfigLoadingOverlay act as full-screen overlay */
+    #deviceSendConfigLoadingOverlay {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.45);
+        top: 0;
+        left: 0;
+        z-index: 11000;
+        display: none;
+        /* hidden by default */
+        justify-content: center;
+        align-items: center;
+    }
+
+    #deviceSendConfigLoadingOverlay .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #fff;
+        border-radius: 50%;
+        width: 48px;
+        height: 48px;
+        animation: spin 1s linear infinite;
+    }
+
+    #sendConfigDiv {
+        margin-top: 20px;
+        border-radius: 30px;
+    }
+
+    #deviceSendToastText {
+        color: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+    }
+
+    #Registersection {
+        max-height: 500px;
+        overflow-y: auto;
+        contain: content;
+    }
+</style>
+<script src="path/to/jquery.min.js"></script>
+<script src="path/to/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="popover"]').popover({
+            placement: 'bottom',
+            // offset: '0 50px' 
+        });
+    });
+
+
+    document.getElementById("serialslaveid").onkeyup = function () {
+        var input = parseInt(this.value);
+        if (isNaN(input)) {
+            $("#serialslaveid").val("");
+        }
+        else {
+            if (input < 1 || input > 255) {
+                $("#serialslaveid").val("");
+                return;
+            }
+        }
+    }
+    document.getElementById("CommPort").onkeyup = function () {
+        var input = parseInt(this.value);
+        if (isNaN(input)) {
+            $("#CommPort").val("");
+        }
+        else {
+            if (input < 1 || input > 6555) {
+                $("#CommPort").val("");
+                return;
+            }
+        }
+    }
+</script>

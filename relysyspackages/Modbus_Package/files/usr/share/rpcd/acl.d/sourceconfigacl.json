@@ -1,0 +1,16 @@
+{
+    "sourceconfig": {
+        "description": "Source Configuration",
+            "read": {
+                "uci": [
+                    "sourceconfig"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "sourceconfig"
+                ]
+            }
+    }
+}

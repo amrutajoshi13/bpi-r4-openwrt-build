@@ -1,0 +1,47 @@
+#!/usr/bin/haserl
+
+<?
+/usr/bin/printf "Status: 200 OK\r\n"
+
+if [ "x$FORM_DownloadFile" = "x" ]
+then
+    TarFileName=TCP-slave-Reg-Mapping.pdf
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+	
+	touch /tmp/TCP-slave-Reg-Mapping.pdf
+
+	
+		flag=0
+		if [ $flag -eq 0 ]
+		then 
+			cat /root/TCP-SLAVE-REGMAP-LATEST.pdf >> /tmp/TCP-SLAVE-REGMAP-LATEST.pdf
+		fi 
+		
+	
+
+	/bin/dd if=/tmp/TCP-slave-Reg-Mapping.pdf
+	/bin/rm -rf /tmp/TCP-slave-Reg-Mapping.pdf
+
+    #/usr/bin/printf "Content-Type:application/octet-stream; name=\"TCP-slave-Reg-Mapping.pdf\"\r\n";
+    #/usr/bin/printf "Content-Disposition: attachment; filename=\"TCP-slave-Reg-Mapping.pdf\"\r\n\n";
+    #/bin/echo "no file"
+    exit 1
+fi
+
+SessionAccess=$(/bin/ubus call session access "{\"ubus_rpc_session\":\"$FORM_sessionid\",\"scope\":\"cgi-file\",\"object\":\"download\",\"function\":\"read\"}" 2>&1)
+Permission=$(/bin/echo "$SessionAccess" | /usr/bin/awk -F":" '/access/{print $2}')
+if ! /bin/echo "$Permission" | /bin/grep -qw "true"
+then
+    /usr/bin/printf "Content-Type:application/octet-stream; name=\"error.pdf\"\r\n";
+    /usr/bin/printf "Content-Disposition: attachment; filename=\"error.pdf\"\r\n\n";
+    /bin/echo "Download permission denied"
+    exit 1
+fi
+       
+
+exit 0
+
+?> 
+

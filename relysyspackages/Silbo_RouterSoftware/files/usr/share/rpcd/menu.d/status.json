@@ -1,0 +1,41 @@
+{
+    "status": {
+        "title": "Status",
+        "index": 10
+    },
+
+    "status/dashboard": {
+        "title": "Dashboard",
+        "acls": [ "status" ],
+        "view": "status/dashboard",
+        "index": 10
+    },
+
+    "status/interfaces": {
+        "title": "Interfaces",
+        "acls": [ "network" ],
+        "view": "status/interfaces",
+        "index": 20
+    },
+
+	"status/wanstatus": {
+        "title": "WAN-Status",
+        "acls": [ "mwan3statusacl" ],
+        "view": "status/wanstatus",
+        "index": 30
+    },
+
+	"status/modemstatus": {
+        "title": "Modem",
+        "acls": [ "interfacemanager" ],
+        "view": "status/modemstatus",
+        "index": 40
+    },
+
+    "status/routes": {
+        "title": "Routes / Neighbours",
+        "acls": [ "status" ],
+        "view": "status/routes",
+        "index": 50
+    }	
+}

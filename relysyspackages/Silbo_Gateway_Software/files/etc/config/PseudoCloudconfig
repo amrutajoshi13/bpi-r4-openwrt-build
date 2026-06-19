@@ -1,0 +1,18 @@
+
+config pseudocloudConfig 'Test11'
+	option pseudoDataSendingMethod '1'
+	option enablepseudoSlaveDataStatus '1'
+	option enablepseudoSlaveCloudStatus '1'
+	option pseudoTopicName 'topicname1'
+	option pseudoJsonHeaderKeyName 'Key1'
+	option pseudoJsonKeyName1 'Key2'
+	option pseudoJsonKeyValue1 '1'
+	option pseudoJsonKeyName2 'Key3'
+	option pseudoJsonKeyValue2 '2'
+	option pseudoJsonKeyName3 'Key4'
+	option pseudoJsonKeyValue3 '3'
+	option enablepseudoJsonHeaderKeyStatus '1'
+	option enablepseudoCustomFieldStatus1 '1'
+	option enablepseudoCustomFieldStatus2 '1'
+	option enablepseudoCustomFieldStatus3 '1'
+

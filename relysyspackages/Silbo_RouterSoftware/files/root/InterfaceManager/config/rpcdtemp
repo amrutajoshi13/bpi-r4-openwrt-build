@@ -1,0 +1,5 @@
+
+config rpcdtempsection 'rpcdtemp'
+		option password 'admin'
+	
+

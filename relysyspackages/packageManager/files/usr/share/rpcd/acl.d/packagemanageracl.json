@@ -1,0 +1,24 @@
+
+{
+    "packagemanager": {
+        "description": "package manager",
+        "read": {
+                        "ubus" : {
+                "rpc-packagerinstall":[
+                "configure"
+
+                ]
+            },
+            "uci": [
+                "packagemanager"
+            ]
+
+        },
+        "write": {
+            "uci": [
+               "packagemanager"
+            ]
+        }
+    }
+}
+

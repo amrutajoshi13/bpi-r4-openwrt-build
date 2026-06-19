@@ -1,0 +1,214 @@
+<div style="border-bottom: 1px solid #70707038;">
+	<h1 class="header">Flash operations</h1>
+</div>
+<div class="pagecontent">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">
+				Firmware Operations
+			</h3>
+		</div>
+
+		<div class="cards" role="region" aria-label="Firmware actions cards" style="margin-top: 20px;">
+
+			<div id="flash-card" aria-labelledby="flash-title" style=" margin-top: -20px;">
+				<!-- <h3 id="flash-title">Flash Controls</h3> -->
+
+				<!-- <div style="margin-top: 10px;">
+					<div class="icon blue-circle" aria-hidden="true">
+						<img src="/luci2/icons/microchip-solid-full.svg " alt="fals image" class=" svg-white" />
+
+
+
+					</div>
+				</div> -->
+
+				<div>
+					<div class="controls" role="group" aria-label="Flash controls">
+						<div>
+							<div style="margin-top: 10px;">
+								<div class="icon blue-circle" aria-hidden="true">
+									<img src="/luci2/icons/flash-line.svg " alt="falsh image" class=" svg-white" />
+								</div>
+							</div>
+							<p class="lead">Upload a sysupgrade-compatible image to replace the running firmware.
+								Use the
+								<strong>Flash Image</strong> button to flash with default settings.
+							</p>
+							<input class="btn btn-primary" title="Flash image" type="button" id="btn_flash"
+								value="Flash image" aria-label="Flash image" />
+						</div>
+
+						<div>
+							<div style="margin-top: 10px;">
+								<div class="icon blue-circle" aria-hidden="true">
+									<img src="/luci2/icons/microchip.svg " alt="microchip image" class="svg-white" />
+								</div>
+							</div>
+							<p class="lead">Upload and flash a new image while keeping the current device
+								configuration. Use <strong>Retain config and flash</strong> button
+								when you want to preserve settings.</p>
+							<input class="btn btn-primary" title="Retain config and flash" type="button"
+								id="btn_retainconfig_flash" value="Retain Config and Flash"
+								aria-label="Retain config and flash" />
+						</div>
+
+						<div>
+							<div style="margin-top: 10px;">
+								<div class="icon blue-circle" aria-hidden="true">
+									<img src="/luci2/icons/reset-settings.svg" alt="reset image" class=" svg-white" />
+								</div>
+							</div>
+							<p class="lead">Reset device to factory defaults. This will erase all settings — use
+								<strong>Factory reset</strong>
+								button with
+								caution.
+							</p>
+							<input class="btn btn-primary" title="Factory reset" type="button" style="margin-top: 30px;"
+								id="btn_factory_reset" value="Factory Reset" aria-label="Factory reset" />
+						</div>
+					</div>
+
+					<!-- <div class="meta">Status: <span id="flash-status">Idle</span></div> -->
+				</div>
+			</div>
+
+		</div>
+		<!-- </div> -->
+	</div>
+
+
+
+
+</div>
+
+<style>
+	.cards {
+		display: grid;
+		grid-template-columns: 1fr;
+		width: 90%;
+		margin: 0 auto;
+		height: auto;
+		border: none !important;
+		box-shadow: none !important;
+		background-color: transparent !important;
+	}
+
+	/* .card {
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), #fff);
+		border-radius: 14px;
+		padding: 22px;
+		border: 1px solid rgba(11, 63, 150, 0.06);
+		min-height: 240px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		transition: transform .22s cubic-bezier(.2, .9, .2, 1), box-shadow .22s ease;
+	} */
+
+
+	.icon {
+		width: 96px;
+		height: 96px;
+		border-radius: 50%;
+		margin: 0 auto 12px auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.icon.blue-circle {
+		background: linear-gradient(135deg, #0b63d1 0%, #2fb3ff 100%);
+	}
+
+	.icon.green-circle {
+		background: linear-gradient(135deg, #00b894 0%, #38e0a6 100%);
+	}
+
+	.icon img.svg-white {
+		width: 46px;
+		height: 46px;
+		filter: brightness(0) invert(1);
+	}
+
+
+	/* .card h3 {
+		text-align: left;
+		font-size: 16px !important;
+		margin: 11px 0 20px 5px !important;
+		color: #071032;
+		font-weight: 500 !important;
+		border-bottom: 1px solid rgba(16, 32, 52, 0.04);
+		padding-bottom: 8px;
+	} */
+
+	.card p {
+		text-align: center;
+		color: #55607a;
+		font-size: 13px;
+		margin: 0 0 14px;
+		padding: 0 4px;
+	}
+
+
+	.controls {
+		display: flex;
+		gap: 18px;
+		justify-content: center;
+		align-items: flex-start;
+		flex-wrap: wrap;
+		margin-top: 8px;
+	}
+
+
+	.controls>div {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		min-width: 180px;
+		max-width: 250px;
+		box-sizing: border-box;
+		padding: 22px;
+		border-radius: 14px;
+		border: 1px solid rgba(11, 63, 150, 0.06);
+		/* border: 1px solid rgba(11, 63, 150, 0.15); */
+		margin: 0 auto;
+	}
+
+
+	.controls>div p.lead {
+		font-size: 12px;
+		color: #6b7280;
+		margin: 0 0 8px 0;
+		line-height: 1.35;
+		text-align: center;
+	}
+
+	.controls>div input.btn {
+		margin-top: 0;
+		padding: 10px 14px;
+		border-radius: 8px;
+		cursor: pointer;
+		font-size: 13px;
+	}
+
+	.meta {
+		margin-top: 14px;
+		font-size: 12px;
+		color: #6b7280;
+		text-align: center;
+	}
+
+
+	@media (max-width: 560px) {
+		.controls {
+			gap: 12px;
+		}
+
+		.controls>div {
+			min-width: auto;
+			width: 100%;
+			max-width: none;
+		}
+	}
+</style>

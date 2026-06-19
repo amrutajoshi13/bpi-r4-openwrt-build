@@ -1,0 +1,64 @@
+config IOUtilities
+    option utility "MODBUS UTILITY"
+    option action "READORWRITE"
+    option inputs "1"
+    option input1Name "Slave ID"
+    option input1Element "text"
+    option input1Type "text"  
+    
+ 
+config IOUtilities
+    option utility "All Temperature Sensors"
+    option action "READ"
+    option inputs "0"
+    
+config IOUtilities
+    option utility "Single Temperature Sensor"
+    option action "READ"
+    option inputs "1"
+    option input1Name "Address"
+    option input1Element "text"
+    option input1Type "text"
+    option input1Name '28.XXXXXXXXXXXX'
+    
+ 
+config IOUtilities 
+	option action 'READ'
+	option input1Element 'selection'
+	option input1Name 'DIO'
+	option input1Type 'string'
+	list input1Values '1'
+	list input1Values '2'
+	list input1Values '3'
+	list input1Values '4'
+	option inputs '2'
+	option utility 'Digital Input'
+	
+config IOUtilities                          
+        option utility 'Digital Output'
+        option action 'WRITE'           
+        option inputs '3'                     
+        option input1Element 'selection'
+        option input1Name 'DIO'               
+        option input1Type 'string'      
+        list input1Values '1'  
+        list input1Values '2'           
+        list input1Values '3'          
+        list input1Values '4'           
+        option input2Name 'value - 0 or 1'
+        option input2Element 'text'     
+        option input2Type 'text'    
+
+config IOUtilities                          
+        option utility 'Analog Input'
+        option action 'READ'                
+        option inputs '3'               
+        option input1Element 'selection'
+        option input1Name 'AIO'               
+        option input1Type 'string'   
+        list input1Values '1'                 
+        list input1Values '2'  
+        option input2Name 'Range 1-6 - default: 2'
+        option input2Element 'text'               
+        option input2Type 'text'
+        

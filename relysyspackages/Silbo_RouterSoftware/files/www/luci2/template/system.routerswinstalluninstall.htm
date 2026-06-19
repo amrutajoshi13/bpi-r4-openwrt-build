@@ -1,0 +1,39 @@
+<div id="map"></div>
+<p></p><p></p>
+<div id="packageInfo"></div>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><%:Router Software Install/Uninstall%></h3>
+    </div>
+    <div class="panel-body" style="display:none;" id="UploadDiv">
+          <p><%:Enter checksum and size then click on 'Upload' to upload the file %></p>
+            <p>
+	</div>	
+	
+	    <form class = "form-horizontal" role = "form">
+				   
+	<div class = "form-group">
+		<label for = "checksum" class = "col-sm-2 control-label">Checksum</label>
+		<div class = "col-sm-6">
+			<input type = "text" class = "form-control" id = "checksum" placeholder = "Enter checksum">
+		</div>
+	</div>
+	
+	<div class = "form-group">
+	<label for = "size" class = "col-sm-2 control-label">Size</label>    
+		<div class = "col-sm-6">
+			<input type = "text" class = "form-control" id = "size" placeholder = "Enter size of file">
+		</div>
+	</div>
+		
+	<div class = "form-group">
+                    <div class = "col-sm-6">
+                        <input class="btn btn-primary" type="button" id="btn_upload" value="<%:Upload%>" />
+                        <input class="btn btn-primary" type="button" id="btn_install"  value="<%:Install%>" />
+                        <input class="btn btn-primary" type="button" id="btn_uninstall"  value="<%:Uninstall%>" />
+
+                    </div>
+				</div>
+            </p>
+    </div>	
+</div>    

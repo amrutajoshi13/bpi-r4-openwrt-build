@@ -1,0 +1,129 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+uci get cloudconfigNH.cloudconfigNH.enablehb > /etc/vpn_heartbeat.cfg
+uci get cloudconfigNH.cloudconfigNH.timesechb >> /etc/vpn_heartbeat.cfg
+
+ArchiveDLPath="/root/Device_health/certificate"
+UpdateConfigScript="/bin/UpdateConfigurationsGateway"
+UpdateNMSConfigScript="/root/Device_health/Device_health_update.sh"
+
+Device_id=$(uci get boardconfig.board.serialnum)
+uci set cloudconfigNH.cloudconfigNH.SiteID="$Device_id"
+uci commit cloudconfigNH
+SHM_Enable=$(uci get cloudconfigNH.cloudconfigNH.enablenwh)
+pid=$(pgrep -f "/root/Device_health_status.sh")
+kill -9 $pid
+kill -TERM "$pid" > /dev/null 2>&1
+
+case "$1" in
+    list)
+        echo '{"configure":{},"delete":{},"countkeyfiles":{},"update":{},"testarchive":{"archive":"ArchiveName"},"save":{}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+                            response=$($UpdateConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : NMS Configuration Update\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : NMS Configuration Update\"}"
+                            fi
+                                                                                 
+                            ;;
+                    update)
+                        	response=$($UpdateNMSConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : NMS Configuration Disable\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : NMS Configuration Disable\"}"
+                            fi
+                                                                                 
+                            ;;                                                                                            
+		            testarchive)
+		                # read the arguments
+		                read -r input;
+		                json_load "$input" > /dev/null 2>&1
+		                json_get_var ArchivedFileWithPath archive
+		               
+		                if [ "x$ArchivedFileWithPath" = "x" ]
+		                then
+		                    echo "{\"code\":1,\"output\":\"invalid input arguments\"}" >> "$logfile"
+		                    exit 1
+		                fi
+		                
+						# find "${ArchiveDLPath}" ! -name '*.tar' -type f -exec rm -f {} +
+						FileExtension="${ArchivedFileWithPath##*.}"
+		               
+		                if [ "$FileExtension" == "zip" ]
+						 then
+		              	 	RetMsg=$(unzip "${ArchivedFileWithPath}" -d "${ArchiveDLPath}" 2>&1)
+						else
+				 			RetMsg=$(tar -zxvf "${ArchivedFileWithPath}" -C "${ArchiveDLPath}" 2>&1)
+						fi
+									
+			            RetVal=$?
+						if [ "$RetVal" -ne 0 ]
+						then
+							echo "Failed to copy key file error-$RetMsg" >> "$logfile"
+						exit 1
+						else
+							echo "{\"code\":0,\"output\":\"SUCCESS : TLS extract\"}"
+
+						fi						
+						
+						rm -f "$ArchivedFileWithPath"
+						   
+		                ;;
+		                
+		            delete) 
+                             rm -rf /root/Device_health/certificate/*
+                             uci set cloudconfigNH.cloudconfigNH.enabledelete=0
+                             uci commit cloudconfigNH
+                             if [ "$?" -ne 0 ]                                      
+                            then
+                                echo "{\"code\":1,\"output\":\"Delete Certificates Failure!!\"}"
+                            else     
+							
+							    echo "{\"code\":0,\"output\":\"Delete Certificates Success!!\"}"
+                            fi 
+							;; 
+                     
+                    countkeyfiles)
+							count=$(ls -l /root/Device_health/certificate/ | wc -l)
+							uci set cloudconfigNH.cloudconfigNH.enabledelete=1
+							uci commit cloudconfigNH
+							echo "{\"code\":0,\"output\":\"$count\"}"
+							
+							;;
+					save)
+					  		if [ "$SHM_Enable" == "1" ]; then
+								sleep 1
+								pkill -f "/root/Device_Health"
+								sleep 1
+								/root/Device_Health &
+								sleep 1
+								/root/Device_health/Device_health_default.sh
+							fi
+							
+							# Check if all commands executed successfully
+							if [ "$?" -ne 0 ]; then
+								echo "{\"code\":1,\"output\":\"FAILURE : Save Operation\"}"
+							else
+								echo "{\"code\":0,\"output\":\"SUCCESS : Save Operation\"}"
+							fi
+							;;
+		             *)
+		                    echo '{"code":"1","output":"invalid method"}'
+		                    exit 1
+		                    ;;
+     
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

@@ -1,0 +1,528 @@
+<div style="border-bottom: 1px solid #70707038;">
+	<h1 class="header">Command Line Interface (CLI)</h1>
+</div>
+<!-- <div class="map"></div> -->
+<div class="pagecontent">
+	<div class="laptop-container" id="laptop-section">
+
+		<div class="laptop">
+			<div class="camera"></div>
+
+			<div class="title-bar">
+				<div class="window-controls">
+					<!-- moved the IDs to the buttons (was on the <i>) -->
+					<button id="minimize-btn" title="Minimize">
+						<img src="/luci2/icons/window-minimize.svg" alt="Upload" class="svg-white"></button>
+					<button id="maximize-btn" title="Maximize"><img src="/luci2/icons/expand-solid.svg" alt="Upload"
+							class="svg-white"></button>
+					<button id="close-btn" title="Close"><img src="/luci2/icons/circle-xmark.svg" alt="Upload"
+							class="svg-white"></button>
+				</div>
+			</div>
+
+			<div class="screen">
+				<!-- Replace with actual ttyd URL -->
+				<iframe id="dynamicIframe"></iframe>
+			</div>
+
+			<div class="taskbar">
+				<div class="left">
+					<img src="/luci2/icons/linux.svg" alt="Linux" class="svg-white"><span>Terminal</span>
+				</div>
+				<div class="right">
+					<img src="/luci2/icons/wifi.svg" alt="Wi-Fi" class="svg-white">
+					<img src="/luci2/icons/volume.svg" alt="Volume" class="svg-white">
+					<span id="clock">--:--</span>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+
+
+<style>
+	@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
+
+
+
+	.laptop-container {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		width: 98%;
+		max-width: 1000px;
+		margin: 18px auto;
+	}
+
+
+	.laptop {
+		width: 100%;
+		aspect-ratio: 16/10;
+		background: linear-gradient(180deg, #0f1112 0%, #121315 100%);
+		border-radius: 22px 22px 10px 10px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		border: 6px solid #0b0b0c;
+		position: relative;
+		/* box-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.55),
+    inset 0 2px 12px rgba(255, 255, 255, 0.02); */
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+
+	.camera {
+		width: 12px;
+		height: 12px;
+		background: radial-gradient(circle at 30% 30%, #666 0%, #222 55%);
+		border-radius: 50%;
+		position: absolute;
+		top: 10px;
+		left: 50%;
+		transform: translateX(-50%);
+		box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+		border: 2px solid rgba(255, 255, 255, 0.06);
+		z-index: 4;
+	}
+
+
+	.title-bar {
+		height: 36px;
+		background: #2c2c2c;
+		color: #d0d4d8;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		padding: 0 12px;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+		z-index: 3;
+	}
+
+
+	.window-controls button {
+		background: transparent;
+		border: none;
+		color: #9aa0a6;
+		font-size: 14px;
+		margin-left: 10px;
+		cursor: pointer;
+		padding: 6px;
+		border-radius: 6px;
+		transition: all .14s ease;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 1;
+	}
+
+
+	.window-controls button img.svg-white {
+		width: 16px;
+		height: 16px;
+		display: block;
+		object-fit: contain;
+		filter: invert(100%) brightness(120%) saturate(0%);
+		opacity: 0.95;
+		transition: filter .14s ease, transform .14s ease, opacity .14s ease;
+		pointer-events: none;
+	}
+
+	/* hover / active visual */
+	.window-controls button:hover {
+		color: #fff;
+		background: rgba(255, 255, 255, 0.02);
+		transform: translateY(-1px);
+	}
+
+	.window-controls button:hover img.svg-white {
+		filter: invert(100%) brightness(160%) saturate(0%);
+		transform: translateY(-1px);
+		opacity: 1;
+	}
+
+	/* focus for keyboard accessibility */
+	.window-controls button:focus {
+		outline: 2px solid rgba(120, 180, 255, 0.12);
+		outline-offset: 2px;
+	}
+
+	/* slightly smaller icons on narrow screens */
+	@media (max-width:520px) {
+		.window-controls button img.svg-white {
+			width: 14px;
+			height: 14px;
+		}
+
+		.window-controls button {
+			padding: 5px;
+		}
+	}
+
+	/* screen area */
+	.screen {
+		flex-grow: 1;
+		background: linear-gradient(145deg, #262a36, #1f2330);
+		color: #e6ebf2;
+		border-top: 1px solid rgba(255, 255, 255, 0.02);
+		position: relative;
+		overflow: hidden;
+		display: block;
+	}
+
+	/* subtle glass reflection */
+	.screen::before {
+		content: '';
+		position: absolute;
+		left: -20%;
+		top: -30%;
+		width: 60%;
+		height: 120%;
+		transform: rotate(-18deg);
+		background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02) 25%, rgba(255, 255, 255, 0) 60%);
+		pointer-events: none;
+		mix-blend-mode: overlay;
+		z-index: 2;
+		opacity: 0.7;
+	}
+
+	/* iframe fits perfectly */
+	.screen iframe {
+		width: 100%;
+		height: 100%;
+		border: none;
+		background: #000;
+		position: relative;
+		z-index: 1;
+	}
+
+	/* taskbar */
+	.taskbar {
+		height: 42px;
+		background: linear-gradient(180deg, #0d0e10, #050609);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 16px;
+		font-size: 14px;
+		color: #d0d6da;
+		border-top: 1px solid rgba(255, 255, 255, 0.02);
+		z-index: 3;
+	}
+
+	/* left / right groups */
+	.taskbar .left,
+	.taskbar .right {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	/* original font-icon styles preserved */
+	/* .taskbar .left i {
+		font-size: 18px;
+		color: #79c66b;
+	} */
+
+	.taskbar .left span {
+		font-weight: 600;
+		opacity: 0.94;
+	}
+
+	/* .taskbar .right i {
+		font-size: 15px;
+		color: #9aa0a6;
+	} */
+
+
+	.taskbar img.svg-white {
+		width: 18px;
+		height: 18px;
+		display: inline-block;
+		object-fit: contain;
+		vertical-align: middle;
+		margin-right: 6px;
+		pointer-events: none;
+		transition: filter .14s ease, transform .14s ease, opacity .14s ease;
+		opacity: 0.95;
+	}
+
+
+	.taskbar .left img.svg-white {
+		filter: invert(56%) sepia(20%) saturate(430%) hue-rotate(78deg) brightness(96%) contrast(92%);
+		/* filter: invert(56%) sepia(18%) saturate(284%) hue-rotate(84deg) brightness(95%) contrast(92%); */
+	}
+
+
+	.taskbar .right img.svg-white {
+		filter: invert(72%) brightness(90%) saturate(0%);
+		width: 16px;
+		height: 16px;
+		margin-right: 0;
+	}
+
+
+	.taskbar img.svg-white+i {
+		display: none;
+	}
+
+	/* responsive small-screen tweak */
+	@media (max-width:520px) {
+		.taskbar img.svg-white {
+			width: 16px;
+			height: 16px;
+		}
+
+		.taskbar .left i {
+			font-size: 16px;
+		}
+
+		.taskbar .right i {
+			font-size: 14px;
+		}
+	}
+
+	#clock {
+		font-family: monospace;
+		font-weight: 600;
+		color: #cfd8dc;
+	}
+
+	/* hinge hint */
+	.hinge {
+		height: 10px;
+		background: linear-gradient(to bottom, #0b0b0b, #000);
+		width: 95%;
+		border-radius: 8px;
+		margin-top: -6px;
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
+	}
+
+	.map {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100vw;
+		height: 100vh;
+		z-index: 9999;
+		background: #000;
+		overflow-y: auto;
+		display: flex;
+		justify-content: center;
+		align-items: flex-start;
+		padding: 30px 0;
+	}
+
+	/* keyboard (kept simple) */
+	.keyboard {
+		width: 102%;
+		background: #151616;
+		margin-top: -10px;
+		padding: 18px;
+		border-radius: 0 0 18px 18px;
+		display: grid;
+		grid-template-columns: repeat(14, 1fr);
+		gap: 6px;
+		transform: perspective(600px) rotateX(6deg);
+	}
+
+	.keyboard div {
+		background: linear-gradient(to bottom, #3a3a3a, #232323);
+		height: 36px;
+		border-radius: 6px;
+		box-shadow: 0 2px 0 rgba(0, 0, 0, 0.7), inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+	}
+
+	/* keyboard special keys */
+	.key-space {
+		grid-column: span 5;
+	}
+
+	.key-shift {
+		grid-column: span 2;
+	}
+
+	.key-tab {
+		grid-column: span 1.5;
+	}
+
+	.key-enter {
+		grid-column: span 2;
+	}
+
+	/* smooth transitions */
+	/* Inside layout */
+	.map .laptop-container {
+		width: 90vw;
+		max-width: 1100px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.map .laptop {
+		width: 100%;
+		height: 60%;
+		/* max-height: 70vh; */
+		max-height: 100vh;
+	}
+
+	.map .keyboard {
+		width: 100%;
+		margin-top: -10px;
+	}
+
+	.pagecontent,
+	.map {
+		transition: all .28s ease-in-out;
+	}
+
+	/* responsive */
+	@media (max-width: 900px) {
+		.laptop {
+			border-radius: 14px;
+		}
+
+		.camera {
+			top: 8px;
+			width: 10px;
+			height: 10px;
+		}
+
+		.title-bar {
+			height: 34px;
+			padding: 0 10px;
+		}
+
+		.taskbar {
+			height: 40px;
+			font-size: 13px;
+			padding: 0 12px;
+		}
+	}
+
+	@media (max-width: 520px) {
+		.laptop {
+			aspect-ratio: 4/3;
+		}
+
+		.keyboard {
+			grid-template-columns: repeat(10, 1fr);
+			padding: 12px;
+		}
+
+		.window-controls button {
+			font-size: 13px;
+			padding: 5px;
+		}
+	}
+</style>
+<script>
+	// safe element lookup
+	const expandBtn = document.getElementById('maximize-btn');
+	const minimizeBtn = document.getElementById('minimize-btn');
+	const closeBtn = document.getElementById('close-btn');
+	const contentWrapper = document.querySelector('.pagecontent');
+
+	// helper to toggle the 'map' class (full/expanded view)
+	function enterMapMode() {
+		if (!contentWrapper) return;
+		contentWrapper.classList.remove('pagecontent');
+		contentWrapper.classList.add('map');
+	}
+	function exitMapMode() {
+		if (!contentWrapper) return;
+		contentWrapper.classList.remove('map');
+		contentWrapper.classList.add('pagecontent');
+	}
+
+	// attach handlers only if elements exist
+	if (expandBtn) {
+
+		expandBtn.addEventListener('click', (e) => {
+			console.log("ertyhuj")
+			e.preventDefault();
+			enterMapMode();
+		});
+	}
+
+	if (minimizeBtn) {
+
+		minimizeBtn.addEventListener('click', (e) => {
+			console.log("mini")
+			e.preventDefault();
+			exitMapMode();
+		});
+	}
+
+	if (closeBtn) {
+
+		closeBtn.addEventListener('click', (e) => {
+			console.log("cloe")
+			e.preventDefault();
+			// simple close behavior: remove 'map' and blank iframe (customize as desired)
+			exitMapMode();
+			const iframe = document.getElementById('dynamicIframe');
+			if (iframe) iframe.src = 'about:blank';
+		});
+	}
+
+	// clock (as you had)
+	function updateClock() {
+		const clock = document.getElementById("clock");
+		if (!clock) return;
+		const now = new Date();
+		clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	}
+	setInterval(updateClock, 1000);
+	updateClock();
+
+	// your baseIP logic unchanged
+	let params = window.location.href;
+	let BaseURL = new URL(params).origin;
+	let ipMatch = BaseURL.match(/https?:\/\/([\d.]+)/);
+	let baseIP = ipMatch ? ipMatch[1] : "192.168.10.1"; // Default fallback IP
+	document.getElementById("dynamicIframe").src = `http://${baseIP}:7681/`;
+</script>
+
+
+<!-- <script>
+
+
+
+	const expandBtn = document.getElementById('maximize-btn');
+	const minimizeBtn = document.getElementById('minimize-btn');
+	const contentWrapper = document.querySelector('.pagecontent');
+
+	expandBtn.addEventListener('click', () => {
+		contentWrapper.classList.remove('pagecontent');
+		contentWrapper.classList.add('map');
+		document.body.classList.add('map-mode');
+	});
+
+	minimizeBtn.addEventListener('click', () => {
+		contentWrapper.classList.remove('map');
+		contentWrapper.classList.add('pagecontent');
+		document.body.classList.remove('map-mode');
+	});
+
+
+	function updateClock() {
+		const clock = document.getElementById("clock");
+		const now = new Date();
+		clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	}
+	setInterval(updateClock, 1000);
+	updateClock();
+
+	let params = window.location.href;
+	let BaseURL = new URL(params).origin;
+	let ipMatch = BaseURL.match(/https?:\/\/([\d.]+)/);
+	let baseIP = ipMatch ? ipMatch[1] : "192.168.10.1"; // Default fallback IP
+	// document.getElementById("dynamicIframe").src = `http://${baseIP}:7681/`;
+
+
+</script> -->

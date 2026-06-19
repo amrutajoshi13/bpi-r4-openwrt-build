@@ -1,0 +1,8 @@
+/root/networkstatuslogs.txt{
+    size 100k
+    rotate 5
+    missingok
+    create 0644 root root
+}
+
+

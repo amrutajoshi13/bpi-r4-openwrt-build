@@ -1,0 +1,30 @@
+
+{
+    "rs232Config": {
+        "description": "rs232Config",
+        "read": {
+                        "ubus" : {
+                "rpc-snmpagentupdate":[
+                "configure"
+                ]
+            },
+            "uci": [
+                "rs232Config",
+
+            ]
+
+        },
+        "write": {
+                        "ubus" : {
+                "rpc-snmpagentupdate":[
+                "configure"
+
+                ]
+            },
+            "uci": [
+               "rs232Config",
+
+            ]
+        }
+    }
+}

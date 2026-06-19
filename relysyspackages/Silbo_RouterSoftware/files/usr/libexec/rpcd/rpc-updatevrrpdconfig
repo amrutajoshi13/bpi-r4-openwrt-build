@@ -1,0 +1,28 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+updatevrrrp="/root/InterfaceManager/script/vrrp/vrrp_handler.sh"
+case "$1" in
+    list)
+        echo '{"configure":{}}'
+        ;;
+    call)
+        case "$2" in
+                   configure)         
+			response=$($updatevrrrp)
+			RetVal=$?
+			echo "{\"code\":\"0\",\"output\":\"Updated Configurations\"}"                                   
+			;;
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+                    ;;
+        esac #appmanager method
+            ;;
+esac # ubus method
+
+exit 0
+
+

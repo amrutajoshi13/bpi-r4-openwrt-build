@@ -1,0 +1,7 @@
+
+config genericonfig 'tcpconfig'
+	option enabletcp '0'
+	option tcpportmode 'eth0.1'
+	option portslave '502'
+	option slaveid '10'
+

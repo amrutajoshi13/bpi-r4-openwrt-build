@@ -1,0 +1,16 @@
+
+config RS485UtilityConfigGeneric 'rs485utilityconfig'
+	option ModbusProtocol 'RTU'
+	option Stopbits '1'
+	option Databits '8'
+	option SerialPort '/dev/ttyS1'
+	option Baudrate '9600'
+	option Parity '0'
+	option FunctionalCode1 '5'
+	option DataForMode2 '11,12,13'
+	option Mode '1'
+	option StartRegister '40002'
+	option NumberOfRegisters '10'
+	option FunctionalCode '3'
+	option StdModbusEnable '1'
+

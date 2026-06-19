@@ -1,0 +1,44 @@
+
+config webOption 'sensorType'
+	option DIO '4'
+	#option scheduledEvent '1'
+
+config webOption 'actionEventAddType'
+	option DIO 'DIO Event'
+	#option scheduledEvent 'Sheduled Event'
+	option Modbus 'Modbus Alarm'
+	option AIO 'Analog Input Alarm'
+	#option Temperature 'Temperature Alarm'
+
+config webOption 'actionType'
+	option DIO '1'
+	option sms '1'
+	option email '1'
+
+config mqtt 'topics'
+	option numberOfSubTopics '4'
+	option subTopic1 'IOCard1/P530/E/Alarm/EnergyMeterDataBL'
+	option subTopic2 'IOCard1/P530/D/DIOEvent'
+	option subTopic3 'IOCard1/P530/T/TemperatureEvent'
+	option subTopic4 'IOCard1/P530/A/AIOEvent'
+	option numberOfPubTopics '1'
+	option pubTopic1 'IOCard1/P530/IREQ/Command'
+
+config general 'general'
+	option logFileDir '/tmp/Log/BLCControlApp/'
+	option logFileName 'log.txt'
+
+config eventStatus 'DIO'
+	option name 'DIO'
+	option type 'DIO'
+	option state '1'
+	option value '1.000000'
+	option timeStamp '20/08/2025 16:56:25'
+
+config eventStatus 'DIO2'
+	option name 'DIO2'
+	option type 'DIO'
+	option state '1'
+	option value '1.000000'
+	option timeStamp '20/08/2025 17:29:25'
+

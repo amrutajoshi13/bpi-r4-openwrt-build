@@ -1,0 +1,23 @@
+#!/bin/sh /etc/rc.common
+
+[ ! -x /usr/sbin/hwclock ] && exit 0
+
+START=12
+STOP=12
+USE_PROCD=1
+
+start_service() {
+    
+    /sbin/hwclock -s 
+    echo "system time was $(date)"
+    echo "setting the system clock using the hardware clock as reference..."
+    hwclock -s --localtime
+    echo "system clock set. system local time is now $(date)"
+}
+
+stop_service() {
+    echo "saving the system clock time to the hardware clock..."
+    hwclock -w --localtime
+    echo "hardware clock updated to $(date)"
+}
+

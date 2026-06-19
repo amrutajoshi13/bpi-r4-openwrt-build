@@ -1,0 +1,242 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">Device Health Configuration</h1>
+</div>
+
+<div class="pagecontent">
+	<div id="senderconfig">
+		<div class="tab-content" id="tabs" id="senderconfig">
+
+			<ul class="nav nav-tabs" id="my_tab"  data-tabs="tabs">	
+				<li class="TabC Tabfm active">
+					<a id="sectiontab_firewall_marking" href="#tab_diosender" data-toggle="tab">Cloud Configuration
+						<span class="badge"></span>
+					</a>
+				</li>
+				<li class="TabC TabZf">
+					<a id="sectiontab_firewall_zonefor" href="#tab_zonefor" data-toggle="tab">Parameter Configuration
+						<span class="badge"></span>
+					</a>
+				</li>
+			</ul>
+
+			<div class="tab-pane TabC Tabfm active"  id="tab_diosender">
+				<div id="sectiontab_dio_sender"></div>
+				<div id="Mansectiontab_dio_sender" class="panel panel-default">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">Upload Certificates archive as ZIP</h3>
+						</div>
+						<div class="panel-body">
+							<table class="table table-condensed table-hover">
+								<tbody>
+									<tr>
+										<td style="width: 60%;">
+											<p><b>Upload</b><br/>
+											Upload Certificates if Publish protocol is MQTT and authentication mode is TLS & CA.
+											</p>
+										</td>
+										<td>
+											<div class="btn-group btn-group-sm">
+												<button class="btn btn-primary" id="btn_upload" style="width:128px" title="Upload" type="button">Upload</button>
+												<button class="btn btn-primary" id="btn_delete" style="width:128px" title="Delete" type="button">Delete</button>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="tab-pane TabC TabZf"  id="tab_zonefor" >
+				
+				<div class="panel panel-default">
+
+					<div class="panel-heading">
+						<h3 class="panel-title">Parameter Configuration</h3>
+					</div>
+
+					<div id="section_firewall_zonefor"></div>	
+
+					<div id="Mansection_firewall_zonefor" class="panel panel-default" style="width:94.5%; margin:20px auto;  margin-top:15px;">
+						<div class="panel-heading">
+							<h3 class="panel-title">Parameter Sender Configuration</h3>
+							<div class="btn-group">
+								<button type="button" id="UpdateZoneForwarding" title="SHM Update" class="btn btn-success" style="margin-top: 0px;  margin-left: -100px;">Update</button>
+							</div>
+						</div>
+						
+						
+						<table class="table table-condensed table-hover"  style="width:100%; border-collapse:collapse; margin-top:10px;">
+							<thead>
+								<tr class="cbi-section-table-titles">
+									<th class="cbi-section-table-cell" style="width: 30%; text-align: -webkit-left; vertical-align: middle;">Field Content</th>
+    								<th class="cbi-section-table-cell" style="width: 50%; text-align: initial; vertical-align: middle;">Field JSON Key Name</th>
+									<th class="cbi-section-table-cell" style="width: 20%; text-align: -webkit-auto; vertical-align: middle;">Action </th>
+								</tr>
+							</thead>
+							
+							<tbody>
+								<tr class="luci2-section-item" id="sectionitem_firewall_zone_newZone" data-luci2-sid="newZone">
+									<td>
+										<div class="luci2-field">
+											<div class="luci2-field-widget">
+												<select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_src">
+													<option value="Device_ID">Deviceid</option>
+													<option value="Device_Model">DeviceModel</option>
+													<option value="Router_Firmware_Version">RouterFirmwareVersion</option>
+													<option value="Gateway_Firmware_Version">GatewayFirmwareVersion</option>
+													<option value="Device_Type">Board_Type</option>
+													<option value="Ethernet_WAN_MAC_ID">EthernetWANMACID</option>
+													<option value="System_Uptime">SystemUptime</option>
+													<option value="Average_CPU_Usage">AverageCPUUsage</option>
+													<option value="RAM_Usage">RAMUsage</option>
+													<option value="Flash_Usage">FlashUsage</option>
+													<option value="WiFi_SSID">WiFiSSID</option>
+													<option value="No_of_DHCP_Leases">NoofDHCPLeases</option>
+													<option value="Device_Wan_Type">WanSource</option>
+													<option value="DeviceWANCount">deviceWANCount</option>
+													<option value="Connection_Type">RouterWANporttimedetail</option>
+													<option value="Connection_Status">RouterWANstatusdetail</option>
+													<option value="Internet_Uptime">RouterWANuptimedetail</option>
+													<option value="Active_WAN_IP">RouterWANipdetail</option>
+													<option value="LAN_IP">LANIP</option>
+													<option value="Cellular_Type">Cellular_Mode</option>
+													<option value="Num_SIM">SIMTYPE</option>
+													<option value="Device_Port">boardtotalport</option>
+													<option value="Device_Port_Status">final_port_status</option>
+													<option value="CPIN_Status">CPINStatus</option>
+													<option value="ICCID">ICCIDa</option>
+													<option value="IMSI">IMSIb</option>
+													<option value="Mobile_Operator_Name">MobileOperatorName</option>
+													<option value="Mobile_Operator_Code">MobileOperatorCode</option>
+													<option value="CREG_Status">CREGStatus</option>                                                     
+													<option value="CGATT_Status">CGREG_STATUS</option>
+													<option value="SIM_RAT">SIMRAT</option>
+													<option value="Mobile_Signal_CSQ">makecsqcombined</option>
+													<option value="RSRP_SINR">RSRPSINR</option>
+													<option value="RSRQ">rsrq</option>
+													<option value="RSSI">rssi</option>
+													<option value="CellID">cellid</option>
+													<option value="BAND">band</option>
+													<option value="MCC">mcc</option>
+													<option value="LAC">lac</option>
+													<option value="Modem_Name">modemname</option>
+													<option value="Frequency">frequency</option>
+													<option value="SIM_Switch1">switch_Time1P</option>
+													<option value="SIM_Switch2">switch_Time2P</option>
+													<option value="CPIN_Status2">CPINStatus2</option>
+													<option value="ICCID2">ICCIDa2</option>
+													<option value="IMSI2">IMSIb2</option>
+													<option value="Mobile_Operator_Name2">MobileOperatorName2</option>
+													<option value="Mobile_Operator_Code2">MobileOperatorCode2</option>
+													<option value="CREG_Status2">CREGStatus2</option>                                                     
+													<option value="CGATT_Status2">CGREG_STATUS2</option>
+													<option value="SIM_RAT2">SIMRAT2</option>
+													<option value="Mobile_Signal_CSQ2">makecsqcombined2</option>
+													<option value="RSRP_SINR2">RSRPSINR2</option>
+													<option value="RSRQ2">rsrq2</option>
+													<option value="RSSI2">rssi2</option>
+													<option value="CellID2">cellid2</option>
+													<option value="BAND2">band2</option>
+													<option value="MCC2">mcc2</option>
+													<option value="LAC2">lac2</option>
+													<option value="Modem_Name2">modemname2</option>
+													<option value="Frequency2">frequency2</option>
+													<option value="Cellular_WAN_Statistics_Daily">daily_datausage</option>
+													<option value="Cellular_WAN_Statistics_Monthly">monthly_datausage</option>
+													<option value="Device_Last_PowerOFF_Time">PowerOFFTime</option>
+													<option value="Device_Last_PowerOFF_Reason">PowerOFFreason</option>
+													<option value="Device_Last_PowerON_Time">PowerONTime</option>
+													<option value="Device_Temperature">Temperature</option>
+													<option value="Device_UUID">DeviceUUID</option>
+													<option value="Collect_Data_Time">collectdatatime</option>
+													<option value="CPU_avg">CPUavg</option>
+													<option value="CSQ">DeviceCSQ</option>
+													<option value="Customfield1">NHCustomparam1</option>
+													<option value="Customfield2">NHCustomparam2</option>
+													<option value="Customfield3">NHCustomparam3</option>
+												</select>
+													<input type="text" class="form-control luci2-field-validate custom-value-input" id="field_firewall_zone_newZone_srczone"  style="display: none;">
+														<div class="luci2-field-error label label-danger" style="display: none;"></div>
+											</div>
+										</div>
+									</td>	
+									<td>
+										<div class="luci2-field">
+											<div class="luci2-field-widget">
+												<input type="text" class="form-control luci2-field-validate custom-value-input2" id="field_firewall_zone_newZone_destzone" type="text" placeholder="">
+													<div class="luci2-field-error label label-danger" style="display: none;"></div>
+											</div>
+										</div>
+									</td>	
+									<td class="text-right" style="width: 0%; text-align: justify;">
+										<div class="btn-group">
+											<button type="button" id="AddNewzoneForwarding" title="Add parameter" class="btn btn-success" style="margin-top: -20px;  margin-left: -9px;">Add</button>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+
+						</table>
+					</div>
+								
+					<div class="panel panel-default" id="SHMjson" style="width:94.5%; margin:20px auto;  margin-top:15px;">
+							<div class="panel-heading">
+								<h3 class="panel-title">SHM JSON Parameters</h3>
+							</div>
+							<div id="SHM-Note"></div>
+
+							<div class="modal-footer">
+								<button type="button" class="btn btn-info" style="background: linear-gradient(135deg, #0e22fb 0%, #1a252f 100%);color: #ffffff;border: 1px solid #1a252f;" id='addButton' onclick="showJson()">Show JSON</button>
+							</div>
+						
+							<div class="row">
+								<div class="col-md-9">
+									<div class="form-group">
+										<textarea class="form-control" disabled style="margin-top:-60px;resize: none;display: none; width: 125%; margin-left:30px;" cols="12" rows="8" id="jsoninfo"></textarea>
+									</div>				
+								</div>
+							</div>
+							
+					</div>
+
+				</div>
+
+			</div>
+			
+		</div>
+	</div>
+</div>
+
+
+
+<style>
+#section_firewall_snat,#section_firewall_rules,#section_firewall_zone{
+border-color: #dddddd;
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 25px 30px #0000001a;
+    border: 1px solid #70707038;
+    border-radius: 10px;
+    width:95%;
+    padding: 17px;
+    margin-bottom: 10px;
+}
+#SHM-Note {
+  margin-inline-start: 20px;
+}
+
+#addButton {
+    margin-top: -180px;
+    margin-right: 50px;
+    margin-bottom: 3px;
+    margin-left: 15px;
+	font-size: 14px; 
+	border-radius: 18px;
+}
+
+
+</style>
+
+

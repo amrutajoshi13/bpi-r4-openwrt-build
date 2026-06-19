@@ -1,0 +1,208 @@
+#!/bin/sh
+. /lib/functions.sh
+
+
+SIACfgDirPath="/root/ConfigFiles/ReAp_MT7628_SIASenderAppConfig"
+SIACommandParserCfgDirPath="/root/ConfigFiles/ReAp_MT7628_SIACommandParserAppConfig"
+
+#SIA Server Configuration
+SIAconfigureCfgPath="${SIACfgDirPath}/SIAGenericConfig"
+SIAconfigureBackendServerCfgPath="${SIACfgDirPath}/SIASenderAppBackendServer"
+SIACRCCfgPath="${SIACommandParserCfgDirPath}/SIACRCCheckConfig"
+SIAEventfile="siaserverconfig"
+siaconfigureEventSection="siaserverconfig"
+offsettoperiodicityscript="bin/OffsetToPeriodicity.sh"
+
+
+
+usage()
+{
+    cat <<EOF
+    Usage:  ${0##*/} <ACTION>
+
+    ACTIONS:
+        ucitoappcfg  update application configuration using UCI
+EOF
+}
+
+
+UpdateSIAServerGenericCfg()
+{
+    echo "Updating SIA Server Generic configuration "
+    echo "Updating '${SIAconfigureCfgPath}.cfg' configuration"
+    config_load "$SIAEventfile"
+    
+    config_get  receivernumber                     "$siaconfigureEventSection"    receivernumber
+    config_get  linenumber                     "$siaconfigureEventSection"    linenumber
+    config_get  accountnumber                     "$siaconfigureEventSection"    accountnumber
+    config_get  serialnum                     "$siaconfigureEventSection"    serialnum
+
+    echo "$receivernumber"
+
+   # config_get  rootCAPath    
+   {
+	   echo "SerialNumber=\"$serialnum\""
+	   echo "ReceiverNumber=\"$receivernumber\""
+	   echo "LineNumber=\"$linenumber\""
+	   echo "AccountNumber=\"$accountnumber\""
+
+   } > "${SIAconfigureCfgPath}.cfg"
+  
+}
+
+SIASenderAppBackendServer()
+{
+	echo "Updating SIA Backend Server configuration "
+    echo "Updating '${SIAconfigureBackendServerCfgPath}.cfg' configuration"
+    config_load "$SIAEventfile"
+    
+    config_get  siaipaddress                     "$siaconfigureEventSection"    siaipaddress
+    config_get  port                     "$siaconfigureEventSection"    port
+    
+    echo "$receivernumber"
+
+   # config_get  rootCAPath    
+   {
+	   echo "ServerNameFlag=1"
+	   echo "ServerName=\"$siaipaddress\""
+	   echo "ServerPortNumber=$port"
+
+   } > "${SIAconfigureBackendServerCfgPath}.cfg"
+	
+}
+
+
+SIASenderHealthCronUpdate()
+{
+	echo "Updating SIA Health packet publish configuration "
+    echo "Updating crontab health configuration"
+    config_load "$SIAEventfile"
+    
+    config_get  enablehealthpacketpublish                     "$siaconfigureEventSection"    enablehealthpacketpublish
+    config_get  healthpacketpublishinterval                     "$siaconfigureEventSection"    healthpacketpublishinterval
+     healthValMinutes=$(echo "$healthpacketpublishinterval" | sed s'/,$//')
+
+    # add entry to cron file
+     if [ "$enablehealthpacketpublish" =  "1" ]
+    then
+	    #sed -i '/HealthPeriodic.sh/d' /etc/crontabs/root
+	   #echo "*/$healthValMinutes * * * * /bin/HealthPeriodic.sh" >> /etc/crontabs/root
+	   res=$($offsettoperiodicityscript)
+	   if [ $? ne 0]
+	   then
+		echo "Failed to execute the script"
+	   else
+		echo "Health packet configuration updated"
+	   fi
+	else
+	    sed -i '/HealthPeriodic.sh/d' /etc/crontabs/root
+
+    fi
+	
+}
+
+SIASenderGPSCronUpdate()
+{
+	echo "Updating SIA GPS packet publish configuration "
+    echo "Updating crontab GPS configuration"
+    config_load "$SIAEventfile"
+    
+    config_get  enablegpspacketpublish                     "$siaconfigureEventSection"    enablegpspacketpublish
+    config_get  gpspacketpublishinterval                     "$siaconfigureEventSection"    gpspacketpublishinterval
+    gpsValMinutes=$(echo "$gpspacketpublishinterval" | sed s'/,$//')
+
+    # add entry to cron file
+   
+    if [ "$enablegpspacketpublish" =  "1" ]
+    then
+	    sed -i '/GPSpub.sh/d' /etc/crontabs/root
+	    echo "*/$gpspacketpublishinterval * * * * /bin/GPSpub.sh" >> /etc/crontabs/root
+	    /etc/init.d/cron restart
+	    sleep 2
+    else
+        sed -i '/GPSpub.sh/d' /etc/crontabs/root
+
+    fi
+}
+	
+	SIASenderCRCUpdate()
+{
+	echo "Updating SIA CRC configuration "
+    config_load "$SIAEventfile"
+    
+    config_get  enablecrcprocessing                     "$siaconfigureEventSection"    enablecrcprocessing
+    
+    {
+	   echo "EnableCRCProcessing=$enablecrcprocessing"
+
+   } > "${SIACRCCfgPath}.cfg"
+    
+    
+}
+		
+UpdateAppCfg()
+{
+    echo "Updating SIA Server configurations..."
+     UpdateSIAServerGenericCfg
+     SIASenderAppBackendServer
+     SIASenderHealthCronUpdate
+     SIASenderGPSCronUpdate
+    # SIASenderCRCUpdate
+     echo "Killing App SIASenderApp"
+	pid=$(pgrep -f "/bin/ReAP_MT7628_SIASenderApp")
+	kill -TERM "$pid" > /dev/null 2>&1
+	sleep 1                 
+	kill -KILL "$pid" > /dev/null 2>&1
+    echo "Restarting App SIASenderApp"
+   /bin/ReAP_MT7628_SIASenderApp &
+   
+    echo "Killing App SIACommandParserApp"
+    pid1=$(pgrep -f "/bin/ReAP_MT7628_SIACommandParserApp")
+	kill -TERM "$pid1" > /dev/null 2>&1
+	sleep 1                 
+	kill -KILL "$pid1" > /dev/null 2>&1
+	echo "Killing App SIACommandParserApp"
+	/bin/ReAP_MT7628_SIACommandParserApp &
+	
+}
+
+if [ $# -ne 1 ]
+then
+    echo "${0##*/}: missing action"
+    usage
+else
+    action="$1"
+    case "$action" in
+        "reset")
+            ResetConfiguration
+            ;;
+
+        "ucitoappcfg")
+            UpdateAppCfg
+            ;;
+        
+            
+        "rs485utilitycfg")
+            UpdateRS485UtilityCfg
+            ;;
+
+        
+        "appcfgtouci")
+            UpdateUCI
+            ;;
+
+        "listcfg")
+            ListConfigurations
+            ;;
+		
+		"updatemaintenancereboot")
+            UpdateMaintenanceReboot
+            ;;
+        *)
+            usage
+            ;;
+    esac
+fi
+
+exit 0
+

@@ -1,0 +1,35 @@
+
+config interface 'loopback'
+	option ifname 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config interface 'VPN'
+	option proto 'none'
+	option ifname 'tun0'
+
+config interface 'VPN1'
+	option proto 'none'
+	option ifname 'tun1'
+
+config interface 'LAN'
+	option ifname 'eth0'
+	option proto 'static'
+	option netmask '255.255.255.0'
+	option ipaddr '192.168.9.1'
+    option dns '8.8.8.8'
+    
+config interface 'ra0'
+	option ipaddr '192.168.90.1'
+	option netmask '255.255.255.0'
+	option proto 'static'
+	option ifname 'ra0'
+
+config interface 'CWAN1_0'
+	option ifname 'wwan0'
+	option proto 'qmi'
+	option device '/dev/cdc-wdm0'
+	option apn 'airtelgprs.com'
+	option metric '2'
+

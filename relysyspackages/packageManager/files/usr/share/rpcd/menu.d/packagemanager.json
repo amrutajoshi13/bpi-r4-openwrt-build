@@ -1,0 +1,13 @@
+{
+    "applications": {
+        "title": "Applications",
+        "index": 80
+    },
+    "applications/packagemanager": {
+        "title": "Application Manager",
+        "acls": ["packagemanager"],
+        "view": "applications/packagemanager",
+        "index": 10
+    }
+
+}

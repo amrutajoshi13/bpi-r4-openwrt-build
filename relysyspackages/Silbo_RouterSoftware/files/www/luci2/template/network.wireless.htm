@@ -1,0 +1,56 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">Wireless Configuration</h1>
+</div>
+
+<div class="pagecontent">
+	<div style="text-align: right;">
+		<button type="button" id="btn_update_wireless" title="Update Wireless Configuration" class="btn btn-success">Update</button>
+	</div>
+	<div id="Update-Note-WiFi"></div>
+
+	<ul class="nav nav-tabs" id="my_tab1" data-tabs="tabs1">
+
+		<li class="TabC TabWifi active">
+			<a id="sectiontab_wifi" href="#tab_wifi" data-toggle="tab">WiFi Setttings
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabGuest">
+			<a id="sectiontab_guestwifi" href="#tab_guestwifi" data-toggle="tab">Guest WiFi
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabWireless">
+			<a id="sectiontab_wireless" href="#tab_wireless" data-toggle="tab">Wireless Schedule
+				<span class="badge"></span>
+			</a>
+		</li>
+	</ul>
+	<div class="tab-content" id="tabs1">
+		<div class="tab-pane TabC TabWifi active" id="tab_wifi">
+			<div id="section_wifi"></div>
+		</div>
+
+		<div class="tab-pane TabC TabGuest" id="tab_guestwifi">
+			<div id="section_guestwifi"></div>
+		</div>
+
+		<div class="tab-pane TabC TabWireless" id="tab_wireless">
+			<div id="section_wireless"></div>
+		</div>
+
+	</div>
+</div>
+
+<style>
+	#Update-Note-WiFi {
+		margin: -64px 0px -2px 0px;
+	}
+
+	#field_sysconfig_wificonfig_wificonfig__scan_wifi {
+		float: right;
+		margin: -55px -149px -46px -21px;
+	}
+</style>

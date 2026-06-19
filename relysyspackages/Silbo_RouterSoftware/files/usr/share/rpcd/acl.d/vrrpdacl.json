@@ -1,0 +1,26 @@
+{
+    "vrrpdconfig": {
+        "description": "VRRPD Configuration",
+        "read": {
+                        "ubus" : {
+                "rpc-updatevrrpdconfig":[
+                "configure"
+
+                ]
+            },
+
+            "uci": [
+                "vrrpd"
+
+            ]
+
+        },
+
+        "write": {
+            "uci": [
+               "vrrpd"
+            ]
+        }
+	}
+}
+

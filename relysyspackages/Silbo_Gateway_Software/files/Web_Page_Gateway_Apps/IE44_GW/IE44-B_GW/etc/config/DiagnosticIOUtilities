@@ -1,0 +1,24 @@
+config IOUtilities 
+	option action 'READ'
+	option input1Element 'selection'
+	option input1Name 'DIO'
+	option input1Type 'string'
+	list input1Values '1'
+	list input1Values '2'
+	option inputs '2'
+	option utility 'Digital Input'
+	
+config IOUtilities                          
+        option utility 'Digital Output'
+        option action 'WRITE'                
+        option inputs '2'               
+        option input1Element 'selection'
+        option input1Name 'DO'               
+        option input1Type 'string'   
+        list input1Values '1'                 
+        list input1Values '2' 
+        option input2Name 'value 0 or 1'
+        option input2Element 'text'               
+        option input2Type 'text'
+	
+

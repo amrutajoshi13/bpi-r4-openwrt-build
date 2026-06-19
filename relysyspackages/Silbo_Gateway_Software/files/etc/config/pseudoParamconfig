@@ -1,0 +1,6 @@
+
+config pseudoConfig 'Test11'
+	option pseudoDeviceName 'Test11'
+	option pseudoSlaveID '343'
+	option pseudoregisterlen '2'
+

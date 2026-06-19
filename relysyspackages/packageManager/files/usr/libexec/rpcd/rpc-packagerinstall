@@ -1,0 +1,48 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+case "$1" in
+    list)
+        echo '{"configure":{"boardName":"board","packageName":"package","packageChecksum":"checksum"}}'
+        ;;
+    call)
+        case "$2" in
+                configure)
+
+                   read -r input;
+                         # parse the received arguments
+                        json_load "$input" > /dev/null 2>&1
+                        json_get_var board boardName
+                        json_get_var package packageName
+                        json_get_var checksum packageChecksum 
+
+                        url=$(uci get packagemanager.general.url)
+                        filepackage=$(curl -o /tmp/${package}.tar.gz "${url}getpackage?deviceName=${board}&packageName=${package}")
+                        cd /tmp/
+                        unfilepackage=$(tar -xvf $package.tar.gz)
+
+                
+				if [ "$?" -ne 0 ]
+                 then
+                    echo "{\"code\":1,\"output\":\"FAILURE : Configuration Update\"}"
+                else
+                    packageChecksum=$(md5sum "/tmp/${unfilepackage}" | cut -d " " -f 1)
+                    if [ "$checksum" = "$packageChecksum" ]
+                    then
+                        echo "{\"code\":0,\"output\":\"/tmp/${unfilepackage}\"}"
+                    else
+                        echo "{\"code\":1,\"output\":\"FAILURE : Checksum mismatch\"}"
+                    fi
+                fi
+                ;;
+            *)
+             echo '{"code":"1","output":"invalid method"}'
+             exit 1
+            ;;
+        esac #appmanager method
+            ;;
+esac # ubus method
+
+exit 0

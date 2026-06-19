@@ -1,0 +1,56 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+RebootScript="/root/usrRPC/script/Board_Recycle_12V_Script.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{"type":"Actiontype","jsonData":"ActionData"}}'
+        ;;
+    call)
+        case "$2" in
+            configure)
+                # read the arguments
+                read -r input
+                json_load "$input" > /dev/null 2>&1
+                json_get_var Actiontype type
+
+                echo "Actiontype: $Actiontype" > /tmp/rpcd_action.txt
+
+                case "$Actiontype" in
+                    reboot)
+                        # Run custom reboot script first
+                        echo "{\"code\":0,\"output\":\"SUCCESS: Router rebooted successfully\"}"
+                        if $RebootScript >/dev/null 2>&1; then
+                            echo "{\"code\":0,\"output\":\"SUCCESS: Router rebooted successfully\"}"
+                        else
+                            echo "{\"code\":1,\"output\":\"FAILURE: Reboot script execution failed\"}"
+                        fi
+                        ;;
+
+                    network)
+                        # Restart network service
+                        /etc/init.d/network restart >/dev/null 2>&1
+                        echo '{"code":0,"output":"SUCCESS: Network restarted successfully !"}'
+                        ;;
+
+                    *)
+                        echo '{"code":1,"output":"Invalid action type"}'
+                        ;;
+                esac
+                ;;
+            *)
+                echo '{"code":1,"output":"Invalid method"}'
+                exit 1
+                ;;
+        esac # application action
+        ;;
+    *)
+        echo '{"code":1,"output":"Invalid command"}'
+        exit 1
+        ;;
+esac # ubus method
+
+exit 0

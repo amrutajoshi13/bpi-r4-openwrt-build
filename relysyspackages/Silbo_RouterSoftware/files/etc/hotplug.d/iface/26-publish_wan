@@ -1,0 +1,68 @@
+#!/bin/sh
+
+
+publish()
+{
+    NetifdLog="/tmp/${INTERFACE}NetifdLog"
+    echo  "$ACTION" "$INTERFACE" > "$NetifdLog"
+
+    ReAPMqtttopic="IOCard1/AI2DI4DO4_SG200/W/${INTERFACE}/${ACTION}/NetifdNWKevent"
+    CurrentDate=$(date +"%Y-%m-%d %H:%M:%S")
+
+    ReAPMqttHost="localhost"
+    ReAPMqttPort="1883"
+    ReAPMqttAppId="3"
+    ReAPMqttMsg="<,$ReAPMqttAppId,$ACTION,$CurrentDate,>"
+    ReAPMqttQos=1
+
+    output=$(mosquitto_pub -h "$ReAPMqttHost" -p "$ReAPMqttPort" -t "$ReAPMqtttopic" -m "$ReAPMqttMsg" -q "$ReAPMqttQos")
+    retval=$?
+    if [ "$retval" = "0" ]
+    then
+        echo "mosquitto_pub -h $ReAPMqttHost -p $ReAPMqttPort -t $ReAPMqtttopic -m $ReAPMqttMsg -q $ReAPMqttQos -> successfull" >> "$NetifdLog"
+    else
+        echo "mosquitto_pub -h $ReAPMqttHost -p $ReAPMqttPort -t $ReAPMqtttopic -m $ReAPMqttMsg -q $ReAPMqttQos -> failure, error-$output" >> "$NetifdLog"
+    fi
+}
+
+
+case "$ACTION" in
+    ifup)
+        case "$INTERFACE" in
+            CWAN1)
+                publish
+            ;;
+            CWAN1_0)
+                publish
+            ;;
+            CWAN1_1)
+                publish
+            ;;
+            CWAN2)
+                publish
+            ;;
+            CWAN3)
+                publish
+            ;;
+        esac
+    ;;
+    ifdown)
+        case "$INTERFACE" in
+            CWAN1)
+                publish
+            ;;
+            CWAN1_0)
+                publish
+            ;;
+            CWAN1_1)
+                publish
+            ;;
+            CWAN2)
+                publish
+            ;;
+            CWAN3)
+                publish
+            ;;
+        esac
+    ;;
+esac

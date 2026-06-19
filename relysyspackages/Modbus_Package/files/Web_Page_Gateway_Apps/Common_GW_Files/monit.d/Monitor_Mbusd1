@@ -1,0 +1,4 @@
+check process mbusd with matching "mbusd" every 1 cycles
+    start program = "/usr/bin/mbusd -c /etc/mbusdconfig.conf -v9 > /dev/null 2>1&"
+    stop program = "/usr/bin/killall mbusd > /dev/null 2>&1"
+

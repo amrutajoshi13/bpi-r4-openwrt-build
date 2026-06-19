@@ -1,0 +1,398 @@
+#!/bin/sh
+
+. /lib/functions.sh
+Logfile="/root/ConfigFiles/Logs/AddIfaceLog.txt"
+SourceConfigPath="/root/SourceAppComponent/etc/Config/DataSourcesConfig"
+SETAPN=$(cat /root/usrRPC/script/autoapnflag.txt | cut -d "=" -f2)
+date=$(date)
+[ ${DEVNAME/[0-9]/} = "ttyUSB" ] || exit 0
+[ "${ACTION}" = "add" ] || [ "${ACTION}" = "remove" ] || exit 0
+
+echo "AddIfaceRunningstatus=1" > /tmp/AddIfaceRunningstatus
+board_name=$(cat /tmp/sysinfo/board_name)
+
+
+usb_name=$(echo ${DEVPATH} | grep -o 1.2)
+if echo "$board_name" | grep -qE "(GD44-C|GD44-D|IAB44-B|IAB44-C|IAF44-C_GW)";
+then
+	productId=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/1-1.1/idProduct)
+else
+	productId=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idProduct)
+fi
+if [ "$usb_name" = "1.2" ] || [ "$productId" != "0900" ]
+then
+
+	date=$(date)
+	echo "============$date:[01-CWAN1] begin 01-CWAN1 ============" >> "$Logfile"
+	if echo "$board_name" | grep -qE "(Silbo_RF44|GD44|RF04|Silbo_IE44-A-EX1)";
+	then
+	     uci set modem.cellularmodule.dualsimsinglemodule='0'
+	     uci set modem.cellularmodule.singlesimsinglemodule='1'
+	     uci set sysconfig.sysconfig.CellularOperationMode='singlecellularsinglesim'
+	     cwanpriority=$(uci get mwan3config.CWAN1.wanpriority)                                                                                     
+	    uci set modem.CWAN1.metric=$cwanpriority 
+	uci commit sysconfig
+	uci commit modem
+	fi
+
+	ReadModemConfigFile()
+	{
+		config_load "$ModemConfigFile"
+		config_get SingleSimSingleModule "cellularmodule" singlesimsinglemodule
+		config_get SingleSimDualModule "cellularmodule" singlesimdualmodule
+		config_get DualSimSingleModule "cellularmodule" dualsimsinglemodule
+	}
+
+#env >> /tmp/envfile.txt
+#[ ${DEVNAME/[0-9]/} = "ttyUSB" ] || exit 0
+	Create_Delete_Symlink(){
+		
+		ACTION="$3"
+		
+		#It doesn't matter if the ttyUSB is 0,1,2 or 3,4,5 or 1,5,7; 
+		#create the symlinks as $name0,$name1,$name2 ... using symlink_value
+		symlink_value="-1"
+		
+		#Find all ttyUSB devices under the usb1/1-1 or usb1/1-2 path, etc.
+		#Use maxdepth to get only single ttyUSB value. Else, we get 2 ttyUSBs each.
+		#Use "sort" as without that the symlinks won't come in proper order.
+		ttyUSBs=$(find $1 -maxdepth 2 -name "ttyUSB*" -type d | sort)
+	
+		#Create symlinks for each ttyUSB device in /dev
+		#There is no use creating symlink for the usb paths(path1/path2); 
+		#If we do, we won't be able to use AT commands on the said symlink.
+		#So, we get the basename from the usb paths, find it in /dev and create symlink of the same.
+		for ttyUSB in $ttyUSBs; do
+			ttyName=$(basename $ttyUSB)
+			
+			symlink_value=$(expr "$symlink_value" + 1)
+			logger devpath=$1 action=$ACTION devname=$ttyName symlink=$2$symlink_value type=$HOTPLUG_TYPE
+			
+			if [ "${ACTION}" = "add" ]
+			then
+				
+				echo "$date:[01-CWAN1]<23-CWAN-ADD> Create_Delete_Symlink ACTION=add" >> "$Logfile"
+			
+				# Create the symlink
+				ln -sf "/dev/${ttyName}" "/dev/$2${symlink_value}"
+				logger -t modem Symlink from /dev/$ttyName to /dev/$2$symlink_value created
+				date=$(date)
+				echo "$date:[01-CWAN1]<23-CWAN-ADD>$date Modem Symlink from /dev/$ttyName to /dev/$2$symlink_value created." >> "$Logfile"
+			
+			elif [ "${ACTION}" = "remove" ]
+			then
+				date=$(date)
+				echo "$date:[01-CWAN1]<23-CWAN-ADD>$date Create_Delete_Symlink ACTION=remove" >> "$Logfile"
+				
+				rm /dev/$2*
+				#rm /dev/$2$symlink_value
+				logger -t modem Symlink /dev/$2$symlink_value removed
+				break
+			fi
+		done		
+	}
+
+
+devdir="/sys${DEVPATH}/../../../../"
+mVid=$(cat "$devdir/idVendor")
+mPid=$(cat "$devdir/idProduct")
+if echo "$board_name" | grep -qE "(GD44-C|GD44-D|IAB44-B|IAB44-C|IAF44-C_GW)";
+then
+	productid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/1-1.1/idProduct)
+	vendorid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/1-1.1/idVendor)
+else
+	productid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idProduct)
+	vendorid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idVendor)
+fi
+
+#EM05-G Modem 
+if [ "2c7c" = "$vendorid" ] && [ "0315" = "$productid" ] 
+then
+		    uci set sysconfig.sysconfig.cellularmodem1=QuectelEM05-G
+		    uci set sysconfig.sysconfig.protocol1=qmi
+		    uci set sysconfig.sysconfig.model1=EM05-G
+			uci set modem.CWAN1_0.device=3
+			uci set modem.CWAN1_0.comport=2
+			uci set modem.CWAN1_0.smsport=2
+			uci set modem.CWAN1_0.interfacename=wwan0
+			uci set modem.CWAN1_0.protocol=qmi
+			uci set modem.CWAN1_1.device=3
+			uci set modem.CWAN1_1.comport=2
+			uci set modem.CWAN1_1.smsport=2
+			uci set modem.CWAN1_1.interfacename=wwan0
+			uci set modem.CWAN1_1.protocol=qmi
+			uci set modem.CWAN1.device=3
+			uci set modem.CWAN1.comport=2
+			uci set modem.CWAN1.smsport=2
+			uci set modem.CWAN1.interfacename=wwan0
+			uci set modem.CWAN1.protocol=qmi
+			uci set modem.CWAN2.device=3
+			uci set modem.CWAN2.comport=2
+			uci set modem.CWAN2.smsport=2
+			uci set modem.CWAN2.interfacename=wwan0
+			uci set modem.CWAN2.protocol=qmi
+			uci set modem.CWAN3.device=3
+			uci set modem.CWAN3.comport=2
+			uci set modem.CWAN3.smsport=2
+			uci set modem.CWAN3.interfacename=wwan0
+			uci set modem.CWAN3.protocol=qmi
+			uci commit sysconfig
+			uci commit modem
+fi
+
+#EC25E Modem 
+if [ "2c7c" = "$vendorid" ] && [ "0125" = "$productid" ] 
+then
+		    uci set sysconfig.sysconfig.cellularmodem1=QuectelEC25E
+		    uci set sysconfig.sysconfig.protocol1=qmi
+		    uci set sysconfig.sysconfig.model1=EC25-E
+			uci set modem.CWAN1_0.device=3
+			uci set modem.CWAN1_0.comport=2
+			uci set modem.CWAN1_0.smsport=2
+			uci set modem.CWAN1_0.interfacename=wwan0
+			uci set modem.CWAN1_0.protocol=qmi
+			uci set modem.CWAN1_1.device=3
+			uci set modem.CWAN1_1.comport=2	
+			uci set modem.CWAN1_1.smsport=2
+			uci set modem.CWAN1_1.interfacename=wwan0
+			uci set modem.CWAN1_1.protocol=qmi
+			uci set modem.CWAN1.device=3
+			uci set modem.CWAN1.comport=2
+			uci set modem.CWAN1.smsport=2
+			uci set modem.CWAN1.interfacename=wwan0
+			uci set modem.CWAN1.protocol=qmi
+			uci set modem.CWAN2.device=3
+			uci set modem.CWAN2.comport=2
+			uci set modem.CWAN2.smsport=2
+			uci set modem.CWAN2.interfacename=wwan0
+			uci set modem.CWAN2.protocol=qmi
+			uci set modem.CWAN3.device=3
+			uci set modem.CWAN3.comport=2
+			uci set modem.CWAN3.smsport=2
+			uci set modem.CWAN3.interfacename=wwan0
+			uci set modem.CWAN3.protocol=qmi
+			uci commit sysconfig
+			uci commit modem
+fi
+
+#EC200A Modem 
+if [ "2c7c" = "$vendorid" ] && [ "6005" = "$productid" ] 
+then
+		    uci set sysconfig.sysconfig.cellularmodem1=QuectelEC200A
+		    uci set sysconfig.sysconfig.protocol1=cdcether
+		    uci set sysconfig.sysconfig.model1=EC200-A
+			uci set modem.CWAN1_0.device=2
+			uci set modem.CWAN1_0.comport=1
+			uci set modem.CWAN1_0.smsport=1
+			uci set modem.CWAN1_0.interfacename=usb0
+			uci set modem.CWAN1_0.protocol=cdcether
+			uci set modem.CWAN1_1.device=2
+			uci set modem.CWAN1_1.comport=1	
+			uci set modem.CWAN1_1.smsport=1
+			uci set modem.CWAN1_1.interfacename=usb0
+			uci set modem.CWAN1_1.protocol=cdcether
+			uci set modem.CWAN1.device=2
+			uci set modem.CWAN1.comport=1
+			uci set modem.CWAN1.smsport=1
+			uci set modem.CWAN1.interfacename=usb0
+			uci set modem.CWAN1.protocol=cdcether
+			uci set modem.CWAN2.device=2
+			uci set modem.CWAN2.comport=1
+			uci set modem.CWAN2.smsport=1
+			uci set modem.CWAN2.interfacename=usb0
+			uci set modem.CWAN2.protocol=cdcether
+			uci set modem.CWAN3.device=2
+			uci set modem.CWAN3.comport=1
+			uci set modem.CWAN3.smsport=1
+			uci set modem.CWAN3.interfacename=usb0
+			uci set modem.CWAN3.protocol=cdcether
+			uci commit sysconfig
+			uci commit modem
+fi
+
+
+#RM500Q 5gmodem
+if [ "2c7c" = "$vendorid" ] && [ "0800" = "$productid" ]                        
+then                                                                            
+                    uci set sysconfig.sysconfig.cellularmodem1=QuectelRM500Q     
+                    uci set sysconfig.sysconfig.model1=RM500Q     
+                        uci set modem.CWAN1_0.device=3                          
+                        uci set modem.CWAN1_0.comport=2                         
+                        uci set modem.CWAN1_0.smsport=2                         
+                        uci set modem.CWAN1_0.interfacename=wwan0               
+                        uci set modem.CWAN1_0.protocol=qmi                     
+                        uci set modem.CWAN1_1.device=3                         
+                        uci set modem.CWAN1_1.comport=2                        
+                        uci set modem.CWAN1_1.smsport=2                        
+                        uci set modem.CWAN1_1.interfacename=wwan0              
+                        uci set modem.CWAN1_1.protocol=qmi                     
+                        uci set modem.CWAN1.device=3                           
+                        uci set modem.CWAN1.comport=2                          
+                        uci set modem.CWAN1.smsport=2                          
+                        uci set modem.CWAN1.interfacename=wwan0            
+                        uci set modem.CWAN1.protocol=qmi                   
+                        uci set modem.CWAN2.device=3                       
+                        uci set modem.CWAN2.comport=2                      
+                        uci set modem.CWAN2.smsport=2                      
+                        uci set modem.CWAN2.interfacename=wwan0            
+                        uci set modem.CWAN2.protocol=qmi                   
+                        uci set modem.CWAN3.device=3                       
+                        uci set modem.CWAN3.comport=2                      
+                        uci set modem.CWAN3.smsport=2                      
+                        uci set modem.CWAN3.interfacename=wwan0            
+                        uci set modem.CWAN3.protocol=qmi                   
+                        uci commit sysconfig                               
+                        uci commit modem                                   
+fi        
+
+#RM500U 5gmodem
+if [ "2c7c" = "$vendorid" ] && [ "0900" = "$productid" ]                        
+then                                                                            
+                    uci set sysconfig.sysconfig.cellularmodem1=QuectelRM500U     
+                    uci set sysconfig.sysconfig.model1=RM500U     
+                        uci set modem.CWAN1_0.device=4                          
+                        uci set modem.CWAN1_0.comport=4                         
+                        uci set modem.CWAN1_0.altcomport=3                         
+                        uci set modem.CWAN1_0.smsport=2                         
+                        uci set modem.CWAN1_0.interfacename=usb0               
+                        uci set modem.CWAN1_0.protocol=cdcether                     
+                        uci set modem.CWAN1_1.device=4                         
+                        uci set modem.CWAN1_1.comport=4                        
+                        uci set modem.CWAN1_1.altcomport=3                        
+                        uci set modem.CWAN1_1.smsport=2                        
+                        uci set modem.CWAN1_1.interfacename=usb0              
+                        uci set modem.CWAN1_1.protocol=cdcether                     
+                        uci set modem.CWAN1.device=4                           
+                        uci set modem.CWAN1.comport=4                          
+                        uci set modem.CWAN1.altcomport=3                          
+                        uci set modem.CWAN1.smsport=2                          
+                        uci set modem.CWAN1.interfacename=usb0            
+                        uci set modem.CWAN1.protocol=cdcether                   
+                        uci set modem.CWAN2.device=4                       
+                        uci set modem.CWAN2.comport=4                     
+                        uci set modem.CWAN2.altcomport=3                     
+                        uci set modem.CWAN2.smsport=2                      
+                        uci set modem.CWAN2.interfacename=usb0            
+                        uci set modem.CWAN2.protocol=cdcether                   
+                        uci set modem.CWAN3.device=4                       
+                        uci set modem.CWAN3.comport=4                     
+                        uci set modem.CWAN3.altcomport=3                     
+                        uci set modem.CWAN3.smsport=2                      
+                        uci set modem.CWAN3.interfacename=usb0            
+                        uci set modem.CWAN3.protocol=cdcether                   
+                        uci commit sysconfig                               
+                        uci commit modem                                   
+fi
+
+date=$(date)
+echo "============$date:[01-CWAN1] After SetConfigs ============" >> "$Logfile"
+
+ModemConfigFile="/etc/config/modem"
+SimNumFile="/tmp/simnumfile"
+
+
+ReadModemConfigFile
+path=$(echo $DEVPATH | cut -d '/' -f 7 | cut -d ':' -f 1)
+if [ "$path" = "1-1" ] || [ "$path" = "1-1.1" ]
+then
+	str=${DEVNAME}
+	if [ "$DualSimSingleModule" = "1" ]
+	then
+		if [ ! -f "$SimNumFile" ]
+		then
+			touch "$SimNumFile"
+			echo "1" > "$SimNumFile"
+			uci set modem.CWAN1_0.modemenable=1
+			uci set modem.CWAN1_1.modemenable=0
+			uci set modem.CWAN1.modemenable=0
+			uci commit modem
+			prefix="CWAN1_0_"
+			prefixlocal="CWAN1_"
+			SYMLINKLOCAL="${prefixlocal}$(echo -n ${str} | tail -c 1)"
+			rm /dev/${SYMLINKLOCAL}
+			prefixlocal="CWAN1_1_"
+			SYMLINKLOCAL="${prefixlocal}$(echo -n ${str} | tail -c 1)"
+			rm /dev/${SYMLINKLOCAL}
+		else
+			sim=`cat "$SimNumFile"`
+			if [ "$sim" = "1" ]
+			then
+				uci set modem.CWAN1_0.modemenable=1
+				uci set modem.CWAN1_1.modemenable=0
+				uci set modem.CWAN1.modemenable=0
+				uci commit modem
+				prefix="CWAN1_0_"
+				prefixlocal="CWAN1_"
+				SYMLINKLOCAL="${prefixlocal}$(echo -n ${str} | tail -c 1)"
+				rm /dev/${SYMLINKLOCAL}
+				prefixlocal="CWAN1_1_"
+				SYMLINKLOCAL="${prefixlocal}$(echo -n ${str} | tail -c 1)"
+				rm /dev/${SYMLINKLOCAL}
+			else
+				uci set modem.CWAN1_0.modemenable=0
+				uci set modem.CWAN1_1.modemenable=1
+				uci set modem.CWAN1.modemenable=0
+				uci commit modem
+				prefix="CWAN1_1_"
+				prefixlocal="CWAN1_"
+				SYMLINKLOCAL="${prefixlocal}$(echo -n ${str} | tail -c 1)"
+				rm /dev/${SYMLINKLOCAL}
+				prefixlocal="CWAN1_0_"
+				SYMLINKLOCAL="${prefixlocal}$(echo -n ${str} | tail -c 1)"
+				rm /dev/${SYMLINKLOCAL}
+			fi
+		fi
+	else
+		uci set modem.CWAN1_0.modemenable=0
+		uci set modem.CWAN1_1.modemenable=0
+		uci set modem.CWAN1.modemenable=1
+		uci commit modem
+		prefix="CWAN1_"
+		prefixlocal="CWAN1_0_"
+		SYMLINKLOCAL="${prefixlocal}$(echo -n ${str} | tail -c 1)"
+		rm /dev/${SYMLINKLOCAL}
+		prefixlocal="CWAN1_1_"
+		SYMLINKLOCAL="${prefixlocal}$(echo -n ${str} | tail -c 1)"
+		rm /dev/${SYMLINKLOCAL}
+	fi
+
+	if [ "${ACTION}" = "add" ]
+	then
+		if ([ "2c7c" = "${mVid}" ] && [ "0315" = "${mPid}" ]) ||  ([ "2c7c" = "${mVid}" ] && [ "6005" = "${mPid}" ]) ||  ([ "2c7c" = "${mVid}" ] && [ "0125" = "${mPid}" ]) || ([ "2c7c" = "${mVid}" ] && [ "0800" = "${mPid}" ])
+		then
+			SYMLINK="${prefix}$(echo -n ${str} | tail -c 1)"
+			logger devpath=$DEVPATH action=$ACTION devname=$DEVNAME symlink=$SYMLINK vendorid=$mVid Productid=$mPid product=$PRODID type=$HOTPLUG_TYPE
+			echo "$date:[01-CWAN1] Modem Symlink from devpath=$devpath to devname=$devname symlink=$symlink created." >> "$Logfile"
+			ln -s /dev/${DEVNAME} /dev/${SYMLINK}
+			logger -t modem Symlink from /dev/$DEVNAME to /dev/${SYMLINK} created
+		elif [ "2c7c" = "${mVid}" ] && [ "0900" = "${mPid}" ]
+		then
+				path="/sys/devices/platform/101c0000.ehci/usb1/1-1/"
+				#Create/delete Symlink 
+				Create_Delete_Symlink $path $prefix $ACTION
+		fi
+	elif [ "x${mVid}" = "x" ] && [ "${ACTION}" = "remove" ]
+	then
+	
+		cellularmodem1=$(uci get sysconfig.sysconfig.cellularmodem1)
+		
+		if [ "$cellularmodem1" = "QuectelRM500U" ]
+		then
+			rm /dev/CWAN1*
+			date=$(date)
+			echo "$date:[01-CWAN1] remove CWAN1" >> "$Logfile"
+
+		else
+	        rm /dev/CWAN1*
+			rm /dev/${SYMLINK}
+			logger -t modem Symlink /dev/${SYMLINK} removed
+			date=$(date)
+			echo "$date:[01-CWAN1] remove $SYMLINK" >> "$Logfile"
+		fi
+		
+		
+	fi
+	
+fi
+
+fi

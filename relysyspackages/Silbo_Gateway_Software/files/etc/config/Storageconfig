@@ -1,0 +1,5 @@
+
+config Storageconfig 'Storageconfig'
+	option eMCCEnable '0'
+	option storagesize '4GB'
+

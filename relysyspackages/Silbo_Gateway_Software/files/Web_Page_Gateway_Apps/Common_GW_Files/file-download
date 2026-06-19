@@ -1,0 +1,244 @@
+#!/usr/bin/haserl
+
+<?
+/usr/bin/printf "Status: 200 OK\r\n"
+
+if [ "x$FORM_DownloadFile" = "x" ]
+then
+    /usr/bin/printf "Content-Type:application/octet-stream; name=\"error.txt\"\r\n";
+    /usr/bin/printf "Content-Disposition: attachment; filename=\"error.txt\"\r\n\n";
+    /bin/echo "no file"
+    exit 1
+fi
+
+SessionAccess=$(/bin/ubus call session access "{\"ubus_rpc_session\":\"$FORM_sessionid\",\"scope\":\"cgi-file\",\"object\":\"download\",\"function\":\"read\"}" 2>&1)
+Permission=$(/bin/echo "$SessionAccess" | /usr/bin/awk -F":" '/access/{print $2}')
+if ! /bin/echo "$Permission" | /bin/grep -qw "true"
+then
+    /usr/bin/printf "Content-Type:application/octet-stream; name=\"error.txt\"\r\n";
+    /usr/bin/printf "Content-Disposition: attachment; filename=\"error.txt\"\r\n\n";
+    /bin/echo "Download permission denied"
+    exit 1
+fi
+        
+case "$FORM_DownloadFile" in
+    KernelLog)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.txt\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.txt\"\r\n\n";
+
+        /bin/dmesg
+    ;;
+    
+    SystemLog)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.txt\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.txt\"\r\n\n";
+    
+        /sbin/logread
+    ;;
+    
+    Periodic)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+
+        PeriodicTable=$(/sbin/uci -q get DiagnosticMiscUtilities.$FORM_SectionID.PeriodicTable 2>/dev/null)
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $PeriodicTable;"
+    ;;
+    
+    Command)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+
+        CommandTable=$(/sbin/uci -q get DiagnosticMiscUtilities.$FORM_SectionID.CommandTable 2>/dev/null)
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $CommandTable;"
+    ;;
+    
+    Event)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+        
+        EventTable=$(/sbin/uci -q get DiagnosticMiscUtilities.$FORM_SectionID.EventTable 2>/dev/null)
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $EventTable;"
+    ;;
+    
+    Calibration)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+        
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $FORM_SysTable;" 2>&1
+    ;;
+    
+    Configurations)
+        TarFileName=Configuration.tar.gz
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+        
+        /bin/tar -czf /tmp/$TarFileName /etc/config /etc/ReAP/Config > /dev/null 2>&1
+        /bin/dd if=/tmp/Configuration.tar.gz
+        /bin/rm -rf /tmp/Configuration.tar.gz
+    ;;
+
+    AddInterfaceLog)
+        TarFileName=Addifacelogs.tar.gz
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+        
+        /bin/tar -czf /tmp/$TarFileName /root/ConfigFiles/Logs > /dev/null 2>&1
+        /bin/dd if=/tmp/Addifacelogs.tar.gz
+        /bin/rm -rf /tmp/Addifacelogs.tar.gz
+    ;;
+    
+    EsimLog)
+        TarFileName=EsimLog.tar.gz
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+        
+        /bin/tar -czf /tmp/$TarFileName /root/ConfigFiles/EsimLog > /dev/null 2>&1
+        /bin/dd if=/tmp/EsimLog.tar.gz
+        /bin/rm -rf /tmp/EsimLog.tar.gz
+    ;;
+    
+    RebootLog)
+        TarFileName=RebootLogs.tar.gz
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+        
+        /bin/tar -czf /tmp/$TarFileName /root/ConfigFiles/RebootLog > /dev/null 2>&1
+        /bin/dd if=/tmp/RebootLogs.tar.gz
+        /bin/rm -rf /tmp/RebootLogs.tar.gz
+    ;;
+
+    PowerOnOffLog)
+        TarFileName=PowerOnOFF_reason.tar.gz
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+        
+        /bin/tar -czf /tmp/$TarFileName /root/ConfigFiles/PowerOnOFF_reason > /dev/null 2>&1
+        /bin/dd if=/tmp/PowerOnOFF_reason.tar.gz
+        /bin/rm -rf /tmp/PowerOnOFF_reason.tar.gz
+    ;;
+
+    NTPsyncLog)
+        TarFileName=NTPsyncLogs.tar.gz
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+        
+        /bin/tar -czf /tmp/$TarFileName /root/ConfigFiles/NTPSyncLog > /dev/null 2>&1
+        /bin/dd if=/tmp/NTPsyncLogs.tar.gz
+        /bin/rm -rf /tmp/NTPsyncLogs.tar.gz
+    ;;
+
+    NMSLog)
+        TarFileName=NMSLog.tar.gz
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+        
+        /bin/tar -czf /tmp/$TarFileName /root/ConfigFiles/NMSLog > /dev/null 2>&1
+        /bin/dd if=/tmp/NMSLog.tar.gz
+        /bin/rm -rf /tmp/NMSLog.tar.gz
+    ;;
+
+    MonitorAppLog)                                                                                        
+        TarFileName=MonitorApplogs.tar.gz                                                                  
+        /usr/bin/printf "Status: 200 OK\r\n"                                                               
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";                    
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";                
+                                                                                                           
+        /bin/tar -czf /tmp/$TarFileName /root/ConfigFiles/RouterAppConfig/Logs/ > /dev/null 2>&1           
+        /bin/dd if=/tmp/MonitorApplogs.tar.gz                                                              
+        /bin/rm -rf /tmp/MonitorApplogs.tar.gz                                                             
+    ;; 
+
+    WanStatusLog)                                                                                        
+        TarFileName=WanStatusLog.tar.gz                                                                  
+        /usr/bin/printf "Status: 200 OK\r\n"                                                               
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";                    
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";                
+                                                                                                           
+        /bin/tar -czf /tmp/$TarFileName /root/ConfigFiles/WanStatusLog/ > /dev/null 2>&1           
+        /bin/dd if=/tmp/WanStatusLog.tar.gz                                                              
+        /bin/rm -rf /tmp/WanStatusLog.tar.gz                                                             
+    ;; 
+
+
+    EnergyMeterRS485)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+
+        EnergyMeterRS485Table=$(/sbin/uci -q get applicationoverviewconfig.$FORM_SectionID.EnergyMeterRS485Table 2>/dev/null)
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $EnergyMeterRS485Table;"
+     ;;
+     
+     EnergyMeterRS232)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+
+        EnergyMeterRS232Table=$(/sbin/uci -q get applicationoverviewconfig.$FORM_SectionID.EnergyMeterRS232Table 2>/dev/null)
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $EnergyMeterRS232Table;"
+     ;;
+     
+     DIO)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+
+        DIOTable=$(/sbin/uci -q get applicationoverviewconfig.$FORM_SectionID.DIOTable 2>/dev/null)
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $DIOTable;"
+     ;;
+     
+     AIO)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+
+        AIOTable=$(/sbin/uci -q get applicationoverviewconfig.$FORM_SectionID.AIOTable 2>/dev/null)
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $AIOTable;"
+     ;;
+     
+     Temperature)
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"${FORM_DownloadFile}.csv\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"${FORM_DownloadFile}.csv\"\r\n\n";
+
+        TemperatureTable=$(/sbin/uci -q get applicationoverviewconfig.$FORM_SectionID.TemperatureTable 2>/dev/null)
+        /usr/bin/sqlite3 -csv -header "$FORM_SysDatabase" "select * from $TemperatureTable;"
+     ;;
+          
+     
+      ApplicationLogsCurrent)
+        TarFileName=ApplicationLogsCurrent.tar.gz
+        /usr/bin/printf "Status: 200 OK\r\n"
+        /usr/bin/printf "Content-Type:application/tar+gzip; name=\"$TarFileName\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"$TarFileName\"\r\n\n";
+        
+        /bin/tar -czf /tmp/$TarFileName /tmp/Log > /dev/null 2>&1
+        /bin/dd if=/tmp/ApplicationLogsCurrent.tar.gz
+        /bin/rm -rf /tmp/ApplicationLogsCurrent.tar.gz
+        
+        ;;
+    
+    *)
+        /usr/bin/printf "Content-Type:application/octet-stream; name=\"error.txt\"\r\n";
+        /usr/bin/printf "Content-Disposition: attachment; filename=\"error.txt\"\r\n\n";
+        
+        /bin/echo "inavlid file $FORM_DownloadFile"
+    ;;
+esac
+
+exit 0
+
+?>

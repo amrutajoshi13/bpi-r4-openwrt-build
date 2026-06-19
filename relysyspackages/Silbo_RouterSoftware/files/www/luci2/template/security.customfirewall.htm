@@ -1,0 +1,82 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">Loopback Rule</h1>
+</div>
+
+<div class="pagecontent">
+	<div style="text-align: right" class="btnclass">
+		<button type="button" class="btn btn-success btn-update" data-type="loopback" title="Update LoopBack"
+			id="btn_update">
+			Update
+		</button>
+	</div>
+	<div id="Update-LoopBack-Note"></div>
+
+	<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Port Forwarding</h3>
+			</div>
+			<p id="No-LoopBack-Config"></p>
+			<div class="scrollable-x" id="section_firewall_port"></div>
+	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Add New Port Forward</h3>
+		</div>
+
+		<div class="panel-body">
+			<div class="luci2-field form-group" style="margin-top: 10px">
+				<label class="col-lg-2 control-label" for="field_firewall_redirect_newRedirect_name">Interface Name</label>
+				<div class="luci2-field-widget">
+					<input class="form-control luci2-field-validate" id="field_firewall_redirect_newRedirect_name"
+						type="text" placeholder="" />
+					<div class="luci2-field-error label label-danger" style="display: none"></div>
+				</div>
+			</div>
+			<div class="luci2-field form-group">
+				<label class="col-lg-2 control-label" for="field_firewall_redirect_newRedirect_src_IP">Loopback IP</label>
+				<div class="luci2-field-widget">
+					<input class="form-control luci2-field-validate" id="field_firewall_redirect_newRedirect_src_IP"
+						type="text" placeholder="" />
+					<div class="luci2-field-error label label-danger" style="display: none"></div>
+				</div>
+			</div>
+			<div class="luci2-field form-group">
+				<label class="col-lg-2 control-label" for="field_firewall_redirect_newRedirect_src_port">Port</label>
+				<div class="luci2-field-widget">
+					<input class="form-control luci2-field-validate" id="field_firewall_redirect_newRedirect_src_port"
+						type="text" placeholder="" />
+					<div class="luci2-field-error label label-danger" style="display: none"></div>
+				</div>
+			</div>
+			<div class="luci2-field form-group">
+				<label class="col-lg-2 control-label" for="field_firewall_redirect_newRedirect_dest_IP">Internal IP</label>
+				<div class="luci2-field-widget">
+					<input class="form-control luci2-field-validate" id="field_firewall_redirect_newRedirect_dest_IP"
+						type="text" placeholder="" />
+					<div class="luci2-field-error label label-danger" style="display: none"></div>
+				</div>
+			</div>
+			<div class="luci2-field form-group">
+				<label class="col-lg-2 control-label" for="field_firewall_redirect_newRedirect_dest_port">Internal Port</label>
+				<div class="luci2-field-widget">
+					<input class="form-control luci2-field-validate" id="field_firewall_redirect_newRedirect_dest_port"
+						type="text" placeholder="" />
+					<div class="luci2-field-error label label-danger" style="display: none"></div>
+				</div>
+			</div>
+			<div class="text-right" style="margin: 0px 10px 20px 0px">
+				<button type="button" title="Add New port" data-action="save" id="AddNewPortForward"
+					class="btn btn-success">
+					Add Interface
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	#Update-LoopBack-Note {
+		margin: -64px 0px 0px 8px;
+	}
+</style>
+

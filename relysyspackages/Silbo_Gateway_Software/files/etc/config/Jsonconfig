@@ -1,0 +1,357 @@
+
+config JsonRs485Keyconfig 'JsonRs485Keyconfig'
+	option Key0 'SiteID'
+	option Key1 'ReadTimeStamp'
+	option Key2 'EpochTimeStamp'
+	option Key3 'EMeterRS485RecordNumber'
+	option Key4 'RecordType'
+	option Key5 'EMeterRS485RequestId'
+	option Key6 'EMeterRS485InterfaceId'
+	option Key7 'EMeterRS485CommIP'
+	option Key8 'EMeterRS485MeterID'
+	option Key9 'EMeterRS485MeterModel'
+	option Key10 'EMeterRS485SlaveID'
+	option Key11 'FunctionCodeUsed'
+	option Key12 'EMeterRS485ResponseCode'
+	option Key13 'StartingRS485RegisterAddress'
+	option Key14 'NoOfRegisters'
+	option Key15 'EMeterREG2'
+	option Key16 'AlarmStatus'
+	option Key17 'EventStatus'
+	option Key18 'NetworkOperator'
+	option Key19 'NetworkMode'
+	option Key20 'signalstrength'
+	option Key21 'imei'
+	option Key22 'SerialNumber'
+	option Key23 'RS485Customfield1'
+	option Key24 'RS485Customfield2'
+	option Key25 'RS485Customfield3'
+	option Key26 'RS485Customfield4'
+	option Key27 'RS485Customfield5'
+	option Key28 'RS485Customfield6'
+	option Key29 'RS485Customfield7'
+	option Key30 'RS485Customfield8'
+	option Key31 'RS485Customfield9'
+	option Key32 'RS485Customfield10'
+
+config DioIndexKeyconfig 'DioIndexKeyconfig'
+	option Key0 'SiteID'
+	option Key1 'ReadTimeStamp'
+	option Key2 'EpochTimeStamp'
+	option Key3 'DIRecordNumber'
+	option Key4 'DIRequestId'
+	option Key5 'DIRecordType'
+	option Key6 'DIValues1'
+	option Key7 'DIValues2'
+	option Key8 'DIValues3'
+	option Key9 'DIValues4'
+	option Key10 'DIOCustomfield1'
+	option Key11 'DIOCustomfield2'
+	option Key12 'DIOCustomfield3'
+	option Key13 'DIOCustomfield4'
+	option Key14 'DIOCustomfield5'
+
+config AIIndexKeyconfig 'AIIndexKeyconfig'
+	option Key0 'SiteID'
+	option Key1 'ReadTimeStamp'
+	option Key2 'EpochTimeStamp'
+	option Key3 'AIRecordNumber'
+	option Key4 'AIRequestId'
+	option Key5 'AIRecordType'
+	option Key6 'AIValues1'
+	option Key7 'AIValues2'
+	option Key8 'AIValues3'
+	option Key9 'AIValues4'
+	option Key10 'AIOCustomfield1'
+	option Key11 'AIOCustomfield2'
+	option Key12 'AIOCustomfield3'
+	option Key13 'AIOCustomfield4'
+	option Key14 'AIOCustomfield5'
+
+config RS232IndexKeyconfig 'RS232IndexKeyconfig'
+	option Key0 'SiteID'
+	option Key1 'ReadTimeStamp'
+	option Key2 'EpochTimeStamp'
+	option Key3 'EMeterRS232RecordNumber'
+	option Key4 'EMeterRS232RequestId'
+	option Key5 'EMeterRS232InterfaceId'
+	option Key6 'EMeterRS232MeterID'
+	option Key7 'EMeterRS232MeterModel'
+	option Key8 'EMeterRS232SlaveID'
+	option Key9 'FunctionCodeUsed'
+	option Key10 'EMeterRS232ResponseCode'
+	option Key11 'StartingRS232RegisterAddress'
+	option Key12 'NoOfRegisters'
+	option Key13 'RS232EMeterREG2'
+	option Key14 'RS232Customfield1'
+	option Key15 'RS232Customfield2'
+	option Key16 'RS232Customfield3'
+	option Key17 'RS232Customfield4'
+	option Key18 'RS232Customfield5'
+
+config SNMPIndexKeyconfig 'SNMPIndexKeyconfig'
+	option Key0 'SiteID'
+	option Key1 'ReadTimeStamp'
+	option Key2 'EpochTimestamp'
+	option Key3 'SNMPRecordNumber'
+	option Key4 'SNMPRequestId'
+	option Key5 'SNMPInterfaceId'
+	option Key6 'SNMPDeviceIPAddress'
+	option Key7 'SNMPDevicePortNumber'
+	option Key8 'SNMPDeviceType'
+	option Key9 'SNMPDeviceName'
+	option Key10 'SNMPDeviceResponseCode'
+	option Key11 'SNMPData'
+	option Key12 'SNMPCustomfield1'
+	option Key13 'SNMPCustomfield2'
+	option Key15 'SNMPCustomfield3'
+	option Key16 'SNMPCustomfield4'
+	option Key17 'SNMPCustomfield5'
+
+config TempIndexKeyconfig 'TempIndexKeyconfig'
+	option Key0 'SiteID'
+	option Key1 'ReadTimestamp'
+	option Key2 'EpochTimestamp'
+	option Key3 'TemperatureRecordNumber'
+	option Key4 'TemperatureRequestId'
+	option Key5 'TemperatureValues1'
+	option Key6 'TemperatureValues2'
+	option Key7 'TemperatureValues3'
+	option Key8 'TemperatureValues4'
+	option Key9 'TemperatureValues5'
+	option Key10 'TemperatureValues6'
+	option Key11 'TemperatureValues7'
+	option Key12 'TemperatureValues8'
+	option Key13 'TemperatureCustomfield1'
+	option Key14 'TemperatureCustomfield2'
+	option Key15 'TemperatureCustomfield3'
+	option Key16 'TemperatureCustomfield4'
+	option Key17 'TemperatureCustomfield5'
+
+config DioIndexconfig
+	option ModbusParameter 'SiteID'
+	option Parameterkey 'site_id'
+
+config DioIndexconfig
+	option Parameterkey 'timestamp'
+	option ModbusParameter 'ReadTimeStamp'
+
+config DioIndexconfig
+	option ModbusParameter 'DIRecordNumber'
+	option Parameterkey 'rec_no'
+
+config AIIndexconfig
+	option ModbusParameter 'SiteID'
+	option Parameterkey 'site_id'
+
+config AIIndexconfig
+	option Parameterkey 'timestamp'
+	option ModbusParameter 'ReadTimeStamp'
+
+config AIIndexconfig
+	option ModbusParameter 'AIRecordNumber'
+	option Parameterkey 'rec_no'
+
+config AIIndexconfig
+	option Parametervalue 'param2'
+	option ModbusParameter 'AIRequestId'
+	option Parameterkey 'request_id'
+
+config RS232Indexconfig
+	option ModbusParameter 'SiteID'
+	option Parameterkey 'site_id'
+
+config RS232Indexconfig
+	option ModbusParameter 'ReadTimeStamp'
+	option Parameterkey 'timestamp'
+
+config RS232Indexconfig
+	option Parametervalue 'mjngbf'
+	option ModbusParameter 'EMeterRS232RecordNumber'
+	option Parameterkey 'rec_no'
+
+config SNMPIndexconfig
+	option ModbusParameter 'SiteID'
+	option Parameterkey 'SiteID'
+
+config SNMPIndexconfig
+	option ModbusParameter 'SNMPInterfaceId'
+	option Parameterkey 'InterfaceId'
+
+config SNMPIndexconfig
+	option ModbusParameter 'SNMPData'
+	option Parameterkey 'Data'
+
+config TmpIndexconfig
+	option ModbusParameter 'ReadTimestamp'
+	option Parameterkey 'ReadTimeStamp'
+
+config TmpIndexconfig
+	option ModbusParameter 'TemperatureRequestId'
+	option Parameterkey 'RequestId'
+
+config TmpIndexconfig
+	option ModbusParameter 'TemperatureValues6'
+	option Parameterkey 'Temperature6'
+
+config JsonRs485Indexconfig
+	option SerialNumber '4'
+	option ModbusParameter 'SiteID'
+	option Parameterkey 'site_id'
+
+config DioIndexconfig
+	option Parametervalue 'param3'
+	option ModbusParameter 'DIRequestId'
+	option Parameterkey 'request_id'
+
+config SNMPIndexconfig
+	option ModbusParameter 'SNMPCustomfield3'
+	option Parameterkey 'hbg'
+	option Parametervalue 'mjhnb'
+
+config TmpIndexconfig
+	option ModbusParameter 'TemperatureCustomfield4'
+	option Parameterkey 'iukujhy'
+	option Parametervalue 'imnbt'
+
+config configType 'Type'
+	option configType '1'
+
+config JsonRs485Indexconfig
+	option SerialNumber '13'
+	option Parameterkey 'device_no'
+	option Parametervalue '17C48220565'
+	option ModbusParameter 'SerialNumber'
+
+config DioIndexconfig
+	option ModbusParameter 'DIRecordType'
+	option Parameterkey 'rec_type'
+
+config DioIndexconfig
+	option ModbusParameter 'DIValues1'
+	option Parameterkey 'dio_1'
+
+config DioIndexconfig
+	option ModbusParameter 'DIValues2'
+	option Parameterkey 'dio_2'
+
+config DioIndexconfig
+	option ModbusParameter 'DIValues3'
+	option Parameterkey 'dio_3'
+
+config DioIndexconfig
+	option ModbusParameter 'DIValues4'
+	option Parameterkey 'dio_4'
+
+config AIIndexconfig
+	option ModbusParameter 'AIRecordType'
+	option Parameterkey 'rec_type'
+
+config AIIndexconfig
+	option ModbusParameter 'AIValues1'
+	option Parameterkey 'ai_1'
+
+config AIIndexconfig
+	option ModbusParameter 'AIValues2'
+	option Parameterkey 'ai_2'
+
+config RS232Indexconfig
+	option ModbusParameter 'EMeterRS232RequestId'
+	option Parameterkey 'request_id'
+
+config RS232Indexconfig
+	option ModbusParameter 'EMeterRS232InterfaceId'
+	option Parameterkey 'interface_id'
+
+config RS232Indexconfig
+	option ModbusParameter 'EMeterRS232MeterID'
+	option Parameterkey 'equiment_id'
+
+config RS232Indexconfig
+	option ModbusParameter 'EMeterRS232MeterModel'
+	option Parameterkey 'equiment_model'
+
+config RS232Indexconfig
+	option ModbusParameter 'EMeterRS232SlaveID'
+	option Parameterkey 'slave_id'
+
+config RS232Indexconfig
+	option ModbusParameter 'FunctionCodeUsed'
+	option Parameterkey 'func_code'
+
+config RS232Indexconfig
+	option ModbusParameter 'EMeterRS232ResponseCode'
+	option Parameterkey 'commstatus'
+
+config RS232Indexconfig
+	option ModbusParameter 'StartingRS232RegisterAddress'
+	option Parameterkey 'startreg'
+
+config RS232Indexconfig
+	option ModbusParameter 'NoOfRegisters'
+	option Parameterkey 'totalreg'
+
+config RS232Indexconfig
+	option ModbusParameter 'RS232EMeterREG2'
+	option Parameterkey 'reg_data'
+
+config JsonRs485Indexconfig
+	option SerialNumber '14'
+	option ModbusParameter 'imei'
+	option Parameterkey 'IMEI_no'
+
+config JsonRs485Indexconfig
+	option SerialNumber '15'
+	option ModbusParameter 'ReadTimeStamp'
+	option Parameterkey 'timestamp'
+
+config JsonRs485Indexconfig
+	option SerialNumber '16'
+	option ModbusParameter 'EMeterRS485RecordNumber'
+	option Parameterkey 'rec_no'
+
+config JsonRs485Indexconfig
+	option SerialNumber '17'
+	option Parameterkey 'rec_type'
+	option ModbusParameter 'RecordType'
+
+config JsonRs485Indexconfig
+	option SerialNumber '19'
+	option Parameterkey 'slave_id'
+	option ModbusParameter 'EMeterRS485SlaveID'
+
+config JsonRs485Indexconfig
+	option SerialNumber '19'
+	option ModbusParameter 'EMeterRS485ResponseCode'
+	option Parameterkey 'commstatus'
+
+config JsonRs485Indexconfig
+	option SerialNumber '9'
+	option ModbusParameter 'AlarmStatus'
+	option Parameterkey 'alarm_status'
+
+config JsonRs485Indexconfig
+	option SerialNumber '10'
+	option ModbusParameter 'EventStatus'
+	option Parameterkey 'event_status'
+
+config JsonRs485Indexconfig
+	option SerialNumber '11'
+	option ModbusParameter 'signalstrength'
+	option Parameterkey 'signal'
+
+config JsonRs485Indexconfig
+	option SerialNumber '12'
+	option ModbusParameter 'NetworkMode'
+	option Parameterkey 'nw_type'
+
+config JsonRs485Indexconfig
+	option SerialNumber '13'
+	option ModbusParameter 'NetworkOperator'
+	option Parameterkey 'op_name'
+
+config JsonRs485Indexconfig
+	option SerialNumber '14'
+	option ModbusParameter 'EMeterREG2'
+	option Parameterkey 'equipment_data'
+

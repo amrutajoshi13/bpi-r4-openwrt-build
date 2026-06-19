@@ -1,0 +1,54 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">MAC Address Binding</h1>
+</div>
+
+
+<div class="pagecontent">
+
+	<div style="text-align: right;" class="btnclass">
+		<button type="button" class="btn btn-success btn-update" data-type="macaddress" title="Update MAC"
+			id="update_mac">Update</button>
+	</div>
+	<div id="Update-MAC-Note"></div>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">MAC Binding Configurations</h3>
+		</div>
+		<p id="No-MacBinding-Config"></p>
+		<div class="scrollable-x " id="section_mac_binding"></div>
+
+	</div>
+			       		
+	<div id="Mansection_firewall_port">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Add New Configuration :</h3>
+			</div>
+
+			<div class="luci2-field form-group" style="margin-top: 10px;">
+				<label class="col-lg-2 control-label" for="field_NewEvent_mac_name">Device Name</label>
+				<div class="luci2-field-widget form-group col-lg-4">
+					<input class="form-control luci2-field-validate" id="field_NewEvent_mac_name" type="text"
+						placeholder="">
+					<div class="luci2-field-error label label-danger" style="display: none;"></div>
+				</div>
+			</div>
+
+			<div class="text-right" style="margin: 0px 10px 20px 0px;">
+				<button type="button" title="Add MAC" data-action="save" id="AddNewmacid" class="btn btn-success">Add
+					Device</button>
+			</div>
+
+		</div>
+
+	</div>
+
+
+	
+</div>
+<style>
+	#Update-MAC-Note {
+		margin: -64px 0px 0px 8px;
+	}
+</style>

@@ -1,0 +1,3 @@
+check process CmdProcessorApp with matching "CmdProcessorApp" every 1 cycles
+    start program = "/root/CmdProcessorAppComponent/CmdProcessorApp > /dev/null 2>&1 &"
+    stop program = "/usr/bin/killall CmdProcessorApp > /dev/null 2>&1"

@@ -1,0 +1,4 @@
+
+config nmsconfig 'nmsconfig'
+	option nmsenable '0'
+

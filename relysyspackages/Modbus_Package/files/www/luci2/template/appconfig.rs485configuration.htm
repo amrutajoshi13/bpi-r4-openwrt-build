@@ -1,0 +1,85 @@
+<div id="map"></div>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">Add New Device:</h3>
+	</div>
+	
+	<table class="table table-condensed table-hover">
+		<thead>
+			<tr class="cbi-section-table-titles">
+				<th class="cbi-section-table-cell">Device Name</th>
+				<th class="cbi-section-table-cell">Port Number</th>
+				<th class="cbi-section-table-cell"> </th>
+			</tr>
+		</thead>
+		
+		<tbody data-toggle="validator">
+			<tr class="luci2-section-item" id="sectionitem_NewEvent" data-luci2-sid="NewEvent">
+				
+				
+				
+				<td>
+					<div class="luci2-field">
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate" id="field_NewEvent_name" type="text" placeholder="">
+	
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+				</td>
+				
+				<script>
+					// Get the input element
+					const inputElement = document.getElementById("field_NewEvent_name");
+
+					// Add an event listener to the input element
+					inputElement.addEventListener("input", function (event) {
+						// Get the current input value
+						const inputValue = event.target.value;
+
+						// Replace any spaces with an empty string
+						const sanitizedValue = inputValue.replace(/\s/g, '');
+
+						// Update the input value with the sanitized value
+						event.target.value = sanitizedValue;
+					});
+				</script>
+				
+				<td>
+					<div class="luci2-field">
+						<div class="luci2-field-widget">
+							<select class="form-control luci2-field-validate" id="field_NewEvent_InterfaceID">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								  </select>
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+				</td>
+				
+<!--
+				<td>
+					<div class="luci2-field">
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate" id="field_NewEvent_MeterID" type="text" placeholder="">
+	
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+				</td>
+				
+-->
+				
+				
+				<td class="text-right" style="width: 1%;">
+					<div class="btn-group">
+						<button type="button" title="" id="AddNewEvent" class="btn btn-success">Add</button>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>	
+
+

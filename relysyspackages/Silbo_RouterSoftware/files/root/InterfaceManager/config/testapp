@@ -1,0 +1,11 @@
+
+config testapp
+    option utility "Run Test App"
+    option action "RUN"
+    option inputs "0" 
+
+config testapp
+    option utility "Show Test Result"
+    option action "SHOW"
+    option inputs "0"           
+    

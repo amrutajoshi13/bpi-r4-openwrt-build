@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="RS_485" data-name="RS 485" transform="translate(-172 -380)">
+    <g id="electricity">
+      <path id="Vector" d="M3.99,11h3a3.831,3.831,0,0,0,4-4V1.91A1.916,1.916,0,0,0,9.08,0H1.91A1.916,1.916,0,0,0,0,1.91V7A3.817,3.817,0,0,0,3.99,11Z" transform="translate(178.51 385)" fill="none" stroke="#292d32" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-2" data-name="Vector" d="M0,0V3" transform="translate(181.5 382)" fill="none" stroke="#292d32" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-3" data-name="Vector" d="M0,0V3" transform="translate(186.5 382)" fill="none" stroke="#292d32" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-4" data-name="Vector" d="M0,6V0" transform="translate(184 396)" fill="none" stroke="#292d32" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+      <path id="Vector-5" data-name="Vector" d="M0,0H24V24H0Z" transform="translate(172 380)" fill="none" opacity="0"/>
+    </g>
+  </g>
+</svg>

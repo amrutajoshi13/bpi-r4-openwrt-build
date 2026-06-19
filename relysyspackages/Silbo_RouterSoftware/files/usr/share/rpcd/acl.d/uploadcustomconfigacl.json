@@ -1,0 +1,26 @@
+{
+    "updatecustomconfig": {
+        "description": "Update Custom Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updatecustomimageconfig":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "customconfig",
+                
+            ]
+        },
+        "write": {
+						"ubus" : {
+                "rpc-updatecustomimageconfig":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "customconfig",                
+            ]
+        }
+    }
+}

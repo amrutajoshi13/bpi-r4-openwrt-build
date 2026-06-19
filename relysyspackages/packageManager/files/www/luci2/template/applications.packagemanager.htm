@@ -1,0 +1,60 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Package Manager</h1>
+</div>
+
+<div class="pagecontent">
+<div id="mainContent">
+    <!-- <div>
+        <h2>Package Manager</h2>
+    </div> -->
+    <div class="tab-content" id="tab">
+        <ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+            <li class="TabC TabGn active">
+                <a id="installedAppTab" href="#installedApp" data-toggle="tab">Installed APP
+                    <span class="badge"></span>
+                </a>
+            </li>
+            <li class="TabA TabAA">
+                <a id="availableAppTab" href="#availableApp" data-toggle="tab">Available APP
+                    <span class="badge"></span>
+                </a>
+            </li>
+            <li class="TabB TabMU">
+                <a id="manualUpagradeTab" href="#manualUpagrade" data-toggle="tab">Manual Upgrade
+                    <span class="badge"></span>
+                </a>
+            </li>
+        </ul>
+        <div class="tab-pane TabC TabGn active" id="installedApp">
+            <div class="panel panel-default" style="padding-bottom: 38px;">
+                <div id="installedAppSettings">
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane TabB TabAA" id="availableApp">
+            <div class="panel panel-default" style="padding-bottom: 38px;">
+                <div id="availableAppSettings">
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane TabA TabMU" id="manualUpagrade">
+            <div class="panel panel-default" style="padding-bottom: 38px;">
+                <div id="manualUpagradeSettings">
+                    <button type="button" class="btn btn-primary"
+                        style="padding: 12px 100px; margin-bottom: 0;margin-top: 4%;margin-left: 25%;"
+                        onclick="uploadIpk()">Select Package To Install</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<style>
+    .note {
+        border: 1px #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+    }
+</style>

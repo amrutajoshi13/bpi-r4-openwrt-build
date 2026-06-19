@@ -1,0 +1,4 @@
+check process ser2net with matching "ser2net" every 1 cycles
+    start program = "/bin/monitser2net.sh > /dev/null 2>1&"
+    stop program = "/usr/bin/killall ser2net > /dev/null 2>&1"
+

@@ -1,0 +1,127 @@
+#!/bin/sh /etc/rc.common
+
+. /lib/functions.sh
+
+START=13
+STOP=13
+USE_PROCD=1
+
+readSignalStrength()
+{
+	#number of modems in board
+	numberOfModems=$(uci get signalstrength.@global[0].numberOfModems) 			#number of modems in board
+	networkModeLed=$(uci get signalstrength.@global[0].networkModeLed)			
+	signalStrengthLed=$(uci get signalstrength.@global[0].signalStrengthLed)
+	
+	for i in $(seq 1 $numberOfModems)
+	do 
+		if [ $networkModeLed -eq 1 ]
+		then 
+			#type of signal strength indicator used)
+			networkModeIndicatorType=$(uci get signalstrength.modem${i}.networkModeIndicatorType)
+			networkModeLedOffValue=$(uci get signalstrength.modem${i}.networkModeLedOffValue)
+	
+			if [ "$networkModeIndicatorType" = "singleled" ]
+			then 
+				networkModeLed=$(uci get signalstrength.modem${i}.networkModeLed)
+								
+				#export network mode led and initialise with led off value
+				echo "$networkModeLed" > /sys/class/gpio/export
+				echo out > /sys/class/gpio/gpio${networkModeLed}/direction
+				echo "$networkModeLedOffValue" > /sys/class/gpio/gpio${networkModeLed}/value
+				
+			elif [ "$networkModeIndicatorType" = "rgled" ]
+			then
+				networkModeGreenLed=$(uci get signalstrength.modem${i}.networkModeGreenLed)
+				networkModeRedLed=$(uci get signalstrength.modem${i}.networkModeRedLed)
+				
+				#export network mode green and red led and initialise with led off value
+				echo "$networkModeGreenLed" > /sys/class/gpio/export
+				echo out > /sys/class/gpio/gpio${networkModeGreenLed}/direction
+				echo "$networkModeLedOffValue" > /sys/class/gpio/gpio${networkModeGreenLed}/value
+				
+				echo "$networkModeRedLed" > /sys/class/gpio/export
+				echo out > /sys/class/gpio/gpio${networkModeRedLed}/direction
+				echo "$networkModeLedOffValue" > /sys/class/gpio/gpio${networkModeRedLed}/value
+			fi
+		fi
+		
+		
+		if [ $signalStrengthLed -eq 1 ]
+		then
+			#type of signal strength indicator used)
+			signalStrengthIndicatorType=$(uci get signalstrength.modem${i}.signalStrengthIndicatorType)
+			signalStrengthLedOffValue=$(uci get signalstrength.modem${i}.signalStrengthLedOffValue)
+			
+			if [ "$signalStrengthIndicatorType" = "ledstrip" ]
+			then 
+				#number of signal strength leds
+				numberOfSignalStrengthLeds=$(uci get signalstrength.modem${i}.numberOfSignalStrengthLeds)
+				
+				for j in $(seq 1 $numberOfSignalStrengthLeds)
+				do
+					led=$(uci get signalstrength.modem${i}.signalStrengthLed${j})
+					
+					#export signal strength led j
+					echo "$led" > /sys/class/gpio/export
+					echo out > /sys/class/gpio/gpio${led}/direction
+					echo "$signalStrengthLedOffValue" > /sys/class/gpio/gpio${led}/value
+				done
+			
+			elif [ "$signalStrengthIndicatorType" = "rgled" ]
+			then
+				signalStrengthGreenLed=$(uci get signalstrength.modem${i}.signalStrengthGreenLed)
+				signalStrengthRedLed=$(uci get signalstrength.modem${i}.signalStrengthRedLed)
+				
+				#export network mode green and red led and initialise with led off value
+				echo "$signalStrengthGreenLed" > /sys/class/gpio/export
+				echo out > /sys/class/gpio/gpio${signalStrengthGreenLed}/direction
+				echo "$signalStrengthLedOffValue" > /sys/class/gpio/gpio${signalStrengthGreenLed}/value
+				
+				echo "$signalStrengthRedLed" > /sys/class/gpio/export
+				echo out > /sys/class/gpio/gpio${signalStrengthRedLed}/direction
+				echo "$signalStrengthLedOffValue" > /sys/class/gpio/gpio${signalStrengthRedLed}/value
+			fi
+		fi
+	done
+}
+
+start_service()
+{
+	board_name=$(cat /tmp/sysinfo/board_name)
+	if echo "$board_name" | grep -qE "(Silbo_IA44|Silbo_IB44|Silbo_IC44_GW||Silbo_IC44)";
+	then
+		simselectgpio=$(uci get systemgpio.gpio.simselectgpio)
+		sim1selectvalue=$(uci get systemgpio.gpio.sim1selectvalue)
+		
+		Sim1LedGpio=$(uci get systemgpio.gpio.Sim1LedGpio)
+		Sim2LedGpio=$(uci get systemgpio.gpio.Sim2LedGpio)
+		Sim1LedGpioOffvalue=$(uci get systemgpio.gpio.Sim1LedGpioOffvalue)
+		Sim2LedGpioOffvalue=$(uci get systemgpio.gpio.Sim2LedGpioOffvalue)
+		
+		#sim select gpio
+		echo "$simselectgpio" > /sys/class/gpio/export 
+		echo out > /sys/class/gpio/gpio${simselectgpio}/direction
+		echo "$sim1selectvalue" > /sys/class/gpio/gpio${simselectgpio}/value
+
+		#sim1 led
+		echo "$Sim1LedGpio" > /sys/class/gpio/export 
+		echo out > /sys/class/gpio/gpio${Sim1LedGpio}/direction
+		echo "$Sim1LedGpioOffvalue" > /sys/class/gpio/gpio${Sim1LedGpio}/value
+
+		#sim2 led
+		echo "$Sim2LedGpio" > /sys/class/gpio/export 
+		echo out > /sys/class/gpio/gpio${Sim2LedGpio}/direction
+		echo "$Sim2LedGpioOffvalue" > /sys/class/gpio/gpio${Sim2LedGpio}/value
+	fi
+	if echo "$board_name" | grep -qE "(Silbo_IA|Silbo_IB|Silbo_IC|Silbo_IC44_GW)";
+	then
+		readSignalStrength
+	fi
+}
+
+stop_service()
+{
+	echo "signal strength gpio's are exported"
+}
+	

@@ -1,0 +1,118 @@
+#!/bin/sh
+. /usr/share/libubox/jshn.sh
+. /reap/lib/functions.sh
+
+#
+# PKG_RELEASE: 1.01
+#
+
+#LogFileDir="/reap/usrRPC/Log"
+#LogFile="$LogFileDir/CommandLog"
+#LogrotateConfigFile="/etc/logrotate.d/UbusCommandLogConfig"
+HardwareReset="/root/usrRPC/api/Board_Recycle_12V_Utility"
+#HardwareReset="reboot"
+
+#[ -d "$LogFileDir" ]  || mkdir -p "$LogFileDir"
+
+case "$1" in
+    list)
+        echo '{ "execute": { "command" : "CommandName", "arguments" : "CommandArguments" }}'
+        ;;
+
+    call)
+        case "$2" in
+            execute)
+                # read the arguments and log the call
+                read -r input;
+                currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+                #echo "[$currentDate] command:execute $input" >> "$LogFile"
+                #logrotate "$LogrotateConfigFile"
+
+                # parse the received arguments
+                json_load "$input" > /dev/null 2>&1
+                json_get_var CmdName command
+                json_get_var CmdArg  arguments
+
+                case "$CmdName" in
+                    "reboot")
+                        if ! echo "$CmdArg" | grep -qE '^system$|^hardware$'
+                        then
+                            echo '{"code":"1","output":"invalid command arguments"}'
+                        else
+                            if [ "$CmdArg" = "system" ]
+                            then
+                                echo '{"code":"0","output":"command received"}'
+                                reboot > /dev/null 2>&1
+                            else
+                                echo '{"code":"0","output":"command received"}'
+                                output=$($HardwareReset 2>&1)
+                                retval=$?
+                            fi
+                        fi
+                        ;;
+
+                    "getip")
+                        config_load modem
+                        if ! echo "$InterfaceName" | grep -qE "^rmnet_data0$"
+                        then
+                                echo "{\"code\":0,\"gettip\":\"invalid interface\"}"
+                        else
+                                source /lib/functions/network.sh
+                                if network_get_ipaddr InterfaceIP "$InterfaceName"
+                                then
+                                        echo "{\"code\":0,\"$InterfaceName\":\"$InterfaceIP\"}"
+                                else
+                                        echo "{\"code\":0,\"$InterfaceName\":\"down\"}"
+                                fi
+                        fi
+                        ;;
+
+                    "changeip")
+                        config_load modem
+                        if ! echo "$InterfaceName" | grep -qE "^rmnet_data0$"
+                        then
+                                echo "{\"code\":0,\"changeip\":\"invalid interface\"}"
+                        else
+                                ChangeIPFile="/tmp/InterfaceManager/$InterfaceName.""ChangeIP"
+                                echo "[$currentDate] command: changeip command received for interface $InterfaceName " > "$ChangeIPFile"
+                                echo "{\"code\":0,\"changeip\":\"command received\"}"
+                        fi
+                        ;;
+
+                    "uptime")
+                        uptime=$(cat /proc/uptime)
+                        uptime=${uptime%%.*}
+                        seconds=$(( uptime%60 ))
+                        minutes=$(( uptime/60%60 ))
+                        hours=$(( uptime/60/60%24 ))
+                        days=$(( uptime/60/60/24 ))
+                        echo "{\"code\":0,\"uptime\":\"$days-$hours-$minutes-$seconds\"}"
+                        ;;
+
+                    "gettime")
+                        if ! echo "$CmdArg" | grep -qE '^system$|^hardware$'
+                        then
+                           echo '{"code":0,"output":"invalid command arguments"}'
+                        else
+                            if [ "$CmdArg" = "system" ]
+                            then
+                                SysTime=$(date +"%F %T")
+                                echo "{\"code\":0,\"systemtime\":\"$SysTime\"}"
+                            else
+                                HWTime=$(hwclock -r 2>&1 | awk -F' ' '{NF-=2;print}')
+                                ModifiedHWTime=$(date -D"%c" -d"$HWTime" +"%F %T")
+                                echo "{\"code\":0,\"hardwaretime\":\"$ModifiedHWTime\"}"
+                            fi
+                        fi
+                        ;;
+
+                    *)
+                        echo '{"code":"1","output":"invalid command"}'
+                        ;;
+                esac #command name
+                ;;
+        esac #command method
+        ;;
+esac #ubus method
+
+exit 0

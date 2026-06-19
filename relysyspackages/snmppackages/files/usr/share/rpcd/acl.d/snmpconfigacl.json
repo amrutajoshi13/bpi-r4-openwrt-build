@@ -1,0 +1,30 @@
+
+{
+    "snmpconfig": {
+        "description": "SNMP Agent Configuration",
+        "read": {
+                        "ubus" : {
+                "rpc-snmpagentupdate":[
+                "configure"
+                ]
+            },
+            "uci": [
+                "snmpconfig",
+
+            ]
+
+        },
+        "write": {
+                        "ubus" : {
+                "rpc-snmpagentupdate":[
+                "configure"
+
+                ]
+            },
+            "uci": [
+               "snmpconfig",
+
+            ]
+        }
+    }
+}

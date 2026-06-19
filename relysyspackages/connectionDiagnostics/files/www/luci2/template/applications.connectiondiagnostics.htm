@@ -1,0 +1,258 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Connection Diagnostics</h1>
+</div>
+
+<div class="pagecontent">
+
+<div id="mainContent">
+    <div class="panel panel-default" style="padding-bottom: 38px;">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="font-size:14px">Application Start/Stop</h3>
+        </div>
+        <form>
+            <div class="form-group row">
+                <label for="startStop" class="col-sm-4 col-form-label">Start or Stop Application</label>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-primary" style="float: left;" id="startStop"
+                        onclick="startStopEvent(event)">Start</button>
+                </div>
+            </div>
+    </div>
+
+    <div class="panel panel-default" style="padding-bottom: 38px;">
+        <div class="panel-heading">
+            <h3 class="panel-title" style="font-size:14px">General Settings</h3>
+        </div>
+        <form>
+            <div class="form-group row">
+                <label for="enable" class="col-sm-4 col-form-label">Enable Connection Diagnostics</label>
+                <div class="col-sm-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" style="margin:10px 0 0" id="enable" value=0
+                            onclick="Enable(event)">
+                    </div>
+                </div>
+            </div>
+            <div id="generalSettings" style="display: none;">
+                <div class="form-group row">
+                    <label for="checkInterval" class="col-sm-4 col-form-label">Check Interval (in seconds)</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" valid="0" min="60" id="checkInterval" placeholder="60"
+                            oninput="validateInputRange(event)">
+                        <div id="validatecheckInterval" class="luci2-field-error label label-danger"
+                            style="display:none"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="numOfPings" class="col-sm-4 col-form-label">Number of Pings</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" valid="0" min="1" max="10" id="numOfPings"
+                            placeholder="5" oninput="validateInputRange(event)">
+                        <div id="validatenumOfPings" class="luci2-field-error label label-danger" style="display:none">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="packetSize" class="col-sm-4 col-form-label">Ping Packet Size (in Bytes)</label>
+                    <div class="col-sm-4">
+                        <select type="number" class="form-control" id="packetSize" placeholder="56">
+                            <option value="12">12</option>
+                            <option value="20">20</option>
+                            <option value="32">32</option>
+                            <option value="56">56</option>
+                            <option value="576">576</option>
+                            <option value="1024">1024</option>
+                            <option value="1500">1500</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="enableMqtt" class="col-sm-4 col-form-label">Send to remote MQTT Broker</label>
+                    <div class="col-sm-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" style="margin:10px 0 0" id="enableMqtt"
+                                value=0 onclick="EnableMqtt(event)">
+                        </div>
+                    </div>
+                </div>
+                <div id="mqttSettings" style="display: none;">
+                    <div class="form-group row">
+                        <label for="dataFormat" class="col-sm-4 col-form-label">Publish Data Format</label>
+                        <div class="col-sm-4">
+                            <input type="radio" id="csv" name="dataFormat" value="csv" checked="checked"
+                                onchange="handlechangeDataFormat(event)">
+                            <label for="csv"> &nbsp;&nbsp;&nbsp;CSV
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                            <input type="radio" id="json" name="dataFormat" value="json" onchange="handlechangeDataFormat(event)">
+                            <label for="json"> &nbsp;&nbsp;&nbsp;JSON </label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="mqttBroker" class="col-sm-4 col-form-label">MQTT Broker url</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="mqttBroker" placeholder="">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="tcpPort" class="col-sm-4 col-form-label">TCP port</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" id="tcpPort">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="mqttTopic" class="col-sm-4 col-form-label">Topic</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="mqttTopic" placeholder="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div>
+            <button type="button" class="btn btn-primary" style="margin-left: 700px; margin-top: 10px;" onclick="AddGeneral()">Save</button>
+        </div>
+    </div>
+
+    <div id="statusPanel" class="panel panel-default">
+        <button type="button" id="Add" data-toggle="modal" data-target="#AddEditModal" class="btn btn-primary"
+            style="margin-left: 700px; margin-top: 15px;">Add new target </button>
+        <div class="panel-heading">
+            <h3 class="panel-title" style="font-size:14px">Connection Status and Management</h3>
+        </div>
+        <div id="renderTable"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="AddEditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" style="width:700px" role="document">
+        <div class="modal-content">
+
+            <!-- <div class="modal-header"> -->
+                <h3 class="modal-header modal-title" id="AddEditModal">Add new target IP</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            <!-- </div> -->
+            <div class="modal-body">
+                <form>  
+                    <div id="targetIpConfig" style="display: block;">
+                        <div class="form-group row">
+                            <label for="IPAddress" class="col-sm-3 col-form-label">Target IP</label>
+                            <div class="col-sm-5">
+                                <input class="form-control" id="IPAddress" oninput="ValidateIPv4(event)">
+                                <div id="validateIPAddress" class="luci2-field-error label label-danger"
+                                    style="display:block">Enter a valid IPv4 address</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="targetDeviceConfig" style="display: none;">
+                        <div class="form-group row">
+                            <label for="deviceName" class="col-sm-3 col-form-label">Target Device</label>
+                            <div class="col-sm-5">
+                                <select type="input" class="form-control" id="deviceName">
+                                    <option value="none">Please Choose any device</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="AddConfig()">Add</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</div>
+
+<style>
+    label {
+        font-weight: lighter;
+    }
+
+    .col-form-label {
+        font-size: 14px;
+        text-align: right;
+        margin-top: 7px;
+    }
+
+    label {
+        font: normal normal normal 13px/18px Poppins;
+        color: #2E384D;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 22px;
+        top: -3px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    input:checked+.slider {
+        background-color: #4caf50;
+    }
+
+    input:focus+.slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked+.slider:before {
+        -webkit-transform: translateX(18px);
+        -ms-transform: translateX(18px);
+        transform: translateX(18px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+    .slider.round:before {
+        border-radius: 50%;
+    }
+
+    .btnApply {
+        width: 100px;
+    }
+
+    checked {
+        background-color: #4caf50;
+    }
+</style>

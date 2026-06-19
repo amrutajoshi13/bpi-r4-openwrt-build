@@ -1,0 +1,30 @@
+{
+    "ioutilities": {
+        "description": "Misc Utilities",
+        "read": {
+            "cgi-file": [ "download", ],
+            "ubus" : {
+                "rpc-diagnosticIOutilities":[
+                    "run"
+                ],
+                "file":[
+                    "read"
+                ],
+                "luci2.system":[
+                    "init_action"
+                ]
+            },
+            "uci": [
+                "DiagnosticIOUtilities",
+                "applist_config"
+            ]
+        },
+        "write": {
+            "cgi-file": [ "upload", ],
+            "uci": [
+                "DiagnosticIOUtilities",
+                "applist_config"
+            ]
+        }
+    },
+}

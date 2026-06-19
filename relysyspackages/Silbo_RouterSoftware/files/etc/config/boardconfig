@@ -1,0 +1,11 @@
+
+
+config interface 'board'
+       option serialnum '1'
+       option wanmacid '12:12:12:12:12'
+       option lanmacid '12:12:12:12:12'
+       option wifimacid '12:12:12:12:12'
+       option FirmwareVer '1.19'
+       option ApplicationSwVer '1.19.3'
+       option imei '9989389389'
+

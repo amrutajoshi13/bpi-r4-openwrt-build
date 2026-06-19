@@ -1,0 +1,209 @@
+<div style="border-bottom: 1px solid #70707038">
+  <h1 class="header">Wireless MAC ID Filtering</h1>
+</div>
+
+<div class="pagecontent">
+
+  <div style="text-align: right;" class="btnclass">
+      <button type="button" class="btn btn-success btn-update" data-type="wirelessfilter" title="Update Wireless filter"
+        id="update_ipsec">Update</button>
+  </div>
+  <div id="Update-WiFiFilter-Note"></div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item active">
+          <a class="nav-link active" data-toggle="tab" href="#settings1" id="communicationid" role="tab">Wi-Fi 2.4G
+            AP</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-toggle="tab" href="#settings2" id="register" role="tab">Wi-Fi 2.4G AP Guest</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tab-content">
+
+    <div class="tab-pane active" id="settings1" name="attributes" role="tabpanel">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Wi-Fi 2.4G AP Configurations</h3>
+        </div>
+        <div class="panel-body">
+          <p id="No-Wifi2.4G-Config"></p>
+          <div class="scrollable-x" id="networktype1"></div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Add 2.4G AP Configurations</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-4">
+              <label style="font-weight: 600;">Change Mode</label>
+              <select class="form-control" id="Accesspolicy1">
+                <option value="blacklist">Blacklist</option>
+                <option value="whitelist">Whitelist</option>
+                <!-- <option value="disable">Disable</option> -->
+              </select>
+            </div>
+            <div class="col-md-2">
+              <div style="margin-top:25px;">
+                <button class="btn btn-primary" id="ChangeMode1">Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="tab-pane" id="settings2" name="attributes" role="tabpanel">
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Wi-Fi 2.4G AP Guest Configurations</h3>
+        </div>
+        <div class="panel-body">
+          <p id="No-Wifi5G-Config"></p>
+          <div class="scrollable-x" id="networktype2"></div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Add 2.4G AP Guest Configurations</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-4">
+              <label style="font-weight: 600;">Change Mode</label>
+              <select class="form-control" id="Accesspolicy2">
+                <option value="blacklist">Blacklist</option>
+                <option value="whitelist">Whitelist</option>
+              </select>
+
+            </div>
+            <div class="col-md-2">
+              <div style="margin-top:25px;">
+                <button class="btn btn-primary" id="ChangeMode2">Apply</button>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+
+
+      </div>
+
+    </div>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Add Wireless MAC ID Filttering Configurations</h3>
+      </div>
+
+      <div class="panel-body">
+        <div class="text-right" style="margin: 10px 10px 20px 0px;">
+          <button class="btn btn-success" data-toggle="modal" id="addnew" data-target="#exampleModal"
+            title="Add Wireless MAC ID">Add New</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header modal-title">
+        <h3 id="updatetext">Basic Information</h3>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-3">
+            <label style="float:right">Status:</label>
+          </div>
+          <div class="col-md-7">
+            <div style="margin-bottom:20px">
+              <label class="switch">
+                <input type="checkbox" checked id="MACfilteringSwitch">
+                <span class="slider round"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <label style="float:right">MACID :</label>
+          </div>
+          <div class="col-md-7">
+            <input type="text" id="MACID" class="form-control" style="margin-bottom: 10px;"
+              placeholder="XX:XX:XX:XX:XX:XX">
+            <div class="luci2-field-error label label-danger" id="validationResult" style="display: none;"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-3">
+            <label style="float:right">Network name :</label>
+          </div>
+          <div class="col-md-7">
+            <select class="form-control" id="NetworkMode">
+              <option value="1">WIFI 2.4G AP</option>
+              <option value="2">WIFI 2.4G AP Guest</option>
+            </select>
+            <div class="luci2-field-error label label-danger" id="validationResult" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class=" modal-footer">
+        <button type="button" class="btn btn-success" id='Applyconfig'>Save</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #Update-WiFiFilter-Note {
+    margin: -64px 0px 0px 8px;
+  }
+</style>
+
+<script>
+  $(document).ready(function () {
+    $('[data-toggle="popover"]').popover({
+      placement: 'bottom',
+    });
+  });
+
+  const lastSelected1 = localStorage.getItem('Accesspolicy1');
+  if (lastSelected1) {
+    $('#Accesspolicy1').val(lastSelected1);
+  }
+
+  // Save the selected option to localStorage on change
+  $('#Accesspolicy1').on('change', function () {
+    localStorage.setItem('Accesspolicy1', $(this).val());
+  });
+
+  const lastSelected2 = localStorage.getItem('Accesspolicy2');
+  if (lastSelected2) {
+    $('#Accesspolicy2').val(lastSelected2);
+  }
+
+  // Save the selected option to localStorage on change
+  $('#Accesspolicy2').on('change', function () {
+    localStorage.setItem('Accesspolicy2', $(this).val());
+  });
+</script>

@@ -1,0 +1,6 @@
+/root/GatewayLogs/rtumd/rtumdLog.txt{
+    size 10k
+    rotate 2
+    missingok
+    create 0644 root root
+}

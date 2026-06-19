@@ -1,0 +1,16 @@
+{
+    "deviceconfig": {
+        "description": "Modbus Device Configuration",
+            "read": {
+                "uci": [
+                    "DeviceConfigGeneric",
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "DeviceConfigGeneric",
+                ]
+            }
+    }
+}

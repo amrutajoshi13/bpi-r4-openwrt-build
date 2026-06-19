@@ -1,0 +1,47 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+
+
+UpdateConfigScript="/bin/UpdateAllUtility.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{"type":"Actiontype","jsonData":"ActionData"}}'
+        ;;
+    call)
+        case "$2" in
+            configure)
+                # read the arguments
+                read -r input
+                json_load "$input" > /dev/null 2>&1
+                json_get_var Actiontype type
+                json_get_var ActionData jsonData
+                echo "Actiontype: $Actiontype" > /tmp/example1.txt
+                echo "ActionData: $ActionData" > /tmp/example2.txt
+
+                # Pass ApplicationName and ActionName to the script and capture output
+                ReadRS485Output=$($UpdateConfigScript "$Actiontype" "$ActionData")
+                ReadRS485RetVal=$?
+                if [ "$ReadRS485RetVal" != 0 ]; then
+                    echo "{\"code\":1,\"output\":\"Failed to execute script for $Actiontype with action $ActionData\"}"
+                else
+                     echo "$ReadRS485Output"
+                     echo "Utilityexitcode: $ReadRS485Output" >> /tmp/debug3.txt
+                fi
+                ;;
+            *)
+                echo '{"code":"1","output":"invalid action"}'
+                exit 1
+                ;;
+        esac # application action
+        ;;
+    *)
+        echo '{"code":"1","output":"invalid method"}'
+        exit 1
+        ;;
+esac # ubus method
+
+exit 0

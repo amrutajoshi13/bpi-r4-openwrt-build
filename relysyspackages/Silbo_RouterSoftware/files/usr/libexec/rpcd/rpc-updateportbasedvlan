@@ -1,0 +1,54 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+#UpdateConfigScript="/root/InterfaceManager/script/Port_based_VLAN.sh"
+DeleteConfigScript="/root/InterfaceManager/script/ethernet/Delete_Port_Based_VLAN.sh"
+
+#UpdateConfigScript="/bin/Validate_Vlanid.sh"
+
+SystemstartScript="/root/InterfaceManager/script/ethernet/Port_based_VLAN.sh"
+
+
+case "$1" in
+    list)
+   
+      echo '{"configure":{},"delete":{}}'
+        ;;
+        
+    call)
+        case "$2" in
+                     
+        
+                    configure)
+	                         response=$($SystemstartScript)
+                             if [ "$?" -ne 0 ]
+                             then
+								echo "{\"code\":1,\"output\":\"Failure : VLAN Config Save\"}"
+                             else
+								echo "{\"code\":0,\"output\":\"Success : VLAN Config Save\"}"
+                             fi                                                      
+                             ;;   
+                             
+                    delete)
+                            response=$($DeleteConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : Configuration not deleted\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS :  Configuration Deleted\"}"
+                            fi
+                                                                                 
+                            ;;   
+                                      
+                           
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+                    ;;
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

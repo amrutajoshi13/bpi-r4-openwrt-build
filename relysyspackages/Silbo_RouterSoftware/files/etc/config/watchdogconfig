@@ -1,0 +1,17 @@
+ 
+config watchdogconfig
+    option utility "Read Watchdog Status"
+    option action "READ"
+    option inputs "0"  
+           
+config watchdogconfig
+    option utility "Set Watchdog State"
+    option action "SET"
+    option inputs "1"
+    option input1Name "Type"
+    option input1Element "selection"
+    option input1Type "string"
+    list input1Values "Enable"
+    list input1Values "Disable"
+
+

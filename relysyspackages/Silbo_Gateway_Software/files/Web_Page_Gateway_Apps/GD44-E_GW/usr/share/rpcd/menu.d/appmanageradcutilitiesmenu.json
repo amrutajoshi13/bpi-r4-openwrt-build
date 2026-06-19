@@ -1,0 +1,16 @@
+{
+
+    "appmanager": {
+     "title": "Appmanager",
+        "index": 75
+    },
+
+                                               
+    "appmanager/adcutilityconfiguration": {       
+         "title": "ADC Utility Configuration",
+         "acls": [ "adcutilityconfig" ],           
+         "view": "appmanager/adcutilityconfiguration",
+         "index": 20                                   
+     },  
+   
+}

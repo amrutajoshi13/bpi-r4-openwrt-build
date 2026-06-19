@@ -1,0 +1,6 @@
+/mnt/disk/AppData/ReAP_MT7628/SIASenderApp/Log/SIASenderAppLog {
+    size 5k
+    rotate 3
+    missingok
+    create 0644 root root 
+}

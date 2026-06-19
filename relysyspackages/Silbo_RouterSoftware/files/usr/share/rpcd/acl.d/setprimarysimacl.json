@@ -1,0 +1,26 @@
+{
+    "setprimarysim": {
+        "description": "Set Primary Sim",
+        "read": {
+			"ubus" : {
+                "rpc-updatesetprimarysim":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "setprimarysimconfig",
+                
+            ]
+        },
+        "write": {
+						"ubus" : {
+                "rpc-updatesetprimarysim":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "setprimarysimconfig",                
+            ]
+        }
+    }
+}

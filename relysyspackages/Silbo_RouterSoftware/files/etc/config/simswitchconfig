@@ -1,0 +1,5 @@
+
+config simswitchconfig 'simswitchconfig'
+	option sim1datausagelimit '1000'
+	option cellulardatausagemanagerperiodicity 'daily'
+	option simswitch 'none'

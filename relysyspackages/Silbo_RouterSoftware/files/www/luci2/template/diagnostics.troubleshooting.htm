@@ -1,0 +1,319 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">TCP Dump Debug</h1>
+</div>
+
+
+<div class="pagecontent">
+	<div id="map"></div>
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Download PCAP File</h3>
+		</div>
+		<div class="panel-body">
+			<div style="float: right;">
+				<input class="btn btn-success" type="button" id="btn_run" value="Run TCP_Dump" />
+			</div>
+			<div id="loading" style="display: none; text-align: center;">
+				<div class="spinner" style="margin: 10px auto;"></div>
+				<div style="color: #13557E; font-size: 18px; font-weight: bold;">Loading...</div>
+			</div>
+			<div class="transfer-container" style="display: none;">
+				<img src="/luci2/icons/laptop-solid.svg" alt="Laptop" class="laptop">
+				<div class="transfer-line">
+					<svg width="240" height="12" viewBox="0 0 240 12" xmlns="http://www.w3.org/2000/svg">
+						<line class="flow-line strong" x1="0" y1="6" x2="240" y2="6" stroke="url(#gradLineFlow_123)"
+							stroke-width="4" stroke-linecap="round" stroke-dasharray="6 6" />
+					</svg>
+				</div>
+				<img src="/luci2/icons/folder-closed-solid.svg" alt="Folder" class="folder">
+			</div>
+
+
+
+			<div id="progress-container" style="display: none;">
+				<div id="progress-bar">
+				</div>
+			</div>
+			<p id="progress-label"></p>
+			<p>
+			<p id="couter_lable">0 seconds</p>
+			<p>
+			<p id="Error-label"></p>
+			<p>
+			<form action="/cgi-bin/file_pcap" method="post" style="display:inline">
+				<input type="hidden" name="sessionid" />
+				<input class="btn btn-primary" type="button" id="btn_backup" style="display: none;"
+					value="<%:Download file%>" />
+			</form>
+			</p>
+		</div>
+	</div>
+</div>
+
+
+
+
+<style>
+	.transfer-container {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		position: relative;
+		margin: 20px auto;
+		width: 360px;
+		height: 70px;
+	}
+
+	.transfer-container img.laptop,
+	.transfer-container img.folder {
+		width: 42px;
+		height: 42px;
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		filter: brightness(0) saturate(100%) invert(21%) sepia(45%) saturate(1200%) hue-rotate(175deg) brightness(92%) contrast(95%);
+
+	}
+
+	.transfer-container .laptop {
+		left: 18px;
+		filter: drop-shadow(0 2px 4px rgba(19, 85, 126, 0.3)) brightness(0) saturate(100%) invert(21%) sepia(45%) saturate(1200%) hue-rotate(175deg) brightness(92%) contrast(95%);
+	}
+
+	.transfer-container .folder {
+		right: 10px;
+		filter: drop-shadow(0 2px 4px rgba(19, 85, 126, 0.3)) brightness(0) saturate(100%) invert(21%) sepia(45%) saturate(1200%) hue-rotate(175deg) brightness(92%) contrast(95%);
+	}
+
+
+
+	.transfer-line {
+		position: absolute;
+		top: 32px;
+		left: 65px;
+		right: 65px;
+		height: 12px;
+	}
+
+
+	.flow-line {
+		stroke: #13557e;
+		stroke-dasharray: 6 6;
+		stroke-linecap: round;
+		animation: flowDash 0.7s linear infinite;
+	}
+
+
+	@keyframes flowDash {
+		0% {
+			stroke-dashoffset: 50;
+		}
+
+		100% {
+			stroke-dashoffset: 0;
+		}
+	}
+
+
+
+	@-webkit-keyframes signalFlow {
+		from {
+			stroke-dashoffset: 50;
+		}
+
+		to {
+			stroke-dashoffset: 0;
+		}
+	}
+
+	@keyframes signalFlow {
+		from {
+			stroke-dashoffset: 50;
+		}
+
+		to {
+			stroke-dashoffset: 0;
+		}
+	}
+
+
+	.transfer-container.visible .flow-line.strong {
+		-webkit-animation: signalFlow 0.7s linear infinite, glowPulse 2.2s ease-in-out infinite;
+		animation: signalFlow 0.7s linear infinite, glowPulse 2.2s ease-in-out infinite;
+	}
+
+	@keyframes glowPulse {
+		0% {
+			filter: drop-shadow(0 0 4px rgba(31, 143, 232, 0.25));
+		}
+
+		50% {
+			filter: drop-shadow(0 0 14px rgba(31, 143, 232, 0.45));
+		}
+
+		100% {
+			filter: drop-shadow(0 0 4px rgba(31, 143, 232, 0.25));
+		}
+	}
+
+	/* responsive */
+	@media (max-width: 640px) {
+		.transfer-container {
+			width: 92%;
+		}
+
+		.transfer-container .laptop {
+			left: 6px;
+			font-size: 36px;
+		}
+
+		.transfer-container .folder {
+			right: 6px;
+			font-size: 36px;
+		}
+
+		.transfer-line {
+			left: 60px;
+			right: 60px;
+			top: 28px;
+			height: 10px;
+		}
+	}
+
+
+
+
+	#progress-container {
+		width: 72%;
+		background: rgba(11, 99, 183, 0.06);
+		border-radius: 12px;
+		margin-top: 14px;
+		height: 14px;
+		overflow: hidden;
+		position: relative;
+		margin-left: 14%;
+		box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+	}
+
+
+	#progress-bar {
+		height: 100%;
+		width: 0%;
+		background: linear-gradient(90deg, #1f8fe8, #0b63b7);
+		transition: width 300ms linear;
+		border-radius: 12px;
+		box-shadow: 0 4px 12px rgba(11, 99, 183, 0.12);
+	}
+
+
+	#progress-bar::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: -40%;
+		width: 40%;
+		height: 100%;
+		background: linear-gradient(90deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02));
+		transform: skewX(-20deg);
+		animation: shimmer 1.8s linear infinite;
+		opacity: 0.6;
+	}
+
+	@keyframes shimmer {
+		0% {
+			left: -40%;
+		}
+
+		100% {
+			left: 140%;
+		}
+	}
+
+
+	#progress-label {
+		margin: 0;
+		color: #234b5f;
+		font-weight: 500;
+		font-size: 13.5px;
+		word-wrap: break-word;
+		text-align: center;
+	}
+
+	#couter_lable {
+		margin-top: 6px;
+		color: #0b63b7;
+		font-weight: 700;
+		text-align: center;
+		display: none;
+	}
+
+	#Error-label {
+		color: #d9534f;
+		font-weight: 700;
+		text-align: center;
+		display: none;
+	}
+
+
+	#btn_run {
+		padding: 8px 16px !important;
+		margin: 10px 0px 20px 0px;
+		color: #fff;
+		border: none;
+		border-radius: 6px;
+		cursor: pointer;
+		font-weight: 500;
+		transition: transform .12s ease, box-shadow .12s ease;
+		background: linear-gradient(180deg, #1f8fe8, #0b63b7);
+	}
+
+	#btn_run:active {
+		transform: translateY(1px);
+	}
+
+	#btn_backup {
+		padding: 10px 14px !important;
+		font-weight: 500;
+		font-size: 12px;
+		background: linear-gradient(180deg, #1f8fe8, #0b63b7);
+		color: #ffffff;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		display: none;
+		margin: 90px auto 0 auto;
+	}
+
+
+	.spinner {
+		width: 40px;
+		height: 40px;
+		border: 4px solid rgba(243, 243, 243, 0.95);
+		border-top: 4px solid #13557E;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+		margin: 8px auto;
+	}
+
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+</style>
+
+
+
+<script>
+	function showLoading() {
+		document.getElementById('loading').style.display = 'block';
+	}
+
+	function hideLoading() {
+		document.getElementById('loading').style.display = 'none';
+	}
+</script>

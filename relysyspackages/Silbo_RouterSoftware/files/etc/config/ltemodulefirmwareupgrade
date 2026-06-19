@@ -1,0 +1,10 @@
+
+config ltemodulefirmwareupgrade 'ltemodulefirmwareupgrade'
+	option Authenable '1'
+	option firmwareversion '1.0'
+	option user 'username'
+	option password 'password'
+	option url '100.2.4.5'
+	option connectiontimeout '100'
+	option operationtimeout '20'
+

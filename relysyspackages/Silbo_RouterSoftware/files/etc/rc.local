@@ -1,0 +1,23 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+
+# setup for logrotate
+if [ ! -d "/var/lib" ]
+then
+    mkdir "/var/lib"
+fi
+chmod 644 /etc/logrotate.d/*
+
+# For System reset switch
+#echo 38 > /sys/class/gpio/export
+
+#Sim1 status gpio
+#echo 499 > /sys/class/gpio/export
+
+#Sim2 status gpio
+#echo 500 > /sys/class/gpio/export
+
+/root/InterfaceManager/script/SystemBoot.sh
+/root/watchdog.sh &
+sh /root/user/init.d/*
+exit 0

@@ -1,0 +1,28 @@
+{
+    "wirelessconfig": {
+        "description": "Wireless Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updatewirelessconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "sysconfig",
+                "wificonfig",
+                "wirelessconfig"
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "sysconfig",
+               "wificonfig",
+               "wirelessconfig"
+             
+            ]
+        }
+    }
+}

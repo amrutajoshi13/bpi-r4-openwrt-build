@@ -1,0 +1,16 @@
+{
+
+    "appmanager": {
+     "title": "Appmanager",
+        "index": 75
+    },
+
+                                               
+    "appmanager/rs485utilityconfiguration": {       
+         "title": "Modbus Utility Configuration",
+         "acls": [ "rs485utilityconfig" ],           
+         "view": "appmanager/rs485utilityconfiguration",
+         "index": 20                                   
+     },  
+   
+}

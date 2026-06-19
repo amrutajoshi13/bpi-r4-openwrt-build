@@ -1,0 +1,16 @@
+{
+    "logsmanagemnet": {
+        "description": "Logs Management",
+            "read": {
+                "uci": [
+                    "LogsManagement",
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "LogsManagement",
+                ]
+            }
+    }
+}

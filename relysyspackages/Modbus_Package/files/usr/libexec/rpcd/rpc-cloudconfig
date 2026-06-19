@@ -1,0 +1,101 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+
+ArchiveDLPath="/root/MQTTSenderAppComponent/etc/certs"
+UpdateConfigScript="/bin/UpdateConfigurationsGateway"
+UpdateNMSConfigScript="/root/InterfaceManager/script/Disable_Nms.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{},"delete":{},"countkeyfiles":{},"update":{},"testarchive":{"archive":"ArchiveName"}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+                            response=$($UpdateConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : NMS Configuration Update\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : NMS Configuration Update\"}"
+                            fi
+                                                                                 
+                            ;;
+                            
+                        update)
+                            response=$($UpdateNMSConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : NMS Configuration Disable\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : NMS Configuration Disable\"}"
+                            fi
+                                                                                 
+                            ;;                                
+                                                                                        
+		             testarchive)
+		                # read the arguments
+		                read -r input;
+		                json_load "$input" > /dev/null 2>&1
+		                json_get_var ArchivedFileWithPath archive
+		                
+		                if [ "x$ArchivedFileWithPath" = "x" ]
+		                then
+		                    echo "{\"code\":1,\"output\":\"invalid input arguments\"}" >> "$logfile"
+		                    exit 1
+		                fi
+		                
+		                find "${ArchiveDLPath}" ! -name '*.zip' -type f -exec rm -f {} +
+
+		               
+		                #extracting tar file in tmp folder
+		                RetMsg=$(unzip "${ArchivedFileWithPath}" -d "${ArchiveDLPath}" 2>&1)
+			            RetVal=$?
+						if [ "$RetVal" -ne 0 ]
+						then
+							echo "Failed to copy key file error-$RetMsg" >> "$logfile"
+						exit 1
+						else
+							echo "{\"code\":0,\"output\":\"SUCCESS : TLS extract\"}"
+
+						fi						
+						
+						rm -f "$ArchivedFileWithPath"
+						   
+		                ;;
+		                
+		                delete)
+                     
+                             rm -rf /root/MQTTSenderAppComponent/etc/certs/*
+                             uci set cloudconfig.cloudconfig.enabledelete=0
+                             uci commit cloudconfig
+                             if [ "$?" -ne 0 ]                                      
+                            then
+                                echo "{\"code\":1,\"output\":\"Delete Certificates Failure!!\"}"
+                            else     
+							
+							    echo "{\"code\":0,\"output\":\"Delete Certificates Success!!\"}"
+                            fi 
+							;; 
+                     
+                     countkeyfiles)
+							count=$(ls -l /root/MQTTSenderAppComponent/etc/certs/ | wc -l)
+							uci set cloudconfig.cloudconfig.enabledelete=1
+							uci commit cloudconfig
+							echo "{\"code\":0,\"output\":\"$count\"}"
+							
+							;;
+                
+		             *)
+		                    echo '{"code":"1","output":"invalid method"}'
+		                    exit 1
+		                    ;;
+     
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

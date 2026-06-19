@@ -1,0 +1,310 @@
+<div id="map"></div>
+
+
+
+
+<div class="tab-content" id="tabs">
+
+<!--
+	<ul class="nav nav-tabs" id="my_tab"  data-tabs="tabs">
+        <h4><b>Port Based VLAN</b></h4>
+	</ul>
+-->
+	
+	<ul class="nav nav-tabs" id="my_tab"  data-tabs="tabs">
+	
+				<li class="TabC Tabsr active">
+			<a id=":w" href="#Port_based_vlan" data-toggle="tab">Port Based VLAN 
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		
+		<li class="TabC TabAsr">
+						<a id=":W" href="#Tagged_based_vlan" data-toggle="tab">Tagged Based VLAN
+								<span class="badge"></span>
+						</a>
+				</li>
+	</ul>
+	
+
+	<div class="tab-pane TabC Tabsr active"  id="Port_based_vlan">
+	
+		<div class="row">
+			<div class="col-md-12">
+				<button type="button" class="btn btn-primary" id="createdevice" onclick="PopulateSelection()" data-toggle="modal" data-target="#exampleModal" style="float:right;margin: -55px 59px 10px 13px;">
+					Add Device</button>
+				<!-- <div id="map"></div> -->
+			</div>
+		 </div>
+
+
+
+		 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+		 aria-hidden="true">
+		 <div class="modal-dialog" role="document">
+			 <div class="modal-content">
+				 <div class="modal-header">
+					 <h3 class="modal-title" id="addtext" style="margin-bottom: 15px;">VLAN Configuration</h3>
+					 <div>
+					 </div>
+					 <div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+							<label>VLAN ID</label>
+							<input class="form-control luci2-field-validate" id="vlanid" type="number" min="1" placeholder="">
+						</div> 	 
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+							<label>Port 0</label>
+							<select class="form-control luci2-field-validate" id="port0Id" type="text" placeholder="">
+							   <option value="off">OFF</option>
+							   <option value="untagged">Untagged</option>
+							   <option value="tagged">Tagged</option>
+								</select>
+							</div>
+						</div>
+
+					 </div>
+<!--
+					 <div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+							<label>Port 1</label>
+							<select class="form-control luci2-field-validate" id="port1Id" type="text" placeholder="">
+							   <option value="off">OFF</option>
+							   <option value="untagged">Untagged</option>
+							   <option value="tagged">Tagged</option>
+								</select>
+							</div>
+						</div>
+-->
+<!--
+						<div class="col-md-6">
+							<div class="form-group">
+							<label>Port 2</label>
+							<select class="form-control luci2-field-validate" id="port2Id" type="text" placeholder="">
+								<option value="off">OFF</option>
+								<option value="untagged">Untagged</option>
+								<option value="tagged">Tagged</option>
+								 </select>
+								</div>
+						</div>
+					 </div>
+-->
+
+<!--
+					 <div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+							<label>Port 3</label>
+							<select class="form-control luci2-field-validate" id="port3Id" type="text" placeholder="">
+								<option value="off">OFF</option>
+								<option value="untagged">Untagged</option>
+								<option value="tagged">Tagged</option>
+								 </select>
+								</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+							<label>Port 4</label>
+							<select class="form-control luci2-field-validate" id="port4Id" type="text" placeholder="">
+								<option value="off">OFF</option>
+								<option value="untagged">Untagged</option>
+								<option value="tagged">Tagged</option>
+								 </select>
+								</div>
+						</div>
+						
+					 </div>
+-->
+						
+                    
+				 </div>
+				 <div class="modal-footer">
+					 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+					 <button type="button" class="btn btn-primary"   id="AddNewPortForward"
+						   >Add</button>
+				 </div>
+			 </div>
+
+		 </div>
+
+	 </div>
+
+		 
+		<div id="section_vlan_port"></div>
+		<div id="Mansection_vlan_port" class="panel panel-default">
+			<div class="panel-heading">
+				<!-- <h3 class="panel-title"> Port Based VLAN:</h3> -->
+			</div>
+			
+			<!-- <table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+						<th class="cbi-section-table-cell">VLAN ID</th>
+
+
+						<th class="cbi-section-table-cell">Port 0</th>
+						<th class="cbi-section-table-cell">Port 1</th>
+						<th class="cbi-section-table-cell">Port 2</th>												
+						<th class="cbi-section-table-cell">Port 3</th>
+						<th class="cbi-section-table-cell">Port 4</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectionitem_vlan_redirect_newRedirect" data-luci2-sid="newRedirect">
+						<td>
+							<div class="luci2-field">
+								<div class="luci2-field-widget">
+								
+									<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>
+
+
+		
+						
+						<td>
+							<div class="luci2-field">
+								<div class="luci2-field-widget">
+									
+                                    <input type="text" class="form-control custom-value-input" style="display: none;">
+									<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>
+						
+						
+						<td>
+							<div class="luci2-field">
+								<div class="luci2-field-widget">
+								
+                                    <input type="text" class="form-control custom-value-input" style="display: none;">
+									<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>
+						
+						
+						
+						<td>
+							<div class="luci2-field">
+								<div class="luci2-field-widget">
+									
+                                    <input type="text" class="form-control custom-value-input" style="display: none;">
+									<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>
+						
+						<td>
+							<div class="luci2-field">
+								<div class="luci2-field-widget">
+									
+                                    <input type="text" class="form-control custom-value-input" style="display: none;">
+									<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>
+						
+						<td>
+							<div class="luci2-field">
+								<div class="luci2-field-widget">
+									
+                                    <input type="text" class="form-control custom-value-input" style="display: none;">
+									<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>
+						
+						
+						
+						<td class="text-right" style="width: 1%;">
+							<div class="btn-group">
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>	 
+	 -->
+	
+	
+		
+			<table class="table table-condensed table-hover">
+						<td class="text-right" style="width: 5%;">							
+							<button type="button" id="btn_update" title="" class="btn btn-success">Update</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>	  
+			
+	</div>
+	
+		</div>
+
+	
+   <div class="tab-pane TabC TabAsr "  id="Tagged_based_vlan">
+		<div id="section_vlan_tag"></div>
+		<div id="Mansection_vlan_tag" class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Tagged Based VLAN:</h3>
+			</div>
+			
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr class="cbi-section-table-titles">
+						<th class="cbi-section-table-cell">New Device</th>
+						<th class="cbi-section-table-cell"> </th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr class="luci2-section-item" id="sectionitem_vlantag_redirect_newRedirect" data-luci2-sid="newRedirect">
+						<td>
+							<div class="luci2-field">
+								<div class="luci2-field-widget">
+									<input class="form-control luci2-field-validate" id="field_vlantag_redirect_newRedirect_new_device" type="text" placeholder="">
+									<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+							</div>
+						</td>
+						
+						
+						<td class="text-right" style="width: 1%;">
+							<div class="btn-group">
+								<button type="button" id="AddNewTaggedVlan" title="" class="btn btn-success">Add</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>	 
+	
+	
+	
+		
+			<table class="table table-condensed table-hover">
+						<td class="text-right" style="width: 5%;">							
+							<button type="button" id="tagged_btn_update" title="" class="btn btn-success">Update</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>			
+		  	</div> 		
+		  
+ <style>
+.cbi-section{
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 25px 30px #0000001a;
+    border: 1px solid #70707038;
+    border-radius: 10px;
+    width: 95%;
+    padding: 17px;
+margin-bottom:10px;
+}
+
+</style>

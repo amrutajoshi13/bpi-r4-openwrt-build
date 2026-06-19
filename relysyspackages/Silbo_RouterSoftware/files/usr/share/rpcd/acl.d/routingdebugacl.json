@@ -1,0 +1,30 @@
+{
+    "routingdebug": {
+        "description": "Routing Debug",
+        "read": {
+            "cgi-file": [ "download", ],
+            "ubus" : {
+                "rpc-routingdebug":[
+                    "run"
+                ],
+                "file":[
+                    "read"
+                ],
+                "luci2.system":[
+                    "init_action"
+                ]
+            },
+            "uci": [
+                "routingdebug",
+                "applist_config"
+            ]
+        },
+        "write": {
+            "cgi-file": [ "upload", ],
+            "uci": [
+                "routingdebug",
+                "applist_config"
+            ]
+        }
+    },
+}

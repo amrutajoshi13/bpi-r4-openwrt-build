@@ -1,0 +1,27 @@
+
+{
+    "analoginputconfig": {
+        "description": "Analog Input Configuration",
+            "read": {
+				"ubus" : {
+                "rpc-UpdateAIOConfig":[
+                    "configure"
+                ],
+},
+                "uci": [
+                    "analoginputconfig",
+                ]
+            },
+ 
+            "write": {
+				"ubus" : {
+                "rpc-UpdateAIOConfig":[
+                    "configure"
+                ],
+},
+                "uci": [
+                    "analoginputconfig",
+                ]
+            }
+    }
+}

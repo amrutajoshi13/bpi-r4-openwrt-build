@@ -1,0 +1,17 @@
+ 
+config setprimarysimconfig
+    option utility "Read Sim Control Gpio"
+    option action "READ"
+    option inputs "0"  
+           
+config setprimarysimconfig
+    option utility "Choose Default Primary"
+    option action "SET"
+    option inputs "1"
+    option input1Name "Type"
+    option input1Element "selection"
+    option input1Type "string"
+    list input1Values "E-SIM"
+    list input1Values "X-SIM"
+
+

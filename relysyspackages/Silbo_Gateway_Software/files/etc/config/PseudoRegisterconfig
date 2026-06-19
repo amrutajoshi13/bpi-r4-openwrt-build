@@ -1,0 +1,9 @@
+
+config PseudoRegisterconfig 'Test11'
+	option pseudoRegisterName_0 'pseudo1'
+	option pseudoRegisterSlaveID_0 '222'
+	option pseudoSlaveRegister_0 'Register1'
+	option pseudoRegisterName_1 'pseudo2'
+	option pseudoRegisterSlaveID_1 '111'
+	option pseudoSlaveRegister_1 'Btyuim3'
+

@@ -1,0 +1,21 @@
+{
+    "applications": {
+        "title": "Applications",
+        "index": 80
+    },
+   
+
+    "applications/remotemonit": {
+        "title": "Remote Monitoring",
+        "acls": [ "remoteconfig" ],
+        "view": "applications/remotemonit",
+        "index": 15
+    },
+    
+    "applications/routerapplication": {
+        "title": "Network Monitoring App",
+        "acls": [ "routerapplicationacl" ],
+        "view": "applications/routerapplication",
+        "index": 30
+    }
+} 

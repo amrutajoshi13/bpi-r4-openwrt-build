@@ -1,0 +1,31 @@
+{
+    "security": {
+        "title": "Security",
+        "index": 50
+    },
+    
+    "security/urlfilterip": {
+        "title": "URL Filtering",
+        "acls": [ "urlipconfig" ],
+        "view": "security/urlfilterip",
+        "index": 10   
+    },
+    "security/wirelessmacidfiltering": {
+        "title": "Wi-Fi MacID Filtering",
+        "acls": [ "macidconfig" ],
+        "view": "security/wirelessmacidfiltering",
+        "index": 15
+    },    
+     "security/macbinding": {
+        "title": "MAC Address Binding",
+        "acls": [ "macconfig" ],
+        "view": "security/macbinding",
+        "index": 20 
+    },
+    "security/customfirewall": {
+        "title": "Loopback Rule",
+        "acls": [ "customfirewall" ],
+        "view": "security/customfirewall",
+        "index": 25  
+    }
+}

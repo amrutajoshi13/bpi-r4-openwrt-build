@@ -1,0 +1,12 @@
+{
+    "applications": {
+        "title": "Applications",
+        "index": 80
+    },
+    "applications/connectiondiagnostics": {
+        "title": "Connection Diagnostics",
+        "acls": ["connectiondiagnostics"],
+        "view": "applications/connectiondiagnostics",
+        "index": 5
+    }
+}

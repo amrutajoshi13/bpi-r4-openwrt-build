@@ -1,0 +1,368 @@
+#!/bin/sh /etc/rc.common
+. /lib/functions.sh
+
+#source /Web_Page_Gateway_Apps/Board_info.txt
+
+START=99
+STOP=99
+USE_PROCD=1
+
+SCRIPTNAME=$(basename $0)
+AppListFile="/etc/Applist"
+MONITDaemonScript="/etc/initmonit"
+MONITDaemon="/usr/bin/monit"
+SystemHealthMonitoring="CallSystemHealthMonitoringScript.sh"
+AppStatus=$(uci get applist_config.appconfig.running)
+AppSleepInterval=5
+SourceconfigureFile="sourceconfig"
+SourceconfigureEventSection="sourceconfig"
+ModemStatusFile="/tmp/InterfaceStatus/CWAN1Status"
+board_name=$(cat /tmp/sysinfo/board_name)
+SSID1=$(cat /etc/wireless/mt7628/mt7628.dat | grep -i "SSID1" | cut -d '=' -f 2)
+enabletcp=$(uci get tcpconfig.tcpconfig.enabletcp)
+
+board_name_ID=$(cat /tmp/sysinfo/board_name | cut -d "," -f2)
+ID_Product_name=$(echo $board_name_ID | grep -o ID)
+
+ReadSourceConfig()
+{
+     config_load "$SourceconfigureFile"
+     
+     config_get EMeterRS485Line1DataSourceEnable  "$SourceconfigureEventSection"   EMeterRS485Line1DataSourceEnable 
+     
+     config_get EMeterRS485Line2DataSourceEnable  "$SourceconfigureEventSection"   EMeterRS485Line2DataSourceEnable 
+     
+     config_get EMeterRS232Line1DataSourceEnable  "$SourceconfigureEventSection"   EMeterRS232Line1DataSourceEnable 
+   
+     config_get DIODataSourceEnable  "$SourceconfigureEventSection"   DIODataSourceEnable 
+    
+     config_get AIODataSourceEnable  "$SourceconfigureEventSection"   AIODataSourceEnable 
+      
+     config_get TEMPERATUREDataSourceEnable  "$SourceconfigureEventSection"   TEMPERATUREDataSourceEnable 
+     
+}
+
+ReadCloudConfig()
+{
+   cloudprotocol=$(uci get cloudconfig.cloudconfig.cloudprotocol)
+   
+}
+
+ReadPortConfig()
+{
+    ser2netEnable1=$(uci get portconfig.portconfig.Ser2netEnable1)
+    ser2netEnable2=$(uci get portconfig.portconfig.Ser2netEnable2)
+       
+}
+
+
+start_service() {
+	
+        if echo "$board_name" | grep -qE "(RF44|RF04|GD44)";
+     then
+         if [ ! -f /tmp/InterfaceStatus/CWAN1Status ]
+	     then
+		     /root/InterfaceManager/script/AddInterface.sh CWAN1 > /dev/null 2>&1 &
+	     fi
+	 fi 
+	 
+	 /usr/sbin/mosquitto -d  
+	 sleep 1 
+	 
+	 cp /Web_Page_Gateway_Apps/Common_GW_Files/DataSourcesConfig.cfg /root/SourceAppComponent/etc/Config/DataSourcesConfig.cfg
+	 
+	 if [ ! -f /tmp/ModemAnalytics.txt ]
+	 then
+		     echo "NA,NA,NA,NA,NA,NA,NA" > /tmp/ModemAnalytics.txt
+	 fi
+    
+     if [ "$enabletcp" -eq 1 ]
+          then 
+              /root/TCPSLAVE/TCP_Slave_Utility_project > /dev/null 2>&1 &
+              mv /Web_page/Monitor_TCP_Slave_Utility_project /etc/monit.d/
+     fi   
+     
+    if [ "$AppStatus" == 1 ]
+    then
+
+          ReadSourceConfig
+          ReadCloudConfig
+          ReadPortConfig
+          
+                
+                 
+         if [ "$ser2netEnable1" -eq 1 ] || [ "$ser2netEnable2" -eq 1 ] 
+          then
+                echo "Starting Transparent Serial to Remote Client..."
+                mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_ser2net /etc/monit.d/
+			    #/etc/ser2net start > /dev/null 2>&1 &
+			    /usr/sbin/ser2net -c /etc/ser2net.conf > /dev/null 2>&1 &
+			    echo "Transparent Serial Mode started"          
+          fi
+          
+          if [ "$ser2netEnable1" -eq 3 ] || [ "$ser2netEnable2" -eq 3 ]
+          then
+               echo "Starting Transparent Serial to Remote Server..."
+               mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_socat /etc/monit.d/
+              /bin/runsocat.sh
+          
+          fi
+          
+          if [ "$ser2netEnable1" -eq 4 ] 
+          then
+               echo "Starting Modbus RTU Master to Modbus TCP Slave..."
+               mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_rtumd /etc/monit.d/
+              /root/rtumd/rtumd > /dev/null 2>&1 &
+          
+          fi
+          
+          if [ "$ser2netEnable1" -eq 0 ] 
+          then
+                echo "Starting Modbus TCP to RTU..."
+                mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_mbusd1 /etc/monit.d/
+			    /usr/bin/mbusd -c /etc/mbusdconfig.conf -v9 > /dev/null 2>&1 &
+			    #echo "Ser2net started"          
+          fi
+          
+          if [ "$ser2netEnable2" -eq 0 ] 
+          then
+                echo "Starting Modbus TCP to RTU..."
+                mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_mbusd2 /etc/monit.d/
+			    /usr/bin/mbusd -c /etc/mbusdconfig2.conf -v9 > /dev/null 2>&1 &
+			    #echo "Modbus TCP to RTU started"          
+          fi
+          
+                   
+          if [ "$EMeterRS485Line1DataSourceEnable" == 1 ] && [ "$ser2netEnable1" -eq 2 ] || [ "$EMeterRS485Line2DataSourceEnable" == 1 ] && [ "$ser2netEnable2" -eq 2 ]  
+          then
+             mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_EnergyMeterApp /etc/monit.d/
+	         echo "Starting Application EnergyMeterApp"
+	        /root/EnergyMeterAppComponent/EnergyMeterApp > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+	      fi
+	      
+	      if [ "$EMeterRS232Line1DataSourceEnable" == 1 ] && [ "$ser2netEnable2" -eq 2 ] 
+          then
+             mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_ReadRS232App /etc/monit.d/
+	         echo "Starting Application ReadRS232App"
+	        /root/RS232ReadAppComponent/ReadRS232App > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+	      fi
+	      
+	      if [ "$DIODataSourceEnable" == 1 ]
+          then
+             mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_ReadDIApp /etc/monit.d/
+	         echo "Starting Application ReadDIApp"
+	        /root/ReadDIAppComponent/ReadDIApp > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+	      fi
+	      
+	      
+	      if [ "$TEMPERATUREDataSourceEnable" == 1 ]
+          then
+               mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_ReadTemperatureSensorApp /etc/monit.d/
+             
+              sleep "$AppSleepInterval"
+                   echo "Starting Application Temperature App"
+	        /root/ReadTemperatureSensorAppComponent/ReadTemperatureSensorApp > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+	      fi 
+	           
+	         mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_CmdProcessorApp /etc/monit.d/
+	         echo "Starting Application CmdProcessorApp"
+	        /root/CmdProcessorAppComponent/CmdProcessorApp > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+	        
+	        mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_BLControlApp /etc/monit.d/     
+              sleep "$AppSleepInterval"
+              echo "Starting Application BLController"
+	         /root/BLControlAppComponent/BLControlAPP > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+	        
+	    if [ "$cloudprotocol" = "http" ]
+        then
+             mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_HTTPSenderApp /etc/monit.d/
+	        echo "Starting Application HTTPSenderApp"
+           /root/HTTPSenderAppComponent/HTTPSenderApp > /dev/null 2>&1 &	 
+           sleep "$AppSleepInterval"
+        fi   
+              
+        
+         if [ "$cloudprotocol" = "mqtt" ]
+         then
+	         mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_MQTTSenderApp /etc/monit.d/
+	         echo "Starting Application MQTTSenderApp"
+	        /root/MQTTSenderAppComponent/MQTTSenderApp > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+       fi
+	
+	     if [ "$cloudprotocol" = "azure" ]                                                                          
+         then                                                                                                  
+                 mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_AzureCloudConnectApp /etc/monit.d/             
+                 echo "Starting Application AzureCloudConnectApp"                       
+                /root/AzureAppComponent/AzureCloudConnectApp > /dev/null 2>&1 &                                      
+                sleep "$AppSleepInterval"                                                                      
+       fi   
+           
+            echo "Starting Application DataCollectorApp"
+            mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_DataCollectorApp /etc/monit.d/
+            /root/DataCollectorAppComponent/DataCollectorApp > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+             
+             
+          if [ "$AIODataSourceEnable" == 1 ]
+          then
+      
+             mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_ReadAIApp /etc/monit.d/
+	         echo "Starting Application ReadAIApp"
+	        /root/ReadAIAppComponent/ReadAIApp > /dev/null 2>&1 &
+	        sleep "$AppSleepInterval"
+	      fi    
+                         
+             echo "Starting Application RequestGeneratorApp"
+             mv /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/Monitor_RequestGeneratorApp /etc/monit.d/
+	         /root/RequestGeneratorAppComponent/RequestGeneratorApp > /dev/null 2>&1 &
+	         sleep "$AppSleepInterval"      
+       
+        
+        echo "starting monit daemon process"
+         
+        /etc/monit start
+    else
+        echo "Application starting is disabled, To enable, please start the application from web interface"
+     fi
+}
+
+stop_service() {
+             /etc/monit stop
+
+             ReadSourceConfig
+             ReadCloudConfig
+             
+             echo "Stopping TCP Slave..."
+             mv /etc/monit.d/Monitor_TCP_Slave_Utility_project /Web_page/ 
+             /usr/bin/killall TCP_Slave_Utility_project > /dev/null 2>&1
+          		  
+			 echo "Stopping Transparent Serial Mode..."
+              mv /etc/monit.d/Monitor_ser2net  /Web_Page_Gateway_Apps/Common_GW_Files/monit.d
+              mv /etc/monit.d/Monitor_socat  /Web_Page_Gateway_Apps/Common_GW_Files/monit.d
+			  /usr/bin/killall ser2net > /dev/null 2>&1
+			  /usr/bin/killall socat > /dev/null 2>&1
+			  echo "Ser2net stopped"
+			  sleep "$AppSleepInterval" 
+			  
+			  echo "Stopping Modbus TCP to RTU..."
+              mv /etc/monit.d/Monitor_mbusd1  /Web_Page_Gateway_Apps/Common_GW_Files/monit.d
+			  /usr/bin/killall mbusd > /dev/null 2>&1
+			  echo "Modbus TCP to RTU stopped"
+			  sleep "$AppSleepInterval" 
+			  
+			  echo "Stopping  Modbus RTU Master to Modbus TCP Slave..."
+              mv /etc/monit.d/Monitor_rtumd  /Web_Page_Gateway_Apps/Common_GW_Files/monit.d
+			  /usr/bin/killall rtumd > /dev/null 2>&1
+			  echo "Modbus RTU Master to Modbus TCP Slave stopped"
+			  sleep "$AppSleepInterval" 
+			  
+			           
+            if [ "$EMeterRS485Line1DataSourceEnable" == 1 ]
+            then
+                mv /etc/monit.d/Monitor_EnergyMeterApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/
+		       echo "Stopping Application EnergyMeterApp"
+	           killall -9 "EnergyMeterApp" > /dev/null 2>&1
+	           sleep "$AppSleepInterval" 
+	        fi    
+	        
+	        if [ "$EMeterRS232Line1DataSourceEnable" == 1 ]
+            then
+               mv /etc/monit.d/Monitor_ReadRS232App /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/
+
+		       echo "Stopping Application ReadRS232App"
+	           killall -9 "ReadRS232App" > /dev/null 2>&1
+	           sleep "$AppSleepInterval" 
+	        fi    
+	        
+	        if [ "$DIODataSourceEnable" == 1 ]
+            then
+                mv /etc/monit.d/Monitor_ReadDIApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/
+
+		       echo "Stopping Application ReadDIApp"
+	           killall -9 "ReadDIApp" > /dev/null 2>&1
+	           sleep "$AppSleepInterval" 
+	        fi
+	        
+	        if [ "$AIODataSourceEnable" == 1 ]
+            then
+                mv /etc/monit.d/Monitor_ReadAIApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/
+
+		       echo "Stopping Application ReadAIApp"
+	           killall -9 "ReadAIApp" > /dev/null 2>&1
+	           sleep "$AppSleepInterval" 
+	        fi     
+	        
+	        if [ "$TEMPERATUREDataSourceEnable" == 1 ]
+            then
+               mv /etc/monit.d/Monitor_ReadTemperatureSensorApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d
+		       echo "Stopping Application ReadTemperatureSensorApp"
+	           killall -9 "ReadTemperatureSensorApp" > /dev/null 2>&1	   
+	           sleep "$AppSleepInterval"        
+	           #sh -x /Web_Page_Gateway_Apps/Common_GW_Files/initOWFS.sh stop
+	           sleep "$AppSleepInterval" 
+	        fi    
+	       
+	             mv /etc/monit.d/Monitor_CmdProcessorApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/ 
+		         echo "Stopping Application CmdProcessorApp"
+		         killall -9 "CmdProcessorApp" > /dev/null 2>&1 &
+		         sleep "$AppSleepInterval"
+		         
+		           mv /etc/monit.d/Monitor_BLControlApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/ 
+		         echo "Stopping Application BLControlApp"
+		         killall -9 "BLControlAPP" > /dev/null 2>&1 &
+		         sleep "$AppSleepInterval"
+          
+		         mv /etc/monit.d/Monitor_HTTPSenderApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/ 
+		         echo "Stopping Application HTTPSenderApp"
+		        killall -9 "HTTPSenderApp" > /dev/null 2>&1 &
+		        sleep "$AppSleepInterval"
+		       
+		         mv /etc/monit.d/Monitor_MQTTSenderApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/ 
+		         echo "Stopping Application MQTTSenderApp"
+		         killall -9 "MQTTSenderApp" > /dev/null 2>&1 &
+		         sleep "$AppSleepInterval"
+	         
+			  mv /etc/monit.d/Monitor_AzureCloudConnectApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/  
+			  echo "Stopping Application AzureCloudConnectApp"                                              
+			  killall -9 "AzureCloudConnectApp" > /dev/null 2>&1 &                                          
+			  sleep "$AppSleepInterval"
+       
+	       echo "Stopping Application DataCollectorApp"
+	       mv /etc/monit.d/Monitor_DataCollectorApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/
+           killall -9 "DataCollectorApp" > /dev/null 2>&1 &
+		   sleep "$AppSleepInterval"	        
+	                         
+		  echo "Stopping Application RequestGeneratorApp"
+		  mv /etc/monit.d/Monitor_RequestGeneratorApp /Web_Page_Gateway_Apps/Common_GW_Files/monit.d/
+          killall -9 "RequestGeneratorApp" > /dev/null 2>&1 &
+		  sleep "$AppSleepInterval" 	       
+	      
+}
+
+Action=$1
+case "$Action" in
+    start)
+        echo "Starting Apps"
+        start_service
+        ;;
+
+    cron_start)
+        RunMonit
+        ;;
+    
+     stop)
+        stop_service
+        ;;
+    *)
+        echo "Usage: $0 {start|cron_start|stop}"
+        ;;
+esac
+
+exit 0

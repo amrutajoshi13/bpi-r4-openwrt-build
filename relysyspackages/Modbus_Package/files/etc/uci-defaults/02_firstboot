@@ -1,0 +1,6 @@
+#!bin/sh 
+. /lib/functions.sh
+
+cp /Web_Page_Gateway_Apps/Common_GW_Files/rc.local /etc
+
+exit 0

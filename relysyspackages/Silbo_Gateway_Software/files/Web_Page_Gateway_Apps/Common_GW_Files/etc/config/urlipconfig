@@ -1,0 +1,6 @@
+config Mode
+	option EEnable '1'
+	option Accesspolicy 'Blacklist'
+ 
+
+

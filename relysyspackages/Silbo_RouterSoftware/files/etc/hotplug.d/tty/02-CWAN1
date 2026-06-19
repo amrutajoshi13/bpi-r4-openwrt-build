@@ -1,0 +1,179 @@
+#!/bin/sh
+
+. /lib/functions.sh
+Logfile="/root/ConfigFiles/Logs/AddIfaceLog.txt"
+SETAPN=$(cat /root/usrRPC/script/autoapnflag.txt | cut -d "=" -f2)
+date=$(date)
+uptime=$(uptime)
+uptimevalue=$(echo "$uptime" | cut -d ' ' -f 4)
+AutoApnFlag="/root/usrRPC/script/autoapnflag.txt"
+
+if [ "$SETAPN" = "1" ] && [ "$uptimevalue" -gt "3" ]
+then
+   echo "$date:[02-CWAN1] exited out of script as findapn script was running" >> "$Logfile"
+    exit 0
+fi
+echo "SETAPN=0" > "$AutoApnFlag"
+
+[ ${DEVNAME/[0-9]/} = "ttyUSB" ] || exit 0
+[ "${ACTION}" = "add" ] || [ "${ACTION}" = "remove" ] || exit 0
+
+
+
+
+SystemGpioConfig="/etc/config/systemgpio"
+
+ReadModemConfigFile()
+{
+	config_load "$ModemConfigFile"
+	config_get SingleSimSingleModule cellularmodule singlesimsinglemodule
+	config_get SingleSimDualModule cellularmodule singlesimdualmodule
+	config_get DualSimSingleModule cellularmodule dualsimsinglemodule
+}
+
+
+ReadSystemGpioFile()
+{
+	config_load "$SystemGpioConfig"
+	config_get Sim1LedGpio gpio Sim1LedGpio
+	config_get Sim1LedGpioOnvalue gpio Sim1LedGpioOnvalue
+	config_get Sim1LedGpioOffvalue gpio Sim1LedGpioOffvalue
+	config_get Sim2LedGpio gpio Sim2LedGpio
+	config_get Sim2LedGpioOnvalue gpio Sim2LedGpioOnvalue
+	config_get Sim2LedGpioOffvalue gpio Sim2LedGpioOffvalue
+}
+
+
+ReadSystemGpioFile
+
+
+
+devdir="/sys${DEVPATH}/../../../../"
+mVid=$(cat "$devdir/idVendor")
+mPid=$(cat "$devdir/idProduct")
+
+
+ModemConfigFile=/etc/config/modem
+SimNumFile=/tmp/simnumfile
+
+
+ReadModemConfigFile
+path=$(echo $DEVPATH | cut -d '/' -f 7 | cut -d ':' -f 1)
+if [ "$path" = "1-1" ] || [ "$path" = "1-1.1" ]
+then
+		
+
+str=${DEVNAME}
+if [ "$DualSimSingleModule" = "1" ]
+then
+	if [ ! -f "$SimNumFile" ]
+	then
+		touch "$SimNumFile"
+		echo "1" > "$SimNumFile"
+		uci set modem.CWAN1_0.modemenable=1		
+		uci set modem.CWAN1_1.modemenable=0
+		uci set modem.CWAN1.modemenable=0
+		uci commit modem
+		prefix=CWAN1_0_
+	else
+		sim=`cat "$SimNumFile"`
+		if [ "$sim" = "1" ]
+		then
+			uci set modem.CWAN1_0.modemenable=1
+			uci set modem.CWAN1_1.modemenable=0
+			uci set modem.CWAN1.modemenable=0
+			uci commit modem
+		prefix=CWAN1_0_
+		else
+			uci set modem.CWAN1_0.modemenable=0
+			uci set modem.CWAN1_1.modemenable=1
+			uci set modem.CWAN1.modemenable=0
+			uci commit modem
+		prefix=CWAN1_1_
+		fi
+	fi
+else
+		uci set modem.CWAN1_0.modemenable=0
+		uci set modem.CWAN1_1.modemenable=0
+		uci set modem.CWAN1.modemenable=1
+			uci commit modem
+		prefix=CWAN1_
+fi
+
+
+SYMLINK="${prefix}$(echo -n ${str} | tail -c 1)"
+if [ "${ACTION}" = "add" ]
+then
+	if ([ "2c7c" = "${mVid}" ] && [ "0315" = "${mPid}" ]) ||  ([ "2c7c" = "${mVid}" ] && [ "6005" = "${mPid}" ]) ||  ([ "2c7c" = "${mVid}" ] && [ "0125" = "${mPid}" ]) || ([ "2c7c" = "${mVid}" ] && [ "0800" = "${mPid}" ]) || ([ "2c7c" = "${mVid}" ] && [ "0900" = "${mPid}" ])
+	then
+		if [ "$DualSimSingleModule" = "1" ]
+		then
+			if [ ! -f "$SimNumFile" ]
+			then
+			    date=$(date)
+				touch "$SimNumFile"
+				echo "1" > "$SimNumFile"
+			   	/root/InterfaceManager/script/cellular/AddInterface.sh "CWAN1_0" &
+			   	/root/InterfaceManager/script/cellular/AddSMSCfg.sh "CWAN1_0" &
+			   	AddInterfacepid1=$(ps x | grep -i "/root/InterfaceManager/script/cellular/AddInterface.sh" | grep -v grep | awk '{print $1}')
+			   	AddSMSCfgpid2=$(ps x | grep -i "/root/InterfaceManager/script/cellular/AddSMSCfg.sh" | grep -v grep | awk '{print $1}')
+			    echo "$date:[02-CWAN1] pid of AddInterface:$AddInterfacepid1,pid of AddSMSCfg:$AddSMSCfgpid2" >> "$Logfile"
+			else
+				sim=`cat "$SimNumFile"`
+				if [ "$sim" = "1" ]
+				then
+				#echo "1" > /sys/class/gpio/gpio"$Sim2LedGpio"/value
+				#echo "0" > /sys/class/gpio/gpio"$Sim1LedGpio"/value
+				date=$(date)
+
+				echo "1" > "$SimNumFile"
+				/root/InterfaceManager/script/cellular/AddInterface.sh "CWAN1_0" &
+				 	/root/InterfaceManager/script/cellular/AddSMSCfg.sh "CWAN1_0" &	
+				 	AddInterfacepid1=$(ps x | grep -i "/root/InterfaceManager/script/cellular/AddInterface.sh" | grep -v grep | awk '{print $1}')
+			   	AddSMSCfgpid2=$(ps x | grep -i "/root/InterfaceManager/script/cellular/AddSMSCfg.sh" | grep -v grep | awk '{print $1}')
+			    echo "$date:[02-CWAN1] pid of AddInterface:$AddInterfacepid1,pid of AddSMSCfg:$AddSMSCfgpid2" >> "$Logfile"			
+				else
+							    date=$(date)
+
+					echo "2" > "$SimNumFile"
+					/root/InterfaceManager/script/cellular/AddInterface.sh "CWAN1_1" &
+					 	/root/InterfaceManager/script/cellular/AddSMSCfg.sh "CWAN1_1" &
+					 	AddInterfacepid1=$(ps x | grep -i "/root/InterfaceManager/script/cellular/AddInterface.sh" | grep -v grep | awk '{print $1}')
+			   	AddSMSCfgpid2=$(ps x | grep -i "/root/InterfaceManager/script/cellular/AddSMSCfg.sh" | grep -v grep | awk '{print $1}')
+			    echo "$date:[02-CWAN1] pid of AddInterface:$AddInterfacepid1,pid of AddSMSCfg:$AddSMSCfgpid2" >> "$Logfile"
+				fi
+			fi
+		else
+		            			    date=$(date)
+
+					echo "1" > "$SimNumFile"
+					/root/InterfaceManager/script/cellular/AddInterface.sh "CWAN1" &
+					 /root/InterfaceManager/script/cellular/AddSMSCfg.sh "CWAN1" &
+					 	 	AddInterfacepid1=$(ps x | grep -i "/root/InterfaceManager/script/cellular/AddInterface.sh" | grep -v grep | awk '{print $1}')
+			   	AddSMSCfgpid2=$(ps x | grep -i "/root/InterfaceManager/script/cellular/AddSMSCfg.sh" | grep -v grep | awk '{print $1}')
+			    echo "$date:[02-CWAN1] pid of AddInterface:$AddInterfacepid1,pid of AddSMSCfg:$AddSMSCfgpid2" >> "$Logfile"
+		fi
+	fi
+	elif [ "x${mVid}" = "x" ] && [ "${ACTION}" = "remove" ]
+	then
+		if [ "$DualSimSingleModule" = "1" ]
+		then
+			if [ ! -f "$SimNumFile" ]
+			then
+				touch "$SimNumFile"
+				echo "1" > "$SimNumFile"
+				/root/InterfaceManager/script/CallUbusInterfaceManager.sh "disable" "CWAN1_0" &
+			else
+				sim=`cat "$SimNumFile"`
+				if [ "$sim" = "1" ]
+				then
+					/root/InterfaceManager/script/CallUbusInterfaceManager.sh "disable" "CWAN1_0" &
+				else
+					/root/InterfaceManager/script/CallUbusInterfaceManager.sh "disable" "CWAN1_1" &
+				fi
+				fi
+				else
+					/root/InterfaceManager/script/CallUbusInterfaceManager.sh "disable" "CWAN1" &
+		fi
+fi
+fi

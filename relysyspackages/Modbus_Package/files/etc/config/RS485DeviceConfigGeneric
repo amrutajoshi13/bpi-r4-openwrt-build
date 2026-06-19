@@ -1,0 +1,16 @@
+
+config RS485Config 'Test1'
+	option EEnable '0'
+	option InterfaceID '1'
+	option MeterID '1'
+	option Model 'Model1'
+	option SlaveAddress '34'
+	option StartRegister '0'
+	option NoOfRegister '68'
+	option Baudrate '9600'
+	option NoOfStopbits '1'
+	option Databits '8'
+	option FunctionalCode '4'
+	option ModbusProtocol 'RTU'
+	option Parity '0'
+

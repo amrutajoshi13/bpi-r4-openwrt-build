@@ -1,0 +1,21 @@
+{
+    "boardconfigacl": {
+        "description": "Board Configuration",
+            "read": {
+				"ubus" : {
+                "rpc-boardconfig":[
+                "configure"        
+               ]
+            },
+                "uci": [
+                    "boardconfigfile"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "boardconfigfile"
+                ]
+            }
+    }
+}

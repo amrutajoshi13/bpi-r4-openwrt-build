@@ -1,0 +1,67 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+factoryresetscript="/root/InterfaceManager/script/Restore.sh"
+#ImportedBoardModel="/tmp/etc/config/system"
+#ConfigBoardModel="/etc/config/system"
+case "$1" in
+    list)
+        echo '{"rebootsys":{},"testarchive":{},"resetgateway":{}}'
+        ;;
+    call)
+        case "$2" in
+                                        
+               rebootsys)
+						    respreboot=$(/root/usrRPC/script/Board_Recycle_12V_Script.sh)
+						    if [ "$?" -ne 0 ]
+							then
+								echo "{\"code\":1,\"output\":\"Reboot failure!!\"}"
+							else
+								echo "{\"code\":0,\"output\":\"Reboot Success!!\"}"
+							fi
+						    ;;
+							    
+		testarchive)     
+				          
+                    sh /bin/importgatewayfiles.sh
+
+			#sleep 1
+			
+			#elif [ "$ImportedBoardModelValue" != "$ConfigBoardModelValue"  ]
+				#then
+				    #echo "{\"code\":1,\"output\":\"Invalid Import archieve\"}"
+				#fi			   
+                ;;			    
+				
+                    
+                    
+                    
+          resetgateway)
+          
+							  
+					sh /etc/init.d/GD44AppManager stop
+
+					uci set applist_config.appconfig.running="0"
+					uci commit applist_config
+
+					rm /etc/ser2net.conf
+
+					cp -r /Web_Page_Gateway_Apps/Default_Gateway/ /root
+					cp /Web_Page_Gateway_Apps/Default_Gateway/etc/* /etc/
+
+					/root/usrRPC/script/Board_Recycle_12V_Script.sh
+      
+                   sleep 1    
+ 
+			      
+        esac #appmanager method
+        ;;
+        *)
+								echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+                    
+esac # ubus method
+
+exit 0

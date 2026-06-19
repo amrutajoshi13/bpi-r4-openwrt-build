@@ -1,0 +1,15 @@
+
+config snmp 'snmpconfig'
+	option enablesnmp '1'
+	option snmpIP 'IPV4'
+	option portagent '161'
+	option Systemoid '1.3.6.1.4.1.38151'
+	option location 'Bangalore'
+	option password '12345678'
+	option name 'Example'
+	option contact 'www@xxxx.co'
+	option version2 '0'
+	option version1 '1'
+	option version3 '0'
+	
+

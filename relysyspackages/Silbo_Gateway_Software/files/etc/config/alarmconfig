@@ -1,0 +1,5 @@
+
+config alarmconfig 'DEVICR1'
+	option Category_0 '1'
+	option alarmEnabled_0 '0'
+	

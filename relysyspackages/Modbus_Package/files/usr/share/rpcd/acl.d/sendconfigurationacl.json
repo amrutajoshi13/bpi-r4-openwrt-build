@@ -1,0 +1,16 @@
+{
+    "sendconfig": {
+        "description": "Send Configuration",
+            "read": {
+                "uci": [
+                    "Jsonconfig",
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "Jsonconfig",
+                ]
+            }
+    }
+}

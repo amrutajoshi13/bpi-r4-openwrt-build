@@ -1,0 +1,45 @@
+shakthi@shakthi-OptiPlex-3050:~/shakthi_workspace/SDCardManager/partition$ ./partition.sh 
+root@192.168.0.24's password: 
+root@192.168.0.24's password: 
+root@192.168.0.24's password: 
+logging in.....   
+spawn ssh -t root@192.168.0.24 sh /root/SDCardSrc_02/SDCardManager/SDCardManager.sh 4GB ;df -h
+root@192.168.0.24's password: 
+using 4GB as memory card size
+Testing whether memory card is properly inserted or not
+ls: /dev/mmcblk0: No such file or directory
+sh: /dev/mmcblk0: unknown operand
+Verifying copied application source directories
+Verifying previously mounted partitions
+Creating Partitions
+fdisk: cannot open /dev/mmcblk0: No such file or directory
+fdisk: cannot open /dev/mmcblk0: No such file or directory
+fdisk: cannot open /dev/mmcblk0: No such file or directory
+fdisk: cannot open /dev/mmcblk0: No such file or directory
+failed to create partitions
+ErrorCode:1,
+ErrorMsg:
+Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+ErrorCode:
+Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.,
+ErrorMsg:
+Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+ErrorCode:
+Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.,
+ErrorMsg:
+Filesystem                Size      Used Available Use% Mounted on
+/dev/root                26.0M     26.0M         0 100% /rom
+tmpfs                    60.9M    220.0K     60.7M   0% /tmp
+/dev/mtdblock6            4.3M    320.0K      3.9M   7% /overlay
+overlayfs:/overlay        4.3M    320.0K      3.9M   7% /
+tmpfs                   512.0K         0    512.0K   0% /dev
+tmpfs                    60.9M    220.0K     60.7M   0% /sshusers/tmp
+Connection to 192.168.0.24 closed.

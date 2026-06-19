@@ -1,0 +1,94 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">BACnet Monitoring</h1>
+</div>
+<div class="pagecontent">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Live BACnet Device Data</h2>
+        </div>
+        <div class="panel-body">
+            <div id="Update-Note"></div>
+            <ul class="nav nav-tabs" id="pills-tab" role="tablist"></ul>
+            <div class="tab-content" id="pills-tabContent">
+                <p id="No-BACNetData"></p>
+            </div>
+
+            <div class="text-right" style="margin: 0px 10px 20px 0px">
+                <button type="button" title="Download BACNet Data" data-action="download" id="downloadData"
+                    class="btn btn-primary">
+                    Download Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .group-container {
+        display: flex;
+        align-items: center;
+        margin: 16px 0;
+        gap: 12px;
+        width: 35%;
+    }
+
+    .group-label {
+        font-weight: 500;
+        font-size: 14px;
+        white-space: nowrap;
+        min-width: 140px;
+        text-align: right;
+        color: #333;
+    }
+
+    .group-select {
+        flex: 1;
+        padding: 6px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    .group-select:focus {
+        outline: none;
+        border-color: #0056d6;
+        box-shadow: 0 0 0 2px rgba(0, 86, 214, 0.2);
+    }
+
+    .data-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        font-size: 14.5px;
+        color: #1e4f91;
+        padding: 10px 14px;
+    }
+
+    .data-header__label {
+        color: #6b7280;
+    }
+
+    .data-header__group {
+        color: #1e4f91;
+        font-weight: 600;
+    }
+
+    .data-header__device {
+        color: #111827;
+    }
+
+    #Update-Note {
+        margin: -23px 0px -2px 0px;
+    }
+
+    td {
+        font-size: 13px !important;
+    }
+</style>
+<!-- //pdflibrarycdn -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="/luci2/html2pdf.bundle.min.js"></script>
+<script src="/luci2/jspdf.umd.min.js"></script>
+<script src="/luci2/jspdf.plugin.autotable.min.js"></script>

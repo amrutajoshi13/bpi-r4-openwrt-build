@@ -1,0 +1,25 @@
+{
+    "nmsconfig": {
+        "description": "NMS Configuration",
+            "read": {
+				"ubus" : {
+                "rpc-nmsconfig":[
+                 "configure",
+                 "update",
+                 "testarchive",
+                "delete",
+                "countkeyfiles"          
+               ]
+            },
+                "uci": [
+                    "nmsconfig"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "nmsconfig"
+                ]
+            }
+    }
+}

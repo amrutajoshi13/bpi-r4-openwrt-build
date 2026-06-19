@@ -1,0 +1,8 @@
+config IOUtilities
+    option utility "MODBUS UTILITY"
+    option action "READORWRITE"
+    option inputs "1"
+    option input1Name "Slave ID"
+    option input1Element "text"
+    option input1Type "text"       
+    

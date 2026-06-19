@@ -1,0 +1,82 @@
+{
+    "system": {
+        "title": "Maintenance",
+        "index": 40
+    },
+    "system/system": {
+        "title": "General",
+        "acls": [ "system" ],
+        "view": "system/system",
+        "index": 10
+    },
+    "system/users": {
+        "title": "Guest Logins",
+        "acls": [ "users" ],
+        "view": "system/users",
+        "index":20
+    },
+    
+     "system/ltemodulefirmwareupgrade": {
+        "title": "LTE Module Firmware Upgrade",
+        "acls": [ "ltemodulefirmwareupgrade" ],
+        "view": "system/ltemodulefirmwareupgrade",
+        "index": 35
+    },
+   
+     "system/cron": {
+        "title": "Scheduled Tasks",
+        "acls": [ "cron" ],
+        "view": "system/cron",
+        "index": 40
+    },
+
+     "system/changepassword": {
+        "title": "Password",
+        "acls": [ "changepassword" ],
+        "view": "system/changepassword",
+        "index":50
+    },
+ 
+      "system/maintenanceReboot": {
+        "title": "Reboot",
+        "acls": [ "maintenancereboot" ],
+        "view": "system/maintenanceReboot",
+        "index": 60
+    },
+    
+   "system/importexportconfig": {
+        "title": "Import Export Configurations",
+        "acls": [ "backup" ],
+        "view": "system/importexportconfig",
+        "index": 70
+    },
+    
+    /* "system/upgrade": {
+        "title": "Firmware Upgrade",
+        "acls": [ "upgrade" ],
+        "view": "system/upgrade",
+        "index": 80
+    },*/
+    
+    
+  /*   "system/routerapplication": {
+        "title": "Monitor Application",
+        "acls": [ "routerapplicationacl" ],
+        "view": "system/routerapplication",
+        "index": 90
+    },*/
+    
+     "system/routerswinstalluninstall": {
+        "title": "Router Software Install/Uninstall",
+        "acls": [ "routerswinstalluninstallacl" ],
+        "view": "system/routerswinstalluninstall",
+        "index": 100
+    },
+    
+     "system/boardconfig": {
+        "title": "Board Configuration",
+        "acls": [ "boardconfigacl" ],
+        "view": "system/boardconfig",
+        "index": 110
+    },
+}

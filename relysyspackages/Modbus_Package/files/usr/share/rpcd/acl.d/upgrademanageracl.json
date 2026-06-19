@@ -1,0 +1,45 @@
+{
+    "upgrademanager": {
+        "description": "Application Upgradation",
+        "read": {
+			"ubus" : {
+                "rpc-upgradeversioninfo":[
+                "installedversion"                   
+                ],
+                "rpc-applicationmanager":[
+                "UpgradeApp",
+                "testarchive",
+                ],
+                "rpc-autoupgrade":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "UpgradeManagerInstalledPkgs",
+                "applist_config",
+                "UpgradeManagerGeneric",
+                
+            ]
+        },
+        "write": {
+						"ubus" : {
+                "rpc-upgradeversioninfo":[
+                "installedversion"                   
+                ],
+                "rpc-applicationmanager":[
+                "UpgradeApp",
+                "testarchive",
+                ],
+                "rpc-autoupgrade":[
+                "configure"
+                ],
+            },
+            "uci": [
+               "UpgradeManagerInstalledPkgs",
+                "applist_config",
+                "UpgradeManagerGeneric",
+                
+            ]
+        }
+    }
+}

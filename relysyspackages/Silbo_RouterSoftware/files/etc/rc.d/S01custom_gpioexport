@@ -1,0 +1,90 @@
+#!/bin/sh /etc/rc.common
+
+
+START=01
+STOP=01
+USE_PROCD=1
+SystemGpioConfig="/etc/config/systemgpio"
+ReadSystemGpioFile()                               
+{                                                    
+        config_load "$SystemGpioConfig"              
+        config_get BoardPowerGpio gpio boardpowergpio
+        config_get BoardOnValue gpio boardonvalue
+        config_get BoardOffValue gpio boardoffvalue
+        config_get NoOfModem gpio noofmodem
+        config_get Modem1PowerGpio gpio modem1powergpio
+        config_get Modem1PowerOnValue gpio modem1poweronvalue
+        config_get Modem1PowerOffValue gpio modem1poweroffvalue
+        config_get Modem2PowerGpio gpio modem2powergpio
+        config_get Modem2PowerOnValue gpio modem2poweronvalue
+        config_get Modem2PowerOffValue gpio modem2poweroffvalue
+        config_get ExternelUsb gpio externelusb
+        config_get ExternelUsbGpio gpio externelusbgpio
+        config_get ExternelUsbOnValue gpio externelusbonvalue
+        config_get ExternelUsbOffValue gpio externelusboffvalue
+        config_get SimSelectGpio gpio simselectgpio
+        config_get Sim1SelectValue gpio sim1selectvalue
+        config_get Sim2SelectValue gpio sim2selectvalue
+        config_get NoOfProgramLed gpio noofprogramled
+        config_get ProgramLed1Number gpio programled1number
+        config_get ProgramLed1OnValue gpio programled1onvalue
+        config_get ProgramLed1OffValue gpio programled1offvalue
+        config_get ProgramLed2Number gpio programled2number
+        config_get ProgramLed2OnValue gpio programled2onvalue
+        config_get ProgramLed2OffValue gpio programled2offvalue
+        config_get ProgramLed3Number gpio programled3number
+        config_get ProgramLed3OnValue gpio programled3onvalue
+        config_get ProgramLed3OffValue gpio programled3offvalue
+        config_get SystemResetSwitch gpio systemresetswitch
+        config_get Sim1LedGpio gpio Sim1LedGpio
+        config_get Sim1LedGpioOnvalue gpio Sim1LedGpioOnvalue
+        config_get Sim1LedGpioOffvalue gpio Sim1LedGpioOffvalue
+        config_get Sim2LedGpio gpio Sim2LedGpio
+        config_get Sim2LedGpioOnvalue gpio Sim2LedGpioOnvalue
+        config_get Sim2LedGpioOffvalue gpio Sim2LedGpioOffvalue
+        config_get Wpsgpio gpio Wpsgpio
+        config_get numberOfModem1SignalStrengthleds gpio numberOfModem1SignalStrengthleds
+        config_get modem1SignalStrengthLedOnValue gpio modem1SignalStrengthLedOnValue
+        config_get modem1SignalStrengthLedOffValue gpio modem1SignalStrengthLedOffValue
+		config_get modem1SignalStrengthLed1 gpio modem1SignalStrengthLed1
+		config_get modem1SignalStrengthLed2 gpio modem1SignalStrengthLed2
+		config_get modem1SignalStrengthLed3 gpio modem1SignalStrengthLed3
+		config_get modem1SignalStrengthLed4 gpio modem1SignalStrengthLed4
+}
+
+start_service() {
+			SystemGpioConfig="/etc/config/systemgpio"
+			ReadSystemGpioFile
+			if [ "$NoOfModem" = "1" ]
+			then
+			# for onboard Modem power recycle gpio initialization (or its mini-PCIe slot J5 / USB3 , USB3_ENABLE)
+			echo "$Modem1PowerGpio" > /sys/class/gpio/export 
+			echo out > /sys/class/gpio/gpio$Modem1PowerGpio/direction
+			echo "$Modem1PowerOnValue" > /sys/class/gpio/gpio$Modem1PowerGpio/value
+			fi
+			
+			if [ "$NoOfModem" = "2" ]
+			then
+				# for onboard Modem power recycle gpio initialization (or its mini-PCIe slot J5 / USB3 , USB3_ENABLE)
+				echo "$Modem1PowerGpio" > /sys/class/gpio/export 
+				echo out > /sys/class/gpio/gpio$Modem1PowerGpio/direction
+				echo "$Modem1PowerOnValue" > /sys/class/gpio/gpio$Modem1PowerGpio/value
+				sleep 1
+				# for 2nd mini-PCIe slot power recycle gpio initialization (or its mini-PCIe slot J2 / USB4, USB2_ENABLE)
+				echo "$Modem2PowerGpio" > /sys/class/gpio/export 
+				echo out > /sys/class/gpio/gpio$Modem2PowerGpio/direction
+				echo "$Modem2PowerOnValue" > /sys/class/gpio/gpio$Modem2PowerGpio/value
+			fi
+			
+			
+			# Sim Select Gpio
+			echo "$SimSelectGpio" > /sys/class/gpio/export 
+			echo out > /sys/class/gpio/gpio$SimSelectGpio/direction
+		
+
+}
+
+stop_service() {
+    echo "	"
+	
+}

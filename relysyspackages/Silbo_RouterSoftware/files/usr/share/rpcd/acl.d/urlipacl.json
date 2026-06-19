@@ -1,0 +1,29 @@
+{
+    "urlipconfig": {
+        "description": "URL Filtering IP Tables Configuration",
+        "read": {
+                        "ubus" : {
+                "rpc-updateurlconfig":[
+                "configure",
+                 "testarchive"
+
+                ]
+            },
+
+            "uci": [
+                "urlipconfig",
+                 "block"
+
+            ]
+
+        },
+
+        "write": {
+            "uci": [
+               "urlipconfig",
+		"block"		
+
+            ]
+        }
+	}
+}

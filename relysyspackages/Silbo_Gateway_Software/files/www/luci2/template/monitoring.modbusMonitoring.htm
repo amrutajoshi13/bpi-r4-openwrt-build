@@ -1,0 +1,395 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Modbus Monitoring</h1>
+</div>
+
+<div class="pagecontent">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h2 class="panel-title">Live Modbus Device Data</h2>
+            <button class="btn btn-primary" id="downloadPDF">Download PDF</button>
+
+        </div>
+        <div class="panel-body">
+            <p id="No-ModbusData"></p>
+            <div id="renderdatasection">
+                <div class="table-toolbar">
+                    <!-- Left side -->
+                    <div class="toolbar-left">
+                        <div class="toolbar-group">
+                            <label for="deviceSelect">Select Device Name:</label>
+                            <select id="deviceSelect">
+                                <option value="">Select Device</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Right side -->
+                    <div class="toolbar-right">
+                        <div class="toolbar-group">
+                            <label for="search">Search Reg Name:</label>
+                            <input type="text" id="search" placeholder="Enter register name">
+                        </div>
+
+                        <div class="toolbar-group">
+                            <label for="entriesPerPage">Page Entries:</label>
+                            <select id="entriesPerPage">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="context-header" id="summary"></div>
+
+                <table class="table table-condensed table-hover">
+                    <tr class="cbi-section-table-titles">
+                        <th class="cbi-section-table-cell">Parameter</th>
+                        <th class="cbi-section-table-cell">Value</th>
+                    </tr>
+                    <tbody id="registerBody">
+                    </tbody>
+                </table>
+
+                <div class="table-footer">
+                    <div id="entryInfo" class="entry-info"></div>
+
+                    <div class="pagination">
+                        <button id="prevBtn" aria-label="Previous page">‹</button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button id="nextBtn" aria-label="Next page">›</button>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div id="globalLoader" class="global-loader hidden">
+        <div class="loader-card">
+            <div class="spinner"></div>
+            <div class="loader-text">Applying changes…</div>
+        </div>
+    </div>
+</div>
+<style>
+    :root {
+        --bg: #f0f4f8;
+        --card-bg: #ffffff;
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --text: #1e293b;
+        --border: #cbd5e1;
+        --accent: #a5b4fc;
+        --success: #22c55e;
+        --error: #ef4444;
+        --radius: 10px;
+        --transition: 0.3s ease;
+    }
+
+
+    .table-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+
+    .toolbar-left,
+    .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Each labeled control */
+    .toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Labels */
+    .toolbar-group label {
+        font-size: 12.5px;
+        font-weight: 500;
+        /* color: #475569; */
+        color: #243142;
+        white-space: nowrap;
+    }
+
+    /* Inputs & selects */
+    .toolbar-group select,
+    .toolbar-group input[type="text"] {
+        height: 32px;
+        padding: 4px 8px;
+
+        font-size: 13px;
+        color: #0f172a;
+
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+
+        outline: none;
+    }
+
+    /* Width control */
+    #deviceSelect {
+        min-width: 150px;
+    }
+
+    #search {
+        min-width: 180px;
+    }
+
+    #entriesPerPage {
+        min-width: 80px;
+    }
+
+    /* Focus state */
+    .toolbar-group select:focus,
+    .toolbar-group input[type="text"]:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    /* Placeholder */
+    #search::placeholder {
+        color: #9ca3af;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .table-toolbar {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .toolbar-right {
+            justify-content: flex-end;
+            width: 100%;
+        }
+    }
+
+    /* 
+    button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background var(--transition), transform var(--transition);
+    }
+
+    button:hover {
+        background: var(--primary-dark);
+        transform: scale(1.03);
+    } */
+
+
+
+    .context-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        margin-bottom: 1.5rem;
+        /* background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); */
+        border: 1px solid #e2e8f0;
+        border-radius: 10px 10px 0px 0px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        font-size: 13px;
+        color: #334155;
+        margin: 20px 0px -1px 0px;
+    }
+
+    /* Left / Right groups */
+    .context-left,
+    .context-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* Labels */
+    .ctx-label {
+        color: #003380;
+        font-weight: 500;
+    }
+
+    /* Values */
+    .ctx-value {
+        color: #324AB2;
+        font-weight: 600;
+    }
+
+    /* Status */
+    .ctx-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .ctx-status.ok {
+        color: #006400;
+        font-weight: 600;
+    }
+
+    .ctx-status.ok .ctx-dot {
+        animation: heartbeat 4s ease-out infinite;
+    }
+
+    @keyframes heartbeat {
+        0% {
+            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.3);
+        }
+
+        80% {
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+        }
+    }
+
+    .ctx-status.bad {
+        color: #7f1d1d;
+        font-weight: 600;
+    }
+
+    /* Status dot */
+    .ctx-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: currentColor;
+    }
+
+    /* Blink ONLY for bad status */
+    .ctx-status.bad .ctx-dot {
+        animation: dotBlink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes dotBlink {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.3;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+
+    /* =========================================
+   Table Footer – Professional Router UI
+   Pagination & Entry Info
+   ========================================= */
+
+    .table-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        margin-top: 14px;
+        padding-top: 10px;
+
+        border-top: 1px solid #e2e8f0;
+
+        font-size: 13px;
+        color: #475569;
+    }
+
+    /* Entry info text */
+    .entry-info {
+        font-weight: 500;
+    }
+
+    /* Pagination container */
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+
+    /* Pagination buttons */
+    .pagination button {
+        height: 34px;
+        /* slightly bigger */
+        min-width: 34px;
+
+        padding: 0 10px;
+
+        background: #ffffff;
+        color: #1e40af;
+
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+
+        font-size: 20px;
+        /* 🔥 BIG arrow */
+        font-weight: 700;
+        /* 🔥 BOLD arrow */
+        line-height: 1;
+
+        cursor: pointer;
+        transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    /* Hover */
+    .pagination button:hover:not(:disabled) {
+        background: #f1f5f9;
+        border-color: #2563eb;
+    }
+
+    /* Disabled state */
+    .pagination button:disabled {
+        background: #f8fafc;
+        color: #9ca3af;
+        border-color: #e5e7eb;
+        cursor: not-allowed;
+    }
+
+    /* Page info */
+    #pageInfo {
+        padding: 0 6px;
+        font-weight: 500;
+        color: #334155;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+        .table-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .pagination {
+            align-self: flex-end;
+        }
+    }
+
+    td {
+        font-size: 13px !important;
+    }
+
+    table.table {
+        border-radius: 0px 0px 10px 10px !important;
+    }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="/luci2/jspdf.umd.min.js"></script>
+<script src="/luci2/jspdf.plugin.autotable.min.js"></script>
+<script src="/luci2/html2pdf.bundle.min.js"></script>

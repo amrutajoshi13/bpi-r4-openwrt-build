@@ -1,0 +1,7 @@
+/tmp/fallback_logs.txt {
+    size 20k
+    rotate 2
+    missingok
+    create 0640 root root
+}
+

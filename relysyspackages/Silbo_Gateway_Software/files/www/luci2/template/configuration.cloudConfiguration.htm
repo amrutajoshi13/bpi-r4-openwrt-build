@@ -1,0 +1,1473 @@
+<div id="cloudContentWrapper">
+  <div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Cloud Configuration</h1>
+  </div>
+  <div class="pagecontent">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Cloud Configuration</h3>
+      </div>
+      <div class="cloud-page">
+        <div class="cloud-left">
+          <h3>Quick Panel</h3>
+          <div class="cloud-card">
+            <div class="form-row">
+              <label for="siteId">Site ID</label>
+              <input id="siteId" type="text" placeholder="e.g. SITE-1234" />
+            </div>
+
+            <div class="form-row">
+              <label for="serverSelect">Servers</label>
+              <select id="serverSelect">
+                <option value="primary">Only Primary</option>
+                <option value="both">Both - Primary and Secondary</option>
+                <option value="fallback">Primary fallback to Secondary</option>
+              </select>
+              <!-- <div class="small-note">Pick a mode. Server panels (right) will show/hide accordingly.</div> -->
+            </div>
+
+            <!-- <div class="form-row">
+              <label><input id="enablePerSlave" type="checkbox" /> Enable Per Slave Data Sending</label>
+            </div> -->
+
+            <div class="btns-row">
+              <button class="btn save btn-primary">Save</button>
+            </div>
+
+            <p class="small-note">NOTE: Use the server cards on the right to configure each server.</p>
+          </div>
+        </div>
+
+        <!-- RIGHT MAIN PANEL -->
+        <div class="cloud-right" id="cloudRight">
+          <h3>Server Configurations</h3>
+          <!-- PRIMARY SERVER CARD -->
+          <div class="server-card" id="primaryCard">
+            <div class="server-header">
+              <div>
+                <div class="server-title">Primary Server</div>
+                <div class="server-sub">Protocol: <span id="primaryProtocolLabel">�</span></div>
+              </div>
+
+              <div class="server-actions">
+                <div class="pill">
+                  <img class="pill-icon" src="/luci2/icons/server.svg" alt="server icon">
+                </div>
+                <button class="toggle-icon" data-target="primaryCard">?</button>
+              </div>
+
+            </div>
+
+            <div class="server-body">
+              <div class="server-grid">
+                <!-- QUICK SETTINGS -->
+                <div class="quick-settings-panel">
+                  <div class="field">
+                    <label for="primaryProtocol">Protocol</label>
+                    <select id="primaryProtocol">
+                      <option value="http">HTTP</option>
+                      <option value="https">HTTPS</option>
+                      <option value="mqtt">MQTT</option>
+                    </select>
+                  </div>
+
+                  <!-- <div class="checkbox-group">
+                    <input type="checkbox" id="primaryEnableMqttCmd" />
+                    <label for="primaryEnableMqttCmd">Enable MQTT Command Cloud</label>
+                  </div> -->
+                  <div class="checkbox-group" id="primaryEnableMqttCmdField">
+                    <input type="checkbox" id="primaryEnableMqttCmd" />
+                    <label for="primaryEnableMqttCmd">Enable MQTT Command Cloud</label>
+                  </div>
+                </div>
+
+                <!-- INPUT FIELDS (HTTP + MQTT) -->
+                <div class="input-fields-panel">
+
+                  <!-- HTTP SECTION -->
+                  <div id="primaryHttpFields">
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="primaryHttpUrl">HTTP URL</label>
+                        <input id="primaryHttpUrl" type="text" placeholder="Enter HTTP URL" />
+                      </div>
+                      <div class="field">
+                        <label for="primaryHttpPort">HTTP Port (Optional)</label>
+                        <input id="primaryHttpPort" type="text" placeholder="8080" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="primaryContentType">Content Type</label>
+                        <select id="primaryContentType">
+                          <option value="application/json">application/json</option>
+                          <option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+                          <option value="text/plain; charset=UTF-8">text/plain; charset=UTF-8</option>
+                          <option value="custom">Custom</option>
+                        </select>
+                      </div>
+                      <div class="field" id="primaryCustomContentTypeDiv" style="display:none;">
+                        <label for="primaryCustomContentType">Custom Content Type</label>
+                        <input type="text" id="primaryCustomContentType" placeholder="Enter custom type" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="primaryAuth">Enable Authentication</label>
+                        <select id="primaryAuth">
+                          <option value="0">No Authentication</option>
+                          <option value="1">Username/Password</option>
+                          <option value="2">Bearer Token</option>
+                        </select>
+                      </div>
+
+                      <!-- STATIC AUTH FIELDS (always present in DOM; shown/hidden via JS) -->
+                      <div class="field" id="primaryAuthFields" style="display:none;">
+                        <div id="primaryAuthUserPass" style="display:none;">
+                          <div class="field-row">
+                            <div class="field">
+                              <label for="primaryUsername">Username</label>
+                              <input id="primaryUsername" type="text" placeholder="Username" />
+                            </div>
+                            <div class="field">
+                              <label for="primaryPassword">Password</label>
+                              <input id="primaryPassword" type="password" placeholder="Password" />
+                            </div>
+                          </div>
+                        </div>
+                        <div id="primaryAuthBearer" style="display:none;">
+                          <div class="field">
+                            <label for="primaryBearerToken">Bearer Token</label>
+                            <input id="primaryBearerToken" type="text" placeholder="Bearer Token" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <!-- <div class="field checkbox-field">
+                        <label><input type="checkbox" id="primaryEnableServerResp" /> Enable Server Response
+                          Validation</label>
+                      </div> -->
+                      <div class="checkbox-group">
+                        <input type="checkbox" id="primaryEnableServerResp" />
+                        <label for="primaryEnableServerResp"> Enable Server Response Validation</label>
+                      </div>
+                      <div class="field" id="primaryServerRespDiv" style="display:none;">
+                        <label for="primaryServerResp">Server Response</label>
+                        <select id="primaryServerResp">
+                          <option value="recordId">RecordID</option>
+                          <option value="custom">Custom</option>
+                        </select>
+                        <div class="field" id="primaryCustomServerRespDiv" style="display:none;">
+                          <input type="text" id="primaryCustomServerResp" placeholder="Enter custom value" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="primaryMethod">Method</label>
+                        <select id="primaryMethod">
+                          <option value="0">POST</option>
+                          <option value="1">GET</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div id="primaryHttpsCertArea" style="display:none;" class="field-row upload-cert">
+                      <div class="field">
+                        <label>HTTPS Certificate</label>
+                        <div class="upload-area">
+                          <button class="btn btn-primary" type="button" id="btn_upload_https1">
+                            Upload Certificate
+                          </button>
+                          <button class="btn btn-danger" type="button" id="btn_delete_https1">
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                  <!-- END HTTP -->
+
+                  <!-- MQTT -->
+                  <div id="primaryMqttFields" style="display:none;">
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="primaryMqttHost">MQTT Host</label>
+                        <input type="text" id="primaryMqttHost" placeholder="Enter MQTT Host" />
+                      </div>
+                      <div class="field">
+                        <label for="primaryMqttPort">MQTT Port</label>
+                        <input type="text" id="primaryMqttPort" placeholder="1883" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="primaryMqttAuthMode">Authentication Mode</label>
+                        <select id="primaryMqttAuthMode">
+                          <option value="3">No Authentication</option>
+                          <option value="2">Username/Password</option>
+                          <option value="1">Username/Password + CA Certificate</option>
+                          <option value="0">TLS</option>
+                          <option value="4">Username/Password + TLS Certificate</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- MQTT Auth fields -->
+                    <div id="primaryMqttAuthFields" style="display:none;">
+                      <div class="field-row">
+                        <div class="field">
+                          <label for="primaryMqttUser">Username</label>
+                          <input type="text" id="primaryMqttUser" placeholder="Enter Username" />
+                        </div>
+                        <div class="field">
+                          <label for="primaryMqttPass">Password</label>
+                          <input type="password" id="primaryMqttPass" placeholder="Enter Password" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Cert upload -->
+                    <div id="primaryMqttCertArea" style="display:none;" class="field-row upload-cert">
+                      <div class="field">
+                        <label>Certificate</label>
+                        <div class="upload-area">
+                          <!-- <input type="file" id="primaryMqttCertFile" style="display:none;" /> -->
+                          <button class="btn btn-primary" type="button" id="btn_upload1">Upload Certificate</button>
+                          <button class="btn btn-danger" type="button" id="btn_delete1">Delete</button>
+                          <!-- <span class="cert-name" id="primaryCertName">No file chosen</span> -->
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="field-row checkbox-field">
+                      <label><input type="checkbox" id="primaryEnableClientId" /> Enable ClientId</label>
+                    </div>
+
+                    <div class="field-row client-id-field" id="primaryClientIdField" style="display:none;">
+                      <div class="field">
+                        <label for="primaryClientId">Client ID</label>
+                        <input type="text" id="primaryClientId" placeholder="Enter Client ID" />
+                      </div>
+                    </div>
+
+                    <!-- PUBLISH TOPIC -->
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="primaryPublishQos">Publish QOS</label>
+                        <select id="primaryPublishQos">
+                          <option value="2">2</option>
+                          <option value="1">1</option>
+                          <option value="0">0</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- <h4 class="sub-heading">Publish Topic Configuration</h4> -->
+                    <!-- <div class="field-row">
+                      <div class="field">
+                        <label for="primaryModbusTopic">Modbus Topic 1 (Optional)</label>
+                        <input id="primaryModbusTopic" type="text" placeholder="modbus/topic/1" />
+                      </div>
+                      <div class="field">
+                        <label for="primaryRs232Topic">RS232 Topic 1 (Optional)</label>
+                        <input id="primaryRs232Topic" type="text" placeholder="rs232/topic/1" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="primaryAioTopic">AIO Topic 1 (Optional)</label>
+                        <input id="primaryAioTopic" type="text" placeholder="aio/topic/1" />
+                      </div>
+                      <div class="field">
+                        <label for="primaryDioTopic">DIO Topic 1 (Optional)</label>
+                        <input id="primaryDioTopic" type="text" placeholder="dio/topic/1" />
+                      </div>
+                    </div> -->
+
+                    <h4 class="sub-heading">Publish Topic Configuration</h4>
+                    <div class="field-row" id="primaryMqttTopicRow1">
+                      <div class="field" id="primaryModbusTopicField">
+                        <label for="primaryModbusTopic">Modbus Topic 1 (Optional)</label>
+                        <input id="primaryModbusTopic" type="text" placeholder="modbus/topic/1" />
+                      </div>
+                      <div class="field" id="primaryRs232TopicField">
+                        <label for="primaryRs232Topic">RS232 Topic 1 (Optional)</label>
+                        <input id="primaryRs232Topic" type="text" placeholder="rs232/topic/1" />
+                      </div>
+                    </div>
+
+                    <div class="field-row" id="primaryMqttTopicRow2">
+                      <div class="field" id="primaryAioTopicField">
+                        <label for="primaryAioTopic">AIO Topic 1 (Optional)</label>
+                        <input id="primaryAioTopic" type="text" placeholder="aio/topic/1" />
+                      </div>
+                      <div class="field" id="primaryDioTopicField">
+                        <label for="primaryDioTopic">DIO Topic 1 (Optional)</label>
+                        <input id="primaryDioTopic" type="text" placeholder="dio/topic/1" />
+                      </div>
+                    </div>
+                    <div class="field-row checkbox-field">
+                      <label><input type="checkbox" id="primaryEnableSubscribeTopic" /> Enable Subscribe Topic</label>
+                    </div>
+
+                    <div id="primarySubscribeSection" class="subscribe-section" style="display:none;">
+                      <div class="field-row">
+                        <div class="field">
+                          <label for="primarySubscribeQos">Subscribe QOS</label>
+                          <select id="primarySubscribeQos">
+                            <option value="2">2</option>
+                            <option value="1">1</option>
+                            <option value="0">0</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="field-row">
+                        <div class="field">
+                          <label for="primaryCommandRequest">Command Request Topic 1 (Optional)</label>
+                          <input id="primaryCommandRequest" type="text" placeholder="cmd/request/topic/1" />
+                        </div>
+                        <div class="field">
+                          <label for="primaryCommandResponse">Command Response Topic 1 (Optional)</label>
+                          <input id="primaryCommandResponse" type="text" placeholder="cmd/response/topic/1" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECONDARY SERVER CARD (mirror of primary; static fields added similarly) -->
+          <div class="server-card collapsed" id="secondaryCard">
+            <div class="server-header">
+              <div>
+                <div class="server-title">Secondary Server</div>
+                <div class="server-sub">Protocol: <span id="secondaryProtocolLabel">�</span></div>
+              </div>
+              <div class="server-actions">
+                <div class="pill">
+                  <img class="pill-icon" src="/luci2/icons/server.svg" alt="server icon">
+                </div>
+                <button class="toggle-icon" data-target="secondaryCard">?</button>
+              </div>
+
+            </div>
+
+            <div class="server-body">
+              <div class="server-grid">
+                <div class="quick-settings-panel">
+                  <div class="field">
+                    <label for="secondaryProtocol">Protocol</label>
+                    <select id="secondaryProtocol">
+                      <option value="http">HTTP</option>
+                      <option value="https">HTTPS</option>
+                      <option value="mqtt">MQTT</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="input-fields-panel">
+                  <div id="secondaryHttpFields">
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryHttpUrl">HTTP URL</label>
+                        <input id="secondaryHttpUrl" type="text" placeholder="Enter HTTP URL" />
+                      </div>
+                      <div class="field">
+                        <label for="secondaryHttpPort">HTTP Port (Optional)</label>
+                        <input id="secondaryHttpPort" type="text" placeholder="8080" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryContentType">Content Type</label>
+                        <select id="secondaryContentType">
+                          <option value="application/json">application/json</option>
+                          <option value="application/x-www-form-urlencoded">application/x-www-form-urlencoded</option>
+                          <option value="text/plain; charset=UTF-8">text/plain; charset=UTF-8</option>
+                          <option value="custom">Custom</option>
+                        </select>
+                      </div>
+                      <div class="field" id="secondaryCustomContentTypeDiv" style="display:none;">
+                        <label for="secondaryCustomContentType">Custom Content Type</label>
+                        <input type="text" id="secondaryCustomContentType" placeholder="Enter custom type" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryAuth">Enable Authentication</label>
+                        <select id="secondaryAuth">
+                          <option value="0">No Authentication</option>
+                          <option value="1">Username/Password</option>
+                          <option value="2">Bearer Token</option>
+                        </select>
+                      </div>
+
+                      <!-- STATIC AUTH FIELDS for secondary -->
+                      <div class="field" id="secondaryAuthFields" style="display:none;">
+                        <div id="secondaryAuthUserPass" style="display:none;">
+                          <div class="field-row">
+                            <div class="field">
+                              <label for="secondaryUsername">HTTP Username</label>
+                              <input id="secondaryUsername" type="text" placeholder="Username" />
+                            </div>
+                            <div class="field">
+                              <label for="secondaryPassword">HTTP Password</label>
+                              <input id="secondaryPassword" type="password" placeholder="Password" />
+                            </div>
+                          </div>
+                        </div>
+                        <div id="secondaryAuthBearer" style="display:none;">
+                          <div class="field">
+                            <label for="secondaryBearerToken">Bearer Token</label>
+                            <input id="secondaryBearerToken" type="text" placeholder="Bearer Token" />
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div class="field-row">
+                      <!-- <div class="field checkbox-field">
+                        <label><input type="checkbox" id="secondaryEnableServerResp" /> Enable Server Response
+                          Validation</label>
+                      </div> -->
+                      <div class="checkbox-group">
+                        <input type="checkbox" id="secondaryEnableServerResp" />
+                        <label for="secondaryEnableServerResp"> Enable Server Response Validation</label>
+                      </div>
+                      <div class="field" id="secondaryServerRespDiv" style="display:none;">
+                        <label for="secondaryServerResp">Server Response</label>
+                        <select id="secondaryServerResp">
+                          <option value="recordId">RecordID</option>
+                          <option value="custom">Custom</option>
+                        </select>
+                        <div class="field" id="secondaryCustomServerRespDiv" style="display:none;">
+                          <input type="text" id="secondaryCustomServerResp" placeholder="Enter custom value" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryMethod">Method</label>
+                        <select id="secondaryMethod">
+                          <option value="0">POST</option>
+                          <option value="1">GET</option>
+                        </select>
+                      </div>
+
+                      <!-- Enable publish over LAN (static) -->
+                      <!-- <div class="field checkbox-field">
+                  <label><input type="checkbox" id="secondaryEnablePublishOverLan" /> Enable Publish Over LAN</label>
+                </div> -->
+                    </div>
+                    <div id="secondaryHttpsCertArea" class="field-row upload-cert" style="display:none;">
+                      <div class="field">
+                        <label>HTTPS Certificate</label>
+                        <div class="upload-area">
+                          <button type="button" class="btn btn-primary" id="btn_upload_https2">
+                            Upload Certificate
+                          </button>
+                          <button type="button" class="btn btn-danger" id="btn_delete_https2">
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div id="secondaryMqttFields" style="display:none;">
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryMqttHost">MQTT Host</label>
+                        <input type="text" id="secondaryMqttHost" placeholder="Enter MQTT Host" />
+                      </div>
+                      <div class="field">
+                        <label for="secondaryMqttPort">MQTT Port</label>
+                        <input type="text" id="secondaryMqttPort" placeholder="1883" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryMqttAuthMode">Authentication Mode</label>
+                        <select id="secondaryMqttAuthMode">
+                          <option value="3">No Authentication</option>
+                          <option value="2">Username/Password</option>
+                          <option value="1">Username/Password + CA Certificate</option>
+                          <option value="0">TLS</option>
+                          <option value="4">Username/Password + TLS Certificate</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div id="secondaryMqttAuthFields" style="display:none;">
+                      <div class="field-row">
+                        <div class="field">
+                          <label for="secondaryMqttUser">Username</label>
+                          <input type="text" id="secondaryMqttUser" placeholder="Enter Username" />
+                        </div>
+                        <div class="field">
+                          <label for="secondaryMqttPass">Password</label>
+                          <input type="password" id="secondaryMqttPass" placeholder="Enter Password" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="secondaryMqttCertArea" style="display:none;" class="field-row upload-cert">
+                      <div class="field">
+                        <label>Certificate</label>
+                        <div class="upload-area">
+                          <!-- <input type="file" id="secondaryMqttCertFile" style="display:none;" /> -->
+                          <button class="btn btn-primary" type="button" id="btn_upload2">Upload Certificate</button>
+                          <button class="btn btn-danger" type="button" id="btn_delete2">Delete</button>
+                          <!-- <span class="cert-name" id="secondaryCertName">No file chosen</span> -->
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="field-row checkbox-field">
+                      <label><input type="checkbox" id="secondaryEnableClientId" /> Enable ClientId</label>
+                    </div>
+
+                    <div class="field-row client-id-field" id="secondaryClientIdField" style="display:none;">
+                      <div class="field">
+                        <label for="secondaryClientId">Client ID</label>
+                        <input type="text" id="secondaryClientId" placeholder="Enter Client ID" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryPublishQos">Publish QOS</label>
+                        <select id="secondaryPublishQos">
+                          <option value="2">2</option>
+                          <option value="1">1</option>
+                          <option value="0">0</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- <h4 class="sub-heading">Publish Topic Configuration</h4> -->
+                    <!-- <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryModbusTopic">Modbus Topic 1 (Optional)</label>
+                        <input id="secondaryModbusTopic" type="text" placeholder="modbus/topic/1" />
+                      </div>
+                      <div class="field">
+                        <label for="secondaryRs232Topic">RS232 Topic 1 (Optional)</label>
+                        <input id="secondaryRs232Topic" type="text" placeholder="rs232/topic/1" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="secondaryAioTopic">AIO Topic 1 (Optional)</label>
+                        <input id="secondaryAioTopic" type="text" placeholder="aio/topic/1" />
+                      </div>
+                      <div class="field">
+                        <label for="secondaryDioTopic">DIO Topic 1 (Optional)</label>
+                        <input id="secondaryDioTopic" type="text" placeholder="dio/topic/1" />
+                      </div>
+                    </div> -->
+                    <h4 class="sub-heading">Publish Topic Configuration</h4>
+                    <div class="field-row" id="secondaryMqttTopicRow1">
+                      <div class="field" id="secondaryModbusTopicField">
+                        <label for="secondaryModbusTopic">Modbus Topic 1 (Optional)</label>
+                        <input id="secondaryModbusTopic" type="text" placeholder="modbus/topic/1" />
+                      </div>
+                      <div class="field" id="secondaryRs232TopicField">
+                        <label for="secondaryRs232Topic">RS232 Topic 1 (Optional)</label>
+                        <input id="secondaryRs232Topic" type="text" placeholder="rs232/topic/1" />
+                      </div>
+                    </div>
+
+                    <div class="field-row" id="secondaryMqttTopicRow2">
+                      <div class="field" id="secondaryAioTopicField">
+                        <label for="secondaryAioTopic">AIO Topic 1 (Optional)</label>
+                        <input id="secondaryAioTopic" type="text" placeholder="aio/topic/1" />
+                      </div>
+                      <div class="field" id="secondaryDioTopicField">
+                        <label for="secondaryDioTopic">DIO Topic 1 (Optional)</label>
+                        <input id="secondaryDioTopic" type="text" placeholder="dio/topic/1" />
+                      </div>
+                    </div>
+                    <div class="field-row checkbox-field">
+                      <label><input type="checkbox" id="secondaryEnableSubscribeTopic" /> Enable Subscribe Topic</label>
+                    </div>
+
+                    <div id="secondarySubscribeSection" class="subscribe-section" style="display:none;">
+                      <div class="field-row">
+                        <div class="field">
+                          <label for="secondarySubscribeQos">Subscribe QOS</label>
+                          <select id="secondarySubscribeQos">
+                            <option value="2">2</option>
+                            <option value="1">1</option>
+                            <option value="0">0</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="field-row">
+                        <div class="field">
+                          <label for="secondaryCommandRequest">Command Request Topic 1 (Optional)</label>
+                          <input id="secondaryCommandRequest" type="text" placeholder="cmd/request/topic/1" />
+                        </div>
+                        <div class="field">
+                          <label for="secondaryCommandResponse">Command Response Topic 1 (Optional)</label>
+                          <input id="secondaryCommandResponse" type="text" placeholder="cmd/response/topic/1" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MQTT COMMAND CLOUD (single static card at bottom with both sections) -->
+          <div class="server-card collapsed" id="mqttCommandCloudCard" style="display:none;">
+            <div class="server-header">
+              <div>
+                <div class="server-title">MQTT Command Cloud</div>
+              </div>
+              <div class="server-actions">
+                <div class="pill">
+                  <img class="pill-icon" src="/luci2/icons/cloud-data-transfer.svg" alt="server icon">
+                </div>
+                <button class="toggle-icon" data-target="mqttCommandCloudCard" title="Collapse/Expand">?</button>
+
+              </div>
+            </div>
+
+            <div class="server-body">
+              <div class="server-grid">
+                <div class="input-fields-panel" style="width:100%;">
+                  <div class="field-row" style="margin-bottom:10px;">
+                    <button class="btn subtle-btn" id="loadPrimaryMqtt">Consider Primary MQTT Data</button>
+                    <button class="btn subtle-btn" id="loadSecondaryMqtt">Consider Secondary MQTT Data</button>
+                  </div>
+                  <div class="field-row">
+                    <div class="field">
+                      <label for="cmdMqttHost">MQTT Host</label>
+                      <input type="text" id="cmdMqttHost" placeholder="Enter MQTT Host" />
+                    </div>
+                    <div class="field">
+                      <label for="cmdMqttPort">MQTT Port</label>
+                      <input type="text" id="cmdMqttPort" placeholder="1883" />
+                    </div>
+                  </div>
+                  <div class="field-row">
+                    <div class="field">
+                      <label for="cmdMqttAuthMode">Authentication Mode</label>
+                      <select id="cmdMqttAuthMode">
+                        <option value="3">No Authentication</option>
+                        <option value="2">Username/Password</option>
+                        <option value="1">Username/Password + CA Certificate</option>
+                        <option value="0">TLS</option>
+                        <option value="4">Username/Password + TLS Certificate</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div id="cmdMqttAuthFields" style="display:none;">
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="cmdMqttUser">Username</label>
+                        <input type="text" id="cmdMqttUser" placeholder="Enter Username" />
+                      </div>
+                      <div class="field">
+                        <label for="cmdMqttPass">Password</label>
+                        <input type="password" id="cmdMqttPass" placeholder="Enter Password" />
+                      </div>
+                    </div>
+                  </div>
+                  <div id="cmdMqttCertArea" class="field-row upload-cert" style="display:none;">
+                    <div class="field">
+                      <label>Certificate</label>
+                      <div class="upload-area">
+                        <!-- <input type="file" id="cmdMqttCertFile" style="display:none;" /> -->
+                        <button class="btn btn-primary" type="button" id="cmdCertUploadBtn">Upload Certificate</button>
+                        <button class="btn btn-danger" type="button" id="cmdCertDeleteBtn">Delete</button>
+                        <!-- <span class="cert-name" id="cmdCertName">No file chosen</span> -->
+                      </div>
+                    </div>
+                  </div>
+                  <div class="field-row checkbox-field">
+                    <label><input type="checkbox" id="cmdEnableClientId" /> Enable Client ID</label>
+                  </div>
+
+                  <div class="field-row client-id-field" id="cmdClientIdField" style="display:none;">
+                    <div class="field">
+                      <label for="cmdClientId">Client ID</label>
+                      <input type="text" id="cmdClientId" placeholder="Enter Client ID" />
+                    </div>
+                  </div>
+                  <div class="field-row checkbox-field">
+                    <label><input type="checkbox" id="cmdEnableSubscribeTopic" /> Enable Subscribe Topic</label>
+                  </div>
+
+                  <div id="cmdSubscribeSection" class="subscribe-section" style="display:none;">
+                    <h4 class="sub-heading">Subscribe Topic Configuration</h4>
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="cmdSubscribeQos">Subscribe QOS</label>
+                        <select id="cmdSubscribeQos">
+                          <option value="2">2</option>
+                          <option value="1">1</option>
+                          <option value="0">0</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="cmdCommandRequest">Command Request Topic 1 (Optional)</label>
+                        <input id="cmdCommandRequest" type="text" placeholder="cmd/request/topic/1" />
+                      </div>
+                      <div class="field">
+                        <label for="cmdCommandResponse">Command Response Topic 1 (Optional)</label>
+                        <input id="cmdCommandResponse" type="text" placeholder="cmd/response/topic/1" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .cloud-page {
+    max-width: 1200px;
+    margin: 28px 28px 28px 28px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 22px;
+    background-color: #ffffff;
+    /* border: 1px solid rgba(27, 117, 188, 0.08); */
+    border: 1px solid rgba(27, 117, 188, 0.25);
+    /* border: 1px solid rgba(19, 85, 126, 0.25); */
+    border-radius: 10px;
+    padding: 20px;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    box-shadow: 0 6px 20px rgba(16, 32, 52, 0.03);
+    font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #222f3d;
+    line-height: 1.38;
+  }
+
+  /* ---------------------------
+   Cloud card (left column)
+   --------------------------- */
+  .cloud-card {
+    background: #fff;
+    border-radius: 12px;
+    /* box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06); */
+    padding: 18px;
+    /* border: 1px solid rgba(13, 20, 39, 0.04); */
+    border: 1px solid rgba(13, 20, 39, 0.12);
+
+  }
+
+  .cloud-card h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    color: #0b60d8;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+  }
+
+  .cloud-left>h3,
+  .cloud-right>h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #285e8e;
+    font-weight: 500 !important;
+    letter-spacing: -0.2px;
+  }
+
+  .small-note {
+    margin-top: 8px;
+    color: #a0a0a0;
+    font-size: 12px;
+  }
+
+  /* ---------------------------
+   Form rows & labels
+   --------------------------- */
+  .form-row {
+    margin-bottom: 12px;
+  }
+
+  .form-row label {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #324151;
+  }
+
+  /* Inputs, selects � keep structure same but improve visuals */
+  .form-row input[type="text"],
+  .form-row select,
+  .field input[type="text"],
+  .field input[type="password"],
+  .field select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e6e9ee;
+    /* background: #fbfdff; */
+    box-sizing: border-box;
+    margin-top: 4px;
+    font-size: 14px;
+    color: #27313f;
+    /* background: linear-gradient(180deg, #ffffff, #fbfdff); */
+    transition: box-shadow 220ms ease, transform 220ms ease, border-color 200ms ease;
+    outline: none;
+  }
+
+  /* Placeholder color */
+  .form-row input::placeholder,
+  .field input::placeholder {
+    color: #a9b3bf;
+    opacity: 1;
+  }
+
+  /* Focus state � accessible and subtle */
+  .form-row input[type="text"]:focus,
+  .field input[type="text"]:focus,
+  .field input[type="password"]:focus,
+  .form-row select:focus,
+  .field select:focus {
+    border-color: #0b60d8;
+    /* box-shadow: 0 6px 18px rgba(11, 96, 216, 0.08); */
+    transform: translateY(-1px);
+  }
+
+  /* Keep default disabled look functional */
+  [disabled],
+  input[disabled],
+  select[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    margin: -1px 0 0 !important;
+    /* margin-top: 1px \9; */
+    line-height: normal;
+  }
+
+  /* ---------------------------
+   Buttons row & buttons
+   --------------------------- */
+
+
+  .btns-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    justify-content: flex-end;
+    /* RIGHT ALIGN */
+    align-items: flex-end;
+  }
+
+
+
+
+
+  /* Subtle button */
+  .btn.subtle {
+    background: #e9eef6;
+    color: #33475b;
+    border: 1px solid #d8e0eb;
+    box-shadow: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  /* .btn.subtle:hover {
+    transform: translateY(-2px);
+  } */
+
+  /* Subtle grey button */
+  .subtle-btn {
+    /* background: #f1f3f6; */
+    border: 1px solid #d6d9e0;
+    color: #333;
+    font-size: 12px;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 500;
+    cursor: pointer;
+    /* transition: transform 200ms ease, background-color 160ms ease; */
+  }
+
+  .subtle-btn:hover {
+    background: #e7eaee;
+    /* transform: translateY(-2px); */
+  }
+
+  /* ---------------------------
+   Right column / server list
+   --------------------------- */
+  .cloud-right {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  #primaryCard {
+    margin-top: -15px
+  }
+
+  /* Server card */
+  .server-card {
+    border-radius: 12px;
+    /* border: 1px solid rgba(13, 20, 39, 0.06); */
+    border: 1px solid rgba(13, 20, 39, 0.12);
+    overflow: hidden;
+    /* background: linear-gradient(180deg, #fff, #fbfdff); */
+    background: linear-gradient(180deg, #fff, #fbfdff);
+
+    transition: transform .35s ease, box-shadow .35s ease;
+    /* will-change: transform; */
+  }
+
+  .server-card:hover {
+    /* transform: translateY(-4px); */
+    box-shadow: 0 18px 44px rgba(17, 24, 39, 0.08);
+  }
+
+  /* Header */
+  .server-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    /* background: linear-gradient(90deg, rgba(11, 96, 216, 0.08), rgba(11, 96, 216, 0.02)); */
+    background: linear-gradient(180deg, #fff, #fbfdff);
+    border-bottom: 1px solid rgba(11, 96, 216, 0.06);
+    cursor: pointer;
+  }
+
+  .server-title {
+    /* font-weight: 700; */
+    font-weight: 500;
+    color: #0b60d8;
+    font-size: 14px;
+  }
+
+  .server-sub {
+    font-size: 12px;
+    color: #546374;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+
+  /* Actions & pill */
+  .server-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Pill container */
+  .pill {
+    /* background: #fff; */
+    background: linear-gradient(90deg, #f7f8fa, #eef1f5);
+    border-radius: 20px;
+    padding: 19px 15px;
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(11, 96, 216, 0.06);
+    border: 1px solid rgba(11, 96, 216, 0.04);
+    min-width: 40px;
+    height: 28px;
+  }
+
+  /* Icon inside pill */
+  .pill-icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    display: block;
+    /* filter: brightness(0) saturate(100%) opacity(0.8); */
+    /* soft professional tone */
+  }
+
+  /* Toggle icon */
+  .toggle-icon {
+    display: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    font-weight: 700;
+    transition: background 200ms ease, transform 200ms ease;
+  }
+
+  .toggle-icon:hover {
+    background: rgba(11, 96, 216, 0.06);
+    transform: translateY(-2px);
+  }
+
+  /* Server body � expand/collapse (preserve behavior) */
+  .server-body {
+    padding: 18px;
+    display: block;
+    max-height: none;
+    overflow: visible;
+    transition: max-height .35s cubic-bezier(.2, .9, .3, 1), padding .35s ease;
+  }
+
+  /* Collapsed style MUST remain same for JS toggling */
+  .server-card.collapsed .server-body {
+    max-height: 0 !important;
+    padding: 0 18px !important;
+  }
+
+  .server-card.collapsed .server-header {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #0b60d8;
+  }
+
+  /* Server grid inside card (keeps default commented template) */
+  .server-grid {
+    display: grid;
+    /* grid-template-columns: 260px 1fr; */
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* Quick settings panel */
+  .quick-settings-panel {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    /* box-shadow: 0 2px 6px rgba(11, 96, 216, 0.1); */
+    display: flex;
+    gap: 10px;
+    border: 1px solid #dfe3eb;
+    flex-wrap: wrap;
+    align-self: flex-start;
+    /* max-width: 240px; */
+  }
+
+  .quick-settings-panel .field.checkbox-field {
+    margin-top: 48px;
+  }
+
+  /* Input fields panel */
+  .input-fields-panel {
+    background: #fff;
+    border-radius: 10px;
+    padding: 16px;
+    /* box-shadow: 0 2px 6px rgba(11, 96, 216, 0.08); */
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dfe3eb;
+    gap: 12px;
+  }
+
+  /* Fields & labels */
+  .field-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .field {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .field label {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: #33475b;
+    margin-top: 8px;
+  }
+
+  .checkbox-field label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    margin-top: 16px;
+  }
+
+  /* MQTT command cloud */
+  .mqtt-command-cloud {
+    border-radius: 12px;
+    border: 1px solid rgba(13, 20, 39, 0.06);
+    background: #fff;
+    padding: 18px;
+    box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
+  }
+
+  .mqtt-section {
+    margin-bottom: 20px;
+  }
+
+  .mqtt-section h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0b60d8;
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid rgba(11, 96, 216, 0.15);
+  }
+
+  .mqtt-divider {
+    border-top: 1px solid rgba(11, 96, 216, 0.12);
+    margin: 18px 0;
+  }
+
+  /* Upload area */
+  .upload-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+
+
+  .cert-name {
+    font-size: 13px;
+    color: #666;
+  }
+
+  /* Sub-heading */
+  .sub-heading {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 10px 0 6px;
+    color: #0b60d8;
+    border-bottom: 1px solid #e6e9ee;
+    padding-bottom: 4px;
+  }
+
+  /* Utility */
+  .hidden {
+    display: none !important;
+  }
+
+
+  .kv-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+
+  :focus-visible {
+    outline: 3px solid rgba(11, 96, 216, 0.14);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+
+  [disabled],
+  .btn[disabled],
+  input[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+
+  input:required,
+  textarea:required,
+  select:required {
+    box-shadow: inset 0 -2px 0 rgba(255, 0, 0, 0.02);
+  }
+
+  input:required:focus {
+    box-shadow: 0 6px 18px rgba(11, 96, 216, 0.06);
+  }
+
+
+  .server-card .toggle-icon svg {
+    transition: transform 220ms ease;
+  }
+
+  .server-card.collapsed .toggle-icon svg {
+    transform: rotate(-90deg);
+  }
+
+  /* Respect user preference for reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+
+    .server-card,
+    .server-body,
+    .btn,
+    .toggle-icon,
+    .upload-btn,
+    .delete-btn {
+      transition: none !important;
+    }
+  }
+
+  /* Responsive behavior (preserve your breakpoints and structure) */
+  @media (max-width:940px) {
+    .cloud-page {
+      grid-template-columns: 1fr;
+      padding: 12px;
+    }
+
+    .server-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .field-row {
+      flex-direction: column;
+    }
+
+
+    .form-row input[type="text"],
+    .field input[type="text"],
+    .field input[type="password"] {
+      font-size: 15px;
+    }
+  }
+
+  @media (max-width:580px) {
+    .cloud-page {
+      margin: 12px;
+      gap: 12px;
+    }
+
+    .server-title {
+      font-size: 18px;
+    }
+
+    .pill {
+      font-size: 12px;
+      padding: 5px 8px;
+    }
+
+    .btn {
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+  }
+
+  /* -------- Cloud Disable Overlay -------- */
+  #cloudDisabledOverlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+  }
+
+  .cloud-overlay-card {
+    background: #ffffff;
+    padding: 22px 26px;
+    border-radius: 12px;
+    max-width: 460px;
+    text-align: center;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  }
+
+  .cloud-overlay-card h2 {
+    margin-bottom: 10px;
+    color: red;
+  }
+
+  .cloud-blurred {
+    filter: blur(4px);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    margin-top: 32px;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .checkbox-group label {
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  @media (max-width: 900px) {
+
+    .cloud-page {
+      grid-template-columns: 1fr;
+      margin: 8px;
+      padding: 10px;
+      gap: 12px;
+    }
+
+    .cloud-left,
+    .cloud-right {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 900px) {
+
+    .field-row {
+      flex-direction: column;
+      display: flex;
+      gap: 8px;
+    }
+
+    .field {
+      width: 100%;
+    }
+
+  }
+
+  @media (max-width: 900px) {
+
+    .form-row {
+      margin-bottom: 10px;
+    }
+
+    .cloud-card {
+      padding: 12px;
+    }
+
+    .server-body {
+      padding: 10px;
+    }
+
+  }
+
+  @media (max-width: 900px) {
+
+    .server-grid {
+      display: block !important;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+  }
+
+  @media (max-width: 900px) {
+
+    .btns-row {
+      display: flex;
+      justify-content: center;
+    }
+
+    .btns-row .btn {
+      width: 40%;
+    }
+
+  }
+
+  @media (max-width: 900px) {
+
+    .server-card {
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+  }
+
+  @media (max-width: 900px) {
+
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .field {
+      width: 100% !important;
+      flex: 1 1 100%;
+    }
+
+    .field input,
+    .field select {
+      width: 100% !important;
+    }
+
+  }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  @media (max-width: 400px) {
+    .checkbox-group {
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      flex-shrink: 0;
+      width: 16px;
+      height: 16px;
+    }
+
+    .checkbox-group label {
+      min-width: 0;
+      word-break: break-word;
+      white-space: normal;
+      font-size: 12px;
+    }
+  }
+
+  @media (max-width: 400px) {
+
+    .quick-settings-panel,
+    .server-card,
+    .server-body,
+    .server-grid {
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+  }
+</style>

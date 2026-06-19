@@ -1,0 +1,23 @@
+{
+    "setmoduletypeacl": {
+        "description": "Set Module Type",
+        "read": {
+			"ubus" : {
+                "rpc-updateModuletype":[
+                "configure"                   
+                ]
+            },
+            "uci": [
+                "boardconfigfile",
+                "moduletypeconfig"               
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "boardconfigfile",
+               "moduletypeconfig"                
+            ]
+        }
+    }
+}

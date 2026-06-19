@@ -1,0 +1,65 @@
+<div style="border-bottom: 1px solid #70707038">
+    <h1 class="header">Guest logins</h1>
+</div>
+
+<div class="pagecontent">
+    <div id="Update-Login-Note"></div>
+
+    <div id="map"></div>
+    <!-- <div class="scrollable-y" id="map"> -->
+
+</div>
+</div>
+
+<style>
+    .pagecontent {
+        overflow-x: auto;
+        /* keep horizontal scroll */
+        overflow-y: visible;
+        /* allow button to show */
+    }
+
+    .scrollable-y {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 12px;
+        width: 100%;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px 8px;
+        scrollbar-width: thin;
+        scrollbar-color: #114d73 #f1f5f9;
+        box-sizing: border-box;
+    }
+
+    .list-group-item .luci2-section-header>.btn-group {
+        top: 8px !important;
+        right: 8px !important;
+        z-index: 10;
+    }
+
+    table.table {
+        min-width: 0 !important
+    }
+
+    .scrollable-y::-webkit-scrollbar {
+        height: 10px;
+    }
+
+    .scrollable-y::-webkit-scrollbar-thumb {
+        background: #1f66d7;
+        border-radius: 8px;
+        border: 2px solid #f8fafc;
+    }
+
+    .scrollable-y::-webkit-scrollbar-track {
+        background: #f8fafc;
+    }
+
+    #Update-Login-Note {
+        margin: -32px 0px 0px 8px;
+    }
+
+    
+</style>

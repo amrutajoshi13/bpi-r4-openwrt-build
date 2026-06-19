@@ -1,0 +1,3 @@
+check process ReadRS232App with matching "ReadRS232App" every 1 cycles
+    start program = "/root/RS232ReadAppComponent/ReadRS232App > /dev/null 2>&1 &"
+    stop program = "/usr/bin/killall ReadRS232App > /dev/null 2>&1"

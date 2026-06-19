@@ -1,0 +1,4 @@
+check process BLControlAPP with matching "BLControlAPP" every 1 cycles
+    start program = "/root/BLControlAppComponent/BLControlAPP > /dev/null 2>1&"
+    stop program = "/usr/bin/killall BLControlAPP > /dev/null 2>&1"
+

@@ -1,0 +1,4 @@
+check process rtumd with matching "rtumd" every 1 cycles
+    start program = "/root/rtumd/rtumd > /dev/null 2>1&"
+    stop program = "/usr/bin/killall rtumd > /dev/null 2>&1"
+

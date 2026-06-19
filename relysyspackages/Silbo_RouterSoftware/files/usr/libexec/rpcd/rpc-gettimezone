@@ -1,0 +1,29 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+
+case "$1" in
+    list)
+        echo '{"get":{}}'
+        ;;
+    call)
+        case "$2" in
+                    get)
+                            timezone=$(uci get system.system.zonename)
+                         	echo "{\"code\":0,\"output\":\"$timezone\"}"                                                                                  
+                            ;;
+                            
+                          # response1=$(SystemstartScript)
+                           # echo "{\"code\":0,\"output\":\"$file\"}"
+                                                      
+                           
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

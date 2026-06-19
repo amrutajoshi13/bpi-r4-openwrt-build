@@ -1,0 +1,60 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+tunzeroipscript="/bin/findtunip tun0"
+tunoneipscript="/bin/findtunip tun1"
+tapipscript="/bin/findtunip tap0"
+case "$1" in
+    list)
+        echo '{"tunzeroip":{},"tunoneip":{},"tapip":{}}'
+        ;;
+    call)
+        case "$2" in
+                    tunzeroip)
+                            response=$($tunzeroipscript)
+							if [ "$?" -ne 0 ]
+                            then
+                                echo "{\"code\":0,\"output\":\" \"}"
+								#echo "{\"code\":1,\"output\":\"FAILURE : IPSEC Configuration Update\"}"
+                            else
+                            response=$(cat /tmp/tunip)
+                               	echo "{\"code\":0,\"output\":\"$response\"}"
+                            fi
+                                                                                 
+                            ;;    
+                            
+                     tunoneip)
+                             response=$($tunoneipscript)
+							if [ "$?" -ne 0 ]
+                            then
+                                echo "{\"code\":0,\"output\":\" \"}"
+								#echo "{\"code\":1,\"output\":\"FAILURE : IPSEC Configuration Update\"}"
+                            else
+                                response=$(cat /tmp/tunip)
+                               	echo "{\"code\":0,\"output\":\"$response\"}"
+                            fi                          
+                     ;;
+                        tapip)
+                             response=$($tapipscript)
+							if [ "$?" -ne 0 ]
+                            then
+                                echo "{\"code\":0,\"output\":\" \"}"
+								#echo "{\"code\":1,\"output\":\"FAILURE : IPSEC Configuration Update\"}"
+                            else
+                                response=$(cat /tmp/tunip)
+                               	echo "{\"code\":0,\"output\":\"$response\"}"
+                            fi                          
+                     ;;
+                                  
+		             *)
+		                    echo '{"code":"1","output":"invalid method"}'
+		                    exit 1
+		                    ;;
+     
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

@@ -1,0 +1,398 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">Firewall</h1>
+</div>
+
+<div class="pagecontent">
+
+	<div style="text-align: right;" class="btnclass">
+		<button type="button" class="btn btn-success btn-update" data-type="firewall" id="firewall_update"
+			title="Update Firewall">Update</button>
+	</div>
+	<div id="Update-Firewall-Note"></div>
+
+	<div class="tab-content" id="tabs">
+		<ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+			<li class="TabC TabGn active">
+				<a id="sectiontab_firewall_general" href="#tab_general" data-toggle="tab">General Setting 
+					<span class="badge"></span>
+				</a>
+			</li>
+			<li class="TabC TabPf">
+				<a id=":w" href="#tab_port" data-toggle="tab">Port Forwards 
+					<span class="badge"></span>
+				</a>
+			</li>
+			<li class="TabC TabRl">
+				<a id="sectiontab_firewall_rules" href="#tab_rules" data-toggle="tab">Traffic Rules 
+					<span class="badge"></span>
+				</a>
+			</li>
+			<li class="TabC TabSn">
+				<a id="sectiontab_firewall_snat" href="#tab_snat" data-toggle="tab">SNAT Traffic Rules
+					<span class="badge"></span>
+				</a>
+			</li>
+			<li class="TabC TabPc">
+				<a id="sectiontab_firewall_parent" href="#tab_parent" data-toggle="tab">Parental Control 
+					<span class="badge"></span>
+				</a>
+			</li>
+			<li class="TabC TabZf">
+				<a id="sectiontab_firewall_zonefor" href="#tab_zonefor" data-toggle="tab">Zone Forwarding 
+					<span class="badge"></span>
+				</a>
+			</li>
+		</ul>
+		
+		<div class="tab-pane TabC TabGn active" id="tab_general">
+			<div id="section_firewall_general"></div>
+		</div>
+
+		<div class="tab-pane TabC TabPf"  id="tab_port">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Port Forward Configurations</h3>
+				</div>
+				<p id="No-PortForward-Config"></p>
+				<div class="scrollable-x " id="section_firewall_port"></div>
+			</div>
+			<div id="Mansection_firewall_port">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Port Forward</h3>
+					</div>
+					<div class="panel-body">
+
+						<div class="luci2-field form-group">
+							<label class="col-lg-2 control-label"
+								for="field_firewall_redirect_newRedirect_name">Interface Name</label>
+							<div class="luci2-field-widget col-lg-4">
+								<input class="form-control luci2-field-validate"
+									id="field_firewall_redirect_newRedirect_name" type="text" placeholder="">
+								<div class="luci2-field-error label label-danger" style="display: none;"></div>
+							</div>
+						</div>
+
+						<div class="luci2-field form-group">
+							<label class="col-lg-2 control-label"
+								for="field_firewall_redirect_newRedirect_src_zone">Source zone</label>
+								<div class="luci2-field-widget col-lg-4">
+										<select class="form-control luci2-field-validate" id="field_firewall_redirect_newRedirect_src_zone" onchange="handleInterfaceSelectionport()">
+										<option value="SW_LAN">SW_LAN</option>
+										<option value="ra0">ra0</option>
+										<option value="custom">Custom</option>
+										</select>
+									<input type="text" class="form-control luci2-field-validate custom-value-input1" id="field_firewall_zone_newRedirect_srczone"  style="display: none;">
+										<div class="luci2-field-error label label-danger" style="display: none;"></div>
+								</div>
+						</div>
+
+						<div class="luci2-field form-group">
+							<label class="col-lg-2 control-label"
+								for="field_firewall_redirect_newRedirect_src_port">Source port</label>
+							<div class="luci2-field-widget col-lg-4">
+								<input class="form-control luci2-field-validate"
+									id="field_firewall_redirect_newRedirect_src_port" type="text" placeholder="">
+								<div class="luci2-field-error label label-danger" style="display: none;"></div>
+							</div>
+						</div>
+
+						<div class="luci2-field form-group">
+							<label class="col-lg-2 control-label"
+								for="field_firewall_redirect_newRedirect_dest_ip_addr">Destination IP</label>
+							<div class="luci2-field-widget col-lg-4">
+								<input class="form-control luci2-field-validate"
+									id="field_firewall_redirect_newRedirect_dest_ip_addr" type="text" placeholder="">
+								<div class="luci2-field-error label label-danger" style="display: none;"></div>
+							</div>
+						</div>
+
+						<div class="luci2-field form-group">
+							<label class="col-lg-2 control-label"
+								for="field_firewall_redirect_newRedirect_dest_port">Destination port</label>
+							<div class="luci2-field-widget col-lg-4">
+								<input class="form-control luci2-field-validate"
+									id="field_firewall_redirect_newRedirect_dest_port" type="text" placeholder="">
+								<div class="luci2-field-error label label-danger" style="display: none;"></div>
+							</div>
+						</div>
+
+						<div class="text-right" style="margin: 0px 10px 20px 0px;">
+							<button type="button" title="Add Port Forward" data-action="save" id="AddNewPortForward"
+								class="btn btn-success">Add Rule</button>
+						</div>
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="tab-pane TabC TabRl"  id="tab_rules">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Traffic Rules Configurations</h3>
+				</div>
+				<p id="No-Traffic-Config"></p>
+				<div class="scrollable-x " id="section_firewall_rules"></div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Traffic Rule</h3>
+				</div>
+				<div class="panel-body">
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_firewall_rule_NewRule_name">Interface
+							Name</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate" id="field_firewall_rule_NewRule_name"
+								type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_firewall_rule_NewRule_proto">Protocol</label>
+						<div class="luci2-field-widget col-lg-4">
+							<select class="form-control luci2-field-validate" id="field_firewall_rule_NewRule_proto">
+								<option value="all">All Protocol</option>
+								<option value="tcp udp">TCP+UDP</option>
+								<option value="tcp">TCP</option>
+								<option value="udp">UDP</option>
+								<option value="icmp">ICMP</option>
+							</select>
+
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add Traffic Rule" data-action="save" id="AddNewRule"
+							class="btn btn-success">Add Rule</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane TabC TabSn"  id="tab_snat">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">SNAT Traffic Rules Configurations</h3>
+				</div>
+				<p id="No-SNAT-Config"></p>
+				<div class="scrollable-x " id="section_firewall_snat"></div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Source NAT</h3>
+				</div>
+				<div class="panel-body">
+					<div class="luci2-field">
+						<label class="col-lg-2 control-label" for="field_firewall_snat_newSnat_name">Interface
+							Name</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate" id="field_firewall_snat_newSnat_name"
+								type="text" required="" data-error="enter valid username" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field">
+						<label class="col-lg-2 control-label" for="field_firewall_snat_newSnat_src">Source Zone</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate" id="field_firewall_snat_newSnat_src"
+								type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field">
+						<label class="col-lg-2 control-label" for="field_firewall_snat_newSnat_dest">Source IP</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate" id="field_firewall_snat_newSnat_dest"
+								type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="luci2-field">
+						<label class="col-lg-2 control-label" for="field_firewall_snat_newSnat_snat_IP">SNAT IP</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate" id="field_firewall_snat_newSnat_snat_IP"
+								type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add SNAT Rule" data-action="save" id="AddNewSnatRule"
+							class="btn btn-success">Add Rule</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="tab-pane TabC TabPc"  id="tab_parent">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Parental Control Configurations</h3>
+				</div>
+				<p id="No-Parental-Config"></p>
+				<div class="scrollable-x " id="section_firewall_parent"></div>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title"> Add New Parental Control</h3>
+				</div>
+				<div class="panel-body">
+					<div class="luci2-field form-group">
+						<label class="col-lg-2 control-label" for="field_firewall_pcontrol_NewPcontrol_name">Interface
+							Name
+						</label>
+						<div class="luci2-field-widget col-lg-4">
+							<input class="form-control luci2-field-validate"
+								id="field_firewall_pcontrol_NewPcontrol_name" type="text" placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;"></div>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add Parental Rule" data-action="save" id="AddNewParentalControl"
+							class="btn btn-success">Add
+							Rule</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="tab-pane TabC TabZf"  id="tab_zonefor">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Zone Forwarding Configurations</h3>
+				</div>
+				<p id="No-Zone-Config"></p>
+				<div class="scrollable-x " id="section_firewall_zonefor"></div>
+			</div>
+			<div id="Mansection_firewall_zonefor">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Zone Forward</h3>
+					</div>
+					<div class="panel-body">
+						<div class="luci2-field form-group">
+							<label class="col-lg-2 control-label" for="field_firewall_zone_newZone_srczone">Source Zone
+							</label>
+							<div class="luci2-field-widget col-lg-4">
+								<select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_src"
+									onchange="handleInterfaceSelection()">
+									<option value="SW_LAN">SW_LAN</option>
+									<option value="RA0">RA0</option>
+									<option value="custom">Custom</option>
+								</select>
+								<input type="text" class="form-control luci2-field-validate custom-value-input"
+									id="field_firewall_zone_newZone_srczone" style="display: none;">
+								<div class="luci2-field-error label label-danger" style="display: none;"></div>
+							</div>
+						</div>
+						<div class="luci2-field form-group">
+							<label class="col-lg-2 control-label" for="field_firewall_zone_newZone_dest">Destination
+								Zone
+							</label>
+							<div class="luci2-field-widget col-lg-4">
+								<select class="form-control luci2-field-validate" id="field_firewall_zone_newZone_dest"
+									onchange="handleDestinationSelection()">
+									<option value="CWAN1">CWAN1</option>
+									<option value="CWAN1_0">CWAN1_0</option>
+									<option value="CWAN1_1">CWAN1_1</option>
+									<option value="EWAN5">EWAN5</option>
+									<option value="custom">Custom</option>
+								</select>
+								<input type="text" class="form-control luci2-field-validate custom-value-input2"
+									id="field_firewall_zone_newZone_destzone" style="display: none;">
+								<div class="luci2-field-error label label-danger" style="display: none;"></div>
+							</div>
+						</div>
+						<div class="text-right" style="margin: 0px 10px 20px 0px;">
+								<button type="button" title="Add Zone Forwarding" data-action="save"
+									id="AddNewzoneForwarding" class="btn btn-success">Add
+								</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+			
+	</div>
+
+</div>
+
+<style>
+	#section_firewall_snat,
+	#section_firewall_rules,
+	#section_firewall_zone {
+		border-color: #dddddd;
+		background: #FFFFFF 0% 0% no-repeat padding-box;
+		/* box-shadow: 0px 25px 30px #0000001a; */
+		/* border: 1px solid #70707038; */
+		border-radius: 10px;
+		width: 100%;
+		/* padding: 17px; */
+		margin-bottom: 10px;
+	}
+
+	.btn-group>.btn {
+		width: auto !important;
+
+	}
+
+	.btn-success {
+		height: 34px !important;
+	}
+
+	#Update-Firewall-Note {
+		margin: -64px 0px 0px 8px;
+	}
+</style>
+
+<script>
+		function handleInterfaceSelectionport() {
+			var dropdown = document.getElementById("field_firewall_redirect_newRedirect_src_zone");
+			var selectedOption = dropdown.options[dropdown.selectedIndex].value;
+			var customInput = document.querySelector(".custom-value-input1");
+
+			if (selectedOption === "custom") {
+				dropdown.style.display = "none";
+				customInput.style.display = "block";
+			} else {
+				dropdown.style.display = "block";
+				customInput.style.display = "none";
+			}
+		}
+								
+		function handleInterfaceSelection() {
+			var dropdown = document.getElementById("field_firewall_zone_newZone_src");
+			var selectedOption = dropdown.options[dropdown.selectedIndex].value;
+			var customInput = document.querySelector(".custom-value-input");
+
+			if (selectedOption === "custom") {
+				dropdown.style.display = "none";
+				customInput.style.display = "block";
+			} else {
+				dropdown.style.display = "block";
+				customInput.style.display = "none";
+			}
+		}
+				
+		function handleDestinationSelection() {
+			var dropdown = document.getElementById("field_firewall_zone_newZone_dest");
+			var selectedOption = dropdown.options[dropdown.selectedIndex].value;
+			var customInput = document.querySelector(".custom-value-input2");
+
+			if (selectedOption === "custom") {
+				dropdown.style.display = "none";
+				customInput.style.display = "block";
+			} else {
+				dropdown.style.display = "block";
+				customInput.style.display = "none";
+			}
+		}
+	</script>			

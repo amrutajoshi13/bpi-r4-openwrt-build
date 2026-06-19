@@ -1,0 +1,3 @@
+check process AzureCloudConnectApp with matching "AzureCloudConnectApp" every 1 cycles
+    start program = "/root/AzureAppComponent/AzureCloudConnectApp > /dev/null 2>&1 &"
+    stop program = "/usr/bin/killall AzureCloudConnectApp > /dev/null 2>&1"

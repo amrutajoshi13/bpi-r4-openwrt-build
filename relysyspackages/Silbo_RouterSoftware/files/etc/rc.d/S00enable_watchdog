@@ -1,0 +1,36 @@
+#!/bin/sh /etc/rc.common
+
+
+START=00
+STOP=00
+USE_PROCD=1
+
+start_service() {
+    board_name=$(cat /tmp/sysinfo/board_name)
+    watchdogenabledisable=$(uci get applist_config.appconfig.watchdogenabledisable)
+    if echo "$board_name" | grep -qE "(IE44)";then 		
+		watchdogenablegpio=$(uci get applist_config.appconfig.watchdogenablegpioIE)
+		if [ "$watchdogenabledisable" = "0" ];then
+			echo 0 > /sys/class/gpio/gpio$watchdogenablegpio/value
+			pid=$(pgrep -f "/bin/Watchdog_Enable_Disable_IE")
+			kill -9 $pid	     
+		elif [ "$watchdogenabledisable" = "1" ];then
+		     /bin/Watchdog_Enable_Disable_IE &
+		fi
+	elif echo "$board_name" | grep -qE "(RFN|RDB)";then 
+		watchdogenablegpio=$(uci get applist_config.appconfig.watchdogenablegpioRFN)
+		if [ "$watchdogenabledisable" = "0" ];then
+			echo 0 > /sys/class/gpio/gpio$watchdogenablegpio/value
+			pid=$(pgrep -f "/bin/Watchdog_Enable_Disable_RFN")
+			kill -9 $pid	     
+		elif [ "$watchdogenabledisable" = "1" ];then
+		     /bin/Watchdog_Enable_Disable_RFN &
+		fi
+	fi
+}
+
+stop_service() {
+	echo "Stopping watchdog..."
+
+}
+

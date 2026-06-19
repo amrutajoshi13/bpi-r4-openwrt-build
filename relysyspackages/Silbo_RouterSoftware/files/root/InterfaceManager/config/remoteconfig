@@ -1,0 +1,18 @@
+
+config remoteconfig 'general'
+	option rmsoption 'none'
+
+config remoteconfig 'nms'
+    option nmstunneltype 'openvpn'
+	option httpurl 'https://example.com'
+	option nmsenable '0'
+
+config remoteconfig 'tr069'
+	option trenable '0'
+	option periodic_enable '1'
+	option Server_request_enable '1'
+	option username 'User'
+	option password 'Pass'
+	option url 'http://example.com'
+	option periodic_interval '300'
+

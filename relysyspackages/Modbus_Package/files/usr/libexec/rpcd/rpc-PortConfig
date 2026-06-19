@@ -1,0 +1,32 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+UpdateConfigScript="/bin/UpdatePortConfig.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+								 response=$($UpdateConfigScript)
+                            if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"Failure : Port Configuration\"}"
+                            else
+								echo "{\"code\":0,\"output\":\"Success : Port Configuration\"}"
+                            fi
+                                                                                 
+                            ;;                            
+                                                  
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

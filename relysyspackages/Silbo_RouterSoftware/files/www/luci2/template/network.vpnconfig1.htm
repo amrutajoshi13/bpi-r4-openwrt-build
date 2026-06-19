@@ -1,0 +1,521 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">VPN and Tunnel Configuration</h1>
+</div>
+
+
+<div class="pagecontent">
+	<div id="Update-VPN-Note"></div>
+	<ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+		<li class="TabC TabGn active">
+			<a id="sectiontab_vpn_general" href="#tab_general" data-toggle="tab">General Settings
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabIP">
+			<a id=":w" href="#tab_ipsec" data-toggle="tab">IPSEC
+				<span class="badge"></span>
+			</a>
+		</li>
+
+
+		<li class="TabC Tabopenvpn">
+			<a id=":w" href="#tab_openvpn" data-toggle="tab">OpenVPN
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabWire">
+			<a id=":w" href="#tab_Wireguard" data-toggle="tab">Wireguard
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC Tabzero">
+			<a id=":w" href="#tab_zerotier" data-toggle="tab">Zerotier
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabPPTP">
+			<a id=":w" href="#tab_PPTP" data-toggle="tab">PPTP
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabL2TP">
+			<a id=":w" href="#tab_L2TP" data-toggle="tab">L2TP
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabGRE">
+			<a id=":w" href="#tab_gre" data-toggle="tab">GRE Tunnel
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabIPa">
+			<a id=":w" href="#tab_ipip" data-toggle="tab">IPIP Tunnel
+				<span class="badge"></span>
+			</a>
+		</li>
+
+	</ul>
+	<div class="tab-content" id="tabs">
+		<div class="tab-pane TabC TabGn active" id="tab_general">
+
+			<div id="section_vpn_general"></div>
+		</div>
+
+
+
+		<div class="tab-pane TabC Tabip" id="tab_ipsec">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="ipsec"
+					title="Update IPSEC">Update</button>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">IPSEC Configurations</h3>
+				</div>
+				<p id="No-IPSEC-Config"></p>
+
+				<div class="scrollable-x " id="section_vpn_ipsec"></div>
+
+			</div>
+
+			<div id="Mansection_firewall_port">
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">Add New Configuration</h3>
+					</div>
+					<div class="luci2-field form-group" style="margin-top: 10px;">
+						<label class="col-lg-2 control-label" for="field_NewEvent_name">Connection Name</label>
+						<div class="luci2-field-widget">
+							<input class="form-control luci2-field-validate" id="field_NewEvent_name" type="text"
+								placeholder="">
+							<div class="luci2-field-error label label-danger" style="display: none;">
+							</div>
+						</div>
+					</div>
+
+					<div class="text-right" style="margin: 0px 10px 20px 0px;">
+						<button type="button" title="Add IPSEC Interface" data-action="save" id="AddNewconnectionipsec"
+							class="btn btn-success">Add Interface</button>
+					</div>
+
+
+				</div>
+			</div>
+		</div>
+
+
+
+
+
+
+
+
+		<div class="tab-pane TabC Tabopenvpn" id="tab_openvpn">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="openvpn"
+					title="Update OpenVPN">Update</button>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">OpenVPN Configurations</h3>
+				</div>
+				<p id="No-OpenVPN-Config"></p>
+				<div class="scrollable-x " id="section_vpn_openvpn"></div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Configuration</h3>
+				</div>
+
+				<div class="luci2-field form-group" style="margin-top: 10px;">
+					<label class="col-lg-2 control-label" for="field_firewall_rule_NewRule_name">Connection Name</label>
+					<div class="luci2-field-widget col-lg-4">
+						<input class="form-control luci2-field-validate" id="field_firewall_rule_NewRule_name"
+							type="text" placeholder="">
+						<div class="luci2-field-error label label-danger" style="display: none;">
+						</div>
+					</div>
+				</div>
+
+
+				<div class="luci2-field form-group">
+					<label class="col-lg-2 control-label" for="field_openvpn_Role">Role</label>
+					<div class="luci2-field-widget col-lg-4">
+						<select class="form-control luci2-field-validate" id="field_openvpn_Role" type="text"
+							placeholder="">
+							<option value="SERVER">Server</option>
+							<option value="CLIENT">Client</option>
+						</select>
+						<div class="luci2-field-error label label-danger" style="display:none;"></div>
+					</div>
+				</div>
+
+
+				<div class="text-right" style="margin: 0px 10px 20px 0px;">
+					<button type="button" title="Add OpenVPN Interface" data-action="save" id="AddNewconnectionopenvpn"
+						class="btn btn-success">Add Interface</button>
+				</div>
+
+			</div>
+		</div>
+
+
+
+
+
+
+
+		<div class="tab-pane TabC TabWire" id="tab_Wireguard">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="wireguard"
+					title="Update Wireguard">Update</button>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Wireguard Configurations</h3>
+				</div>
+				<p id="No-Wireguard-Config"></p>
+				<div class="scrollable-x" id="section_vpn_wireguard"></div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Configuration</h3>
+				</div>
+
+				<div class="luci2-field" style="margin-top: 10px;">
+					<label class="col-lg-2 control-label" for="field_wireguard_Name">Connection Name</label>
+					<div class="luci2-field-widget col-lg-4">
+						<input class="form-control luci2-field-validate" id="field_wireguard_Name" type="text"
+							placeholder="">
+						<div class="luci2-field-error label label-danger" style="display: none;"></div>
+					</div>
+				</div>
+
+				<div class="luci2-field">
+					<label class="col-lg-2 control-label" for="field_wireguard_Role">Role</label>
+					<div class="luci2-field-widget col-lg-4">
+						<select class="form-control luci2-field-validate" id="field_wireguard_Role" type="text"
+							placeholder="">
+							<option value="SERVER">Server</option>
+							<option value="CLIENT">Client</option>
+						</select>
+						<div class="luci2-field-error label label-danger" style="display: none;">
+						</div>
+					</div>
+				</div>
+
+
+				<div class="text-right" style="margin: 0px 10px 20px 0px;">
+					<button type="button" title="Add Wireguard Interface" data-action="save"
+						id="AddNewconnectionwireguard" class="btn btn-success">Add Interface</button>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="tab-pane TabC Tabzero" id="tab_zerotier">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="zerotier"
+					title="Update Zerotier">Update</button>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Zerotier Configurations</h3>
+				</div>
+				<p id="No-Zerotier-Config"></p>
+				<div class="scrollable-x" id="section_vpn_zerotier"></div>
+			</div>
+
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Configuration</h3>
+				</div>
+				<div class="luci2-field form-group" style="margin-top: 10px;">
+					<label class="col-lg-2 control-label" for="field_firewall_rule2">Connection Name</label>
+					<div class="luci2-field-widget col-lg-4">
+						<input class="form-control luci2-field-validate" id="field_firewall_rule2" type="text"
+							placeholder="">
+						<div class="luci2-field-error label label-danger" style="display: none;"></div>
+					</div>
+				</div>
+
+				<div class="text-right" style="margin: 0px 10px 20px 0px;">
+					<button type="button" title="Add zerotier Interface" data-action="save"
+						id="AddNewconnectionzerotier" class="btn btn-success">Add Interface</button>
+				</div>
+
+			</div>
+		</div>
+
+
+
+		<div class="tab-pane TabC TabPPTP" id="tab_PPTP">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="pptpd"
+					title="Update PPTP">Update</button>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">PPTP Configurations</h3>
+				</div>
+				<p id="No-PPTP-Config"></p>
+				<div class="scrollable-x" id="section_vpn_PPTP"></div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Configuration</h3>
+				</div>
+
+				<div class="luci2-field" style="margin-top: 10px;">
+					<label class="col-lg-2 control-label" for="field_PPTPD_rule_name">Connection Name</label>
+					<div class="luci2-field-widget col-lg-4">
+						<input class="form-control luci2-field-validate" id="field_PPTPD_rule_name" type="text"
+							data-error="pptpd-error-message" data-button="AddNewconnectionpptpd"
+							oninput="validateInput(this)" placeholder="Enter Name (max 10 characters)" />
+						<div class="luci2-field-error label label-danger" id="pptpd-error-message"
+							style="display: none;">
+							Maximum 10 characters allowed
+						</div>
+					</div>
+				</div>
+
+				<div class="luci2-field">
+					<label class="col-lg-2 control-label" for="field_PPTPD_rule_Role">Role</label>
+					<div class="luci2-field-widget col-lg-4">
+						<select class="form-control luci2-field-validate" id="field_PPTPD_rule_Role" type="text"
+							placeholder="">
+							<option value="SERVER">Server</option>
+							<option value="CLIENT">Client</option>
+						</select>
+						<div class="luci2-field-error label label-danger" style="display: none;">
+						</div>
+					</div>
+				</div>
+				<div id="PPTP-Note" style="margin: 0px 0px 0px 10px;"></div>
+
+				<div class="text-right" style="margin: 0px 10px 20px 0px;">
+					<button type="button" title="Add PPTP Interface" data-action="save" id="AddNewconnectionpptpd"
+						class="btn btn-success">Add Interface</button>
+				</div>
+			</div>
+		</div>
+
+
+
+		<div class="tab-pane TabC TabL2TP" id="tab_L2TP">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="L2TP"
+					title="Update L2TP">Update</button>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">L2TP Configurations</h3>
+				</div>
+				<p id="No-L2TP-Config"></p>
+				<div class="scrollable-x" id="section_vpn_L2TP"></div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Configuration</h3>
+				</div>
+				<div class="luci2-field form-group" style="margin-top: 10px;">
+					<label class="col-lg-2 control-label" for="field_L2TP_rule_name">Connection Name</label>
+					<div class="luci2-field-widget col-lg-4">
+						<input class="form-control luci2-field-validate" id="field_L2TP_rule_name" type="text"
+							data-error="l2tp-error-message" data-button="AddNewconnectionl2tp"
+							oninput="validateInput(this)" placeholder="Enter Name (max 10 characters)" />
+						<div class="luci2-field-error label label-danger" id="l2tp-error-message"
+							style="display: none;">
+							Maximum 10 characters allowed
+						</div>
+					</div>
+				</div>
+
+				<div class="luci2-field form-group">
+					<label class="col-lg-2 control-label" for="field_L2TP_rule_Role">Connection Name</label>
+					<div class="luci2-field-widget col-lg-4">
+						<select class="form-control luci2-field-validate" id="field_L2TP_rule_Role" type="text"
+							placeholder="">
+<!--
+							<option value="SERVER">Server</option>
+-->
+							<option value="CLIENT">Client</option>
+						</select>
+						<div class="luci2-field-error label label-danger" style="display: none;">
+						</div>
+					</div>
+				</div>
+
+				<div class="text-right" style="margin: 0px 10px 20px 0px;">
+					<button type="button" title="Add L2TP Interface" data-action="save" id="AddNewconnectionl2tp"
+						class="btn btn-success">Add Interface</button>
+				</div>
+
+			</div>
+		</div>
+
+
+		<div class="tab-pane TabC TabGRE" id="tab_gre">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="greconfig"
+					title="Update GRE">Update</button>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">GRE Configurations</h3>
+				</div>
+				<p id="No-GRE-Config"></p>
+				<div class="scrollable-x" id="section_vpn_gre"></div>
+			</div>
+
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Configuration</h3>
+				</div>
+
+				<div class="luci2-field form-group" style="margin-top: 10px;">
+					<label class="col-lg-2 control-label" for="field_NewEvent_name_gre">Connection Name</label>
+					<div class="luci2-field-widget col-lg-4">
+						<input class="form-control luci2-field-validate" id="field_NewEvent_name_gre" type="text"
+							placeholder="">
+						<div class="luci2-field-error label label-danger" style="display: none;"></div>
+					</div>
+				</div>
+
+				<div class="text-right" style="margin: 0px 10px 20px 0px;">
+					<button type="button" title="Add GRE Interface" data-action="save" id="AddNewconnectiongre"
+						class="btn btn-success">Add Interface</button>
+				</div>
+
+			</div>
+		</div>
+
+
+
+
+		<div class="tab-pane TabC TabIPa" id="tab_ipip">
+			<div style="text-align: right;" class="btnclass">
+				<button type="button" class="btn btn-success btn-update" data-type="ipipconfig"
+					title="Update IPIP">Update</button>
+			</div>
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">IPIP Configurations</h3>
+				</div>
+				<p id="No-IPIP-Config"></p>
+				<div class="scrollable-x" id="section_vpn_ipip"></div>
+			</div>
+
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Add New Configuration</h3>
+				</div>
+
+				<div class="luci2-field form-group" style="margin-top: 10px;">
+					<label class="col-lg-2 control-label" for="field_NewEvent_name_ipip">Connection Name</label>
+					<div class="luci2-field-widget col-lg-4">
+						<input class="form-control luci2-field-validate" id="field_NewEvent_name_ipip" type="text"
+							placeholder="">
+						<div class="luci2-field-error label label-danger" style="display: none;"></div>
+					</div>
+				</div>
+
+				<div class="text-right" style="margin: 0px 10px 20px 0px;">
+					<button type="button" title="Add IPIP Interface" data-action="save" id="AddNewconnectionipip"
+						class="btn btn-success">Add Interface</button>
+				</div>
+
+			</div>
+
+		</div>
+
+
+	</div>
+</div>
+
+<style>
+	.btnclass {
+		margin: -3px 20px 8px 0px
+	}
+
+	#Update-VPN-Note {
+		margin: -32px 0px -2px 0px;
+	}
+</style>
+
+
+
+<script>
+	document.addEventListener('click', function (e) {
+		var btn = e.target.closest('.btn-update');
+		if (!btn) return;
+
+		var type = btn.getAttribute('data-type');
+		if (type) {
+			update(type);
+		}
+	});
+
+	function validateInput(input) {
+		var errorId = input.getAttribute("data-error");
+		var btnId = input.getAttribute("data-button");
+
+		var errorMsg = errorId ? document.getElementById(errorId) : null;
+		var btn = btnId ? document.getElementById(btnId) : null;
+		if (input.value.length > 10) {
+			if (errorMsg) errorMsg.style.display = "block";
+			input.setAttribute('aria-invalid', 'true');
+			if (btn) btn.disabled = true;
+			// input.setCustomValidity("Maximum 10 characters allowed.");
+		} else {
+			if (errorMsg) errorMsg.style.display = "none";
+			input.removeAttribute('aria-invalid');
+			if (btn) btn.disabled = false;
+			input.setCustomValidity("");
+		}
+	}
+
+	document.addEventListener('DOMContentLoaded', function () {
+		document.querySelectorAll('.luci2-field-validate').forEach(function (input) {
+			validateInput(input);
+			input.addEventListener('input', function () {
+				validateInput(input);
+			});
+		});
+	});
+
+
+	// (function () {
+	// 	var storageKey = 'vpn-active-tab';
+	// 	$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+	// 		var tabId = $(e.target).attr('href');
+	// 		if (tabId) {
+	// 			localStorage.setItem(storageKey, tabId);
+	// 		}
+	// 	});
+	// 	$(function () {
+	// 		var activeTab = localStorage.getItem(storageKey);
+	// 		if (activeTab) {
+	// 			var $tabLink = $('a[data-toggle="tab"][href="' + activeTab + '"]');
+	// 			if ($tabLink.length) {
+	// 				$tabLink.tab('show');
+	// 			}
+	// 		}
+	// 	});
+	// })();
+
+</script>

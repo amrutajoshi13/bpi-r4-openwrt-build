@@ -1,0 +1,2 @@
+config general "general"
+    option url 'http://X.X.X.X:3003/'

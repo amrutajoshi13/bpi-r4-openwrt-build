@@ -1,0 +1,27 @@
+{
+    "routerapplicationacl": {
+        "description": "Router Application",
+            "read": {
+				"ubus" : {
+                "rpc-updateRouterApplicationConfig":[
+                "configure"        
+               ]
+            },
+                "uci": [
+                    "routerapplicationconfig"
+                ]
+            },
+ 
+            "write": {
+				 "ubus" : {
+                "rpc-updateRouterApplicationConfig":[
+                "configure"
+               ]
+		},
+                "uci": [
+                    "routerapplicationconfig"
+                ]
+            }
+    }
+}
+

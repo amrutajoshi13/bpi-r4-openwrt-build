@@ -1,0 +1,507 @@
+#!/bin/sh
+
+. /lib/functions.sh
+sleep 5
+
+
+chown sshadmin /root/user
+chown sshadmin /root/user/init.d
+board_name=$(cat /tmp/sysinfo/board_name)
+logo_n=$(hexdump -v -n 1 -s 0x60 -e '7/1 "%02X:" 1/1 "%01X"' /dev/mtd2 | sed 's/://g')
+wifi_enable_disable=$(hexdump -v -n 1 -s 0x61 -e '7/1 "%02X:" 1/1 "%01X"' /dev/mtd2 | sed 's/://g')
+wifi_enable_disable=$(echo "$wifi_enable_disable" | tr -d '\013\014\015 ')
+retainconfigflag=$(uci get applist_config.appconfig.retainconfigflag)
+
+if echo "$board_name" | grep -qE "(IAB44-B|IAB44-C|IAF44-C_GW)";
+then
+	for i in $(seq 1 5)
+	do	
+		productid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/1-1.1/idProduct)
+		vendorid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/1-1.1/idVendor)
+		
+		if [ -z $productid ]
+		then 
+			sleep 1
+		else
+			break
+		fi
+	done
+else
+	for i in $(seq 1 5)
+	do	
+		productid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idProduct)
+		vendorid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idVendor)
+		
+		if [ -z $productid ]
+		then 
+			sleep 1
+		else
+			break
+		fi
+	done
+	productid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idProduct)
+	vendorid=$(cat /sys/devices/platform/101c0000.ehci/usb1/1-1/idVendor)
+fi
+
+
+if [ "$wifi_enable_disable" = "00" ]; then
+ 	if echo "$board_name" | grep -qE "(Silbo_IAB|IAC|GRD|IAF|RFN44)";then
+		board_name=$(echo "$board_name" | sed 's/./0/10')
+	fi
+	if echo "$board_name" | grep -qE "(IA44|IE44|RD44|RC44|RB44)";then
+		board_name=$(echo "$board_name" | sed 's/./0/9')
+	fi
+fi	
+
+if [ "$logo_n" -eq "01" ] || [ $logo_n = FF ]
+then
+	    if [ "2c7c" = "$vendorid" ] && [ "6005" = "$productid" ] 
+		then
+			uci set system.system.model="$board_name"-EC200A
+			uci set boardconfig.board.model="$board_name"-EC200A
+	    elif [ "2c7c" = "$vendorid" ] && [ "0315" = "$productid" ] 
+		then
+			uci set system.system.model="$board_name"-EM05G
+			uci set boardconfig.board.model="$board_name"-EM05G
+		elif [ "2c7c" = "$vendorid" ] && [ "0125" = "$productid" ] 
+		then
+			uci set system.system.model="$board_name"-EC25E
+			uci set boardconfig.board.model="$board_name"-EC25E
+			cp /Web_page/EC25E/* /www/luci2/
+		elif [ "2c7c" = "${vendorid}" ] && [ "0900" = "${productid}" ]   
+		then  
+			uci set system.system.model="$board_name"-RM500U
+			uci set boardconfig.board.model="$board_name"-RM500U
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+		elif [ "2c7c" = "${vendorid}" ] && [ "0800" = "${productid}" ]
+		then     
+			uci set system.system.model="$board_name"-RM500Q
+			uci set boardconfig.board.model="$board_name"-RM500Q
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+			cp /Web_page/EC25E/* /www/luci2/
+		fi
+elif [ "$logo_n" -eq "02" ] 
+then
+    	if [ "2c7c" = "$vendorid" ] && [ "6005" = "$productid" ] 
+		then
+			uci set system.system.model="$board_name"-EC200A
+			uci set boardconfig.board.model="$board_name"-EC200A
+		elif [ "2c7c" = "$vendorid" ] && [ "0315" = "$productid" ] 
+		then
+			uci set system.system.model="$board_name"-EM05G
+			uci set boardconfig.board.model="$board_name"-EM05G
+		elif [ "2c7c" = "$vendorid" ] && [ "0125" = "$productid" ] 
+		then
+			uci set system.system.model="$board_name"-EC25E
+			uci set boardconfig.board.model="$board_name"-EC25E
+			cp /Web_page/EC25E/* /www/luci2/
+		elif [ "2c7c" = "${vendorid}" ] && [ "0900" = "${productid}" ]   
+		then  
+			uci set system.system.model="$board_name"-RM500U
+			uci set boardconfig.board.model="$board_name"-RM500U
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+		elif [ "2c7c" = "${vendorid}" ] && [ "0800" = "${productid}" ]
+		then     
+			uci set system.system.model="$board_name"-RM500Q
+			uci set boardconfig.board.model="$board_name"-RM500Q
+			uci set signalstrength.modem1.highestNetworkMode="5g"
+			cp /Web_page/EC25E/* /www/luci2/
+		fi
+       # Comment out the logo image tag in luci2.html
+        echo "Commenting out the logo image tag in luci2.html..."
+		sed -i '/custom_logo.svg/ c <!-- <img src="/luci2/icons/custom_logo.svg" class="logoimg" /> -->' /www/luci2.html
+        # Comment out the logo appending line in ui.js
+        echo "Commenting out the logo appending line in ui.js..."
+        sed -i 's|\.append('\''<img src="/luci2/icons/custom_logo.svg"/>'\'')|//\.append('\''<img src="/luci2/icons/custom_logo.svg"/>'\'')|g' /www/luci2/ui.js                    
+	/etc/init.d/uhttpd restart
+elif [ "$logo_n" -eq "03" ]
+then  
+    #mount mtdblock and copy the .svg image to /mnt/image path
+	mkdir -p /mnt/image
+	mount -t vfat /dev/mtdblock7 /mnt/image/ 
+	cp /mnt/image/customconfig /etc/config/
+	cp /mnt/image/customconfig /root/InterfaceManager/config/
+	Model=$(uci get customconfig.customconfig.CustomModelname)
+	uci set system.system.model="$Model"
+	uci set boardconfig.board.model="$Model"
+	cp /mnt/image/custom_logo.svg /www/luci2/icons/
+	manufacturer=$(uci get customconfig.customconfig.manufacturer)
+   manufacturer_url=$(uci get customconfig.customconfig.manufacturer_url)
+	uci set easycwmp.@device[0].manufacturer=$manufacturer                                     
+	device_info="/etc/device_info"
+
+	MANUFACTURER=$(grep -w "DEVICE_MANUFACTURER" ${device_info})        
+	MANUFACTURER_Replace="DEVICE_MANUFACTURER=$manufacturer"
+	sed -i "s/${MANUFACTURER}/${MANUFACTURER_Replace}/" "$device_info"
+	
+	MANUFACTURER_URL=$(grep -w "DEVICE_MANUFACTURER_URL" "$device_info")
+	MANUFACTURER_URL_Replace="DEVICE_MANUFACTURER_URL=$manufacturer_url"
+	sed -i "s|${MANUFACTURER_URL}|${MANUFACTURER_URL_Replace}|" "$device_info"
+	
+	DEVICE_PRODUCT=$(grep -w "DEVICE_PRODUCT" ${device_info})        
+	DEVICE_PRODUCT_Replace="DEVICE_PRODUCT=$Model"
+	sed -i "s/${DEVICE_PRODUCT}/${DEVICE_PRODUCT_Replace}/" "$device_info"
+
+	uci commit easycwmp
+	/etc/init.d/uhttpd restart 
+	umount /dev/mtdblock7
+                        
+fi
+
+	uci commit boardconfig
+	uci commit system
+cp /etc/config/system /root/InterfaceManager/config/
+cp /etc/config/boardconfig /root/InterfaceManager/config/
+
+board_name=$(cat /tmp/sysinfo/board_name)
+
+if echo "$board_name" | grep -qE "(Silbo_RB44|Silbo_GRD44-5|GRD44B-5R|GRD44C-5R|RD44-B)";
+then
+	cp /Web_page/Silbo_RB44/www/luci2/template/configuration.vlanconfig.htm /www/luci2/template/
+	cp /Web_page/Silbo_RB44/www/luci2/view/configuration.vlanconfig.js /www/luci2/view/
+	if [ "$board_name" = "Silbo_RB44" ] || [ "$board_name" = "Silbo_GRD44-5" ]
+	then
+	    cp /Web_page/Silbo_RB44/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts/
+	fi
+	if [ "$retainconfigflag" = "0" ]
+	then
+		cp /Web_page/Silbo_RB44/etc/config/* /etc/config/
+	fi
+			cp /Web_page/Silbo_RB44/etc/config/* /root/InterfaceManager/config/
+elif echo "$board_name" | grep -qE "(Silbo_RD44-A)";
+then
+	cp /Web_page/Silbo_RD44-A/* /usr/local/bin/Testscripts/
+	cp /Web_page/Silbo_RB44/www/luci2/template/configuration.vlanconfig.htm /www/luci2/template/
+	cp /Web_page/Silbo_RB44/www/luci2/view/configuration.vlanconfig.js /www/luci2/view/
+	if [ "$retainconfigflag" = "0" ]
+	then
+		cp /Web_page/Silbo_RB44/etc/config/* /etc/config/
+	fi
+			cp /Web_page/Silbo_RB44/etc/config/* /root/InterfaceManager/config/
+elif echo "$board_name" | grep -qE "(Silbo_RD44-3|GRD44B-3R|GRD44C-3R)";
+then
+	cp /Web_page/Silbo_RD44-3/* /usr/local/bin/Testscripts/
+
+elif echo "$board_name" | grep -qE "(IAC)";
+then
+	cp /Web_page/Silbo_IAC44/www/luci2/view/configuration.network.js /www/luci2/view/
+	cp /Web_page/Silbo_IAC44/www/luci2/template/configuration.vlanconfig.htm /www/luci2/template/
+	cp /Web_page/Silbo_IAC44/www/luci2/view/configuration.vlanconfig.js /www/luci2/view/
+	
+	if [ "$retainconfigflag" = "0" ]
+	then
+		cp /Web_page/Silbo_IAC44/etc/config/* /etc/config/
+	fi
+	cp /Web_page/Silbo_IAC44/etc/config/* /root/InterfaceManager/config/
+	cp /Web_page/Common_IA_Files/root/ConfigFiles/* /root/ConfigFiles/
+	cp /Web_page/Silbo_IAC44/etc/uci-defaults/* /etc/uci-defaults/
+	cp /Web_page/Silbo_IAC44/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts/
+
+elif echo "$board_name" | grep -qE "(Silbo_IAF-A|Silbo_IAF-C)";
+then
+	cp /Web_page/Silbo_IAF44/www/luci2/view/* /www/luci2/view/
+	cp /Web_page/Silbo_IAF44/www/luci2/template/* /www/luci2/template/
+	cp /Web_page/Silbo_IAF44/www/luci2/view/configuration.network.js /www/luci2/view/
+	uci add_list rpcd.root.write='!simswitchconfig'
+	 uci add_list rpcd.root.read='!simswitchconfig'
+	  uci add_list rpcd.admin.read='!simswitchconfig'
+	  uci add_list rpcd.admin.write='!simswitchconfig'
+      uci commit rpcd
+	if [ "$retainconfigflag" = "0" ]
+	then
+	     cp /Web_page/Silbo_IAF44/etc/config/* /etc/config/
+	fi
+	    /Web_page/Silbo_IAF44/etc/config/* /root/InterfaceManager/config/
+	 
+elif echo "$board_name" | grep -qE "(Silbo_IA44-A|IA44-C|IAB44_DIO|IE44|IAF44-C|IE44A|RFN44)";
+then
+	cp /Web_page/Silbo_IA44/www/luci2/view/* /www/luci2/view/
+	cp /Web_page/Silbo_IA44/www/luci2/template/* /www/luci2/template/	
+	cp /Web_page/Silbo_IA44/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts/	
+	if [ "$retainconfigflag" = "0" ]
+	then
+		cp /Web_page/Silbo_IA44/etc/config/* /etc/config/
+	fi
+		cp /Web_page/Silbo_IA44/etc/config/* /root/InterfaceManager/config/
+
+	cp /Web_page/Common_IA_Files/root/ConfigFiles/* /root/ConfigFiles/
+	cp /Web_page/Silbo_IA44/usr/local/bin/Testscripts/* /usr/local/bin/Testscripts/
+
+	#if [ "$board_name" = "Silbo_IE44A-EX1" ]
+	if echo "$board_name" | grep -qE "(Silbo_IE44-A-EX1|Silbo_IE44-C-EX1)";
+	then
+			cp /Web_page/Silbo_IE44-A-EX1/www/luci2/view/* /www/luci2/view/
+			cp /Web_page/Silbo_IE44-A-EX1/config/* /root/InterfaceManager/config/
+
+			if [ "$retainconfigflag" = "0" ]
+			then
+				uci set sysconfig.sysconfig.Sim1type="m2mesim"
+				uci set sysconfig.sysconfig.CellularOperationMode="singlecellularsinglesim"
+				uci commit sysconfig
+				cp /Web_page/Silbo_IE44-A-EX1/config/* /etc/config/
+			fi
+	elif [ "$board_name" = "Silbo_IE44-X" ]
+	then
+		cp /Web_page/Silbo_IE44A-X/www/luci2/view/* /www/luci2/view/	
+		cp /Web_page/Silbo_IE44A-X/config/* /root/InterfaceManager/config/
+
+		if [ "$retainconfigflag" = "0" ]
+			then
+				uci set sysconfig.sysconfig.Sim1type="normalsim"
+				uci set sysconfig.sysconfig.CellularOperationMode="singlecellularsinglesim"
+				uci commit sysconfig
+				cp /Web_page/Silbo_IE44A-X/config/* /etc/config/
+
+		fi
+	#elif echo "$board_name" | grep -qE "(Silbo_RFN44-A-EX1)";
+	elif echo "$board_name" | grep -qE "(RFN44-A-EX1|RFN44-B-EX1|RFN44-C-EX1)";
+	then
+			cp /Web_page/Silbo_RFN44-A-EX1/www/luci2/view/* /www/luci2/view/
+			cp /Web_page/Silbo_RFN44-A-EX1/www/luci2/template/* /www/luci2/template/
+			cp /Web_page/Silbo_RFN44-A-EX1/config/* /root/InterfaceManager/config/
+
+			if [ "$retainconfigflag" = "0" ]
+			then
+				uci set sysconfig.sysconfig.Sim1type="m2mesim"
+				uci set sysconfig.sysconfig.CellularOperationMode="singlecellularsinglesim"
+				uci commit sysconfig
+				cp /Web_page/Silbo_RFN44-A-EX1/config/* /etc/config/
+			fi
+	#elif [ "$board_name" = "Silbo_RFN44-A" ]
+	elif echo "$board_name" | grep -qE "(RFN44-A|RFN44-B|RFN44-C)";
+	then
+		cp /Web_page/Silbo_RFN44-A/www/luci2/view/* /www/luci2/view/
+		cp /Web_page/Silbo_RFN44-A/www/luci2/template/* /www/luci2/template/	
+		cp /Web_page/Silbo_RFN44-A/config/* /root/InterfaceManager/config/
+
+		if [ "$retainconfigflag" = "0" ]
+			then
+				uci set sysconfig.sysconfig.Sim1type="normalsim"
+				uci set sysconfig.sysconfig.CellularOperationMode="singlecellulardualsim"
+				uci set sysconfig.sysconfig.Sim2type="normalsim"
+				uci commit sysconfig
+				cp /Web_page/Silbo_RFN44-A/config/* /etc/config/
+
+		fi
+	fi
+elif echo "$board_name" | grep -qE "(IAB44|IAF44)";
+then
+	cp /Web_page/Silbo_IAB44/www/luci2/view/* /www/luci2/view/
+	cp /Web_page/Silbo_IAB44/www/luci2/template/* /www/luci2/template/
+	if [ "$retainconfigflag" = "0" ]
+	then
+		cp /Web_page/Silbo_IAB44/etc/config/* /etc/config/
+	fi
+	cp /Web_page/Silbo_IAB44/etc/config/* /root/InterfaceManager/config/
+
+	cp /Web_page/Common_IA_Files/root/ConfigFiles/* /root/ConfigFiles/
+
+	if echo "$board_name" | grep -qE "(Silbo_IAB44-B)";
+	then
+		cp /Web_page/Silbo_IA44/Silbo_IA44-B/www/luci2/view/* /www/luci2/view/
+		cp /Web_page/Silbo_IA44/Silbo_IA44-B/www/luci2/template/* /www/luci2/template/
+		if [ "$retainconfigflag" = "0" ]
+		then
+			cp /Web_page/Silbo_IA44/Silbo_IA44-B/etc/config/* /etc/config/
+		fi
+		cp /Web_page/Silbo_IA44/Silbo_IA44-B/etc/config/* /root/InterfaceManager/config/
+		cp /Web_page/Common_IA_Files/root/ConfigFiles/* /root/ConfigFiles/
+	fi
+
+elif echo "$board_name" | grep -qE "(Silbo_IA44-B)";
+then
+	cp /Web_page/Silbo_IA44/Silbo_IA44-B/www/luci2/view/* /www/luci2/view/
+	cp /Web_page/Silbo_IA44/Silbo_IA44-B/www/luci2/template/* /www/luci2/template/
+		if [ "$retainconfigflag" = "0" ]
+		then
+			cp /Web_page/Silbo_IA44/Silbo_IA44-B/etc/config/* /etc/config/
+		fi
+		cp /Web_page/Silbo_IA44/Silbo_IA44-B/etc/config/* /root/InterfaceManager/config/
+	cp /Web_page/Common_IA_Files/root/ConfigFiles/* /root/ConfigFiles/
+
+elif echo "$board_name" | grep -qE "(Silbo_RF44|GD44|PC312)";
+then
+	cp /Web_page/Silbo_RF44/configuration.network.js /www/luci2/view/
+	cp /Web_page/Silbo_RF44/SystemStart.sh /root/InterfaceManager/script/
+	cp /Web_page/Silbo_RF44/UpdateWanConfig.sh /bin/
+		if [ "$retainconfigflag" = "0" ]
+		then
+			cp /Web_page/Silbo_RF44/config/* /etc/config/
+		fi
+		cp /Web_page/Silbo_RF44/config/* /root/InterfaceManager/config/
+
+	cp /Web_page/Silbo_RF44/system.json /usr/share/rpcd/menu.d/
+		
+		if [ "$board_name" = "Silbo_PC312_GW" ]
+	    then
+		    cp /Web_page/Silbo_PC312_GW/www/luci2/view/* /www/luci2/view/	
+		    if [ "$retainconfigflag" = "0" ]
+			then   
+				cp /Web_page/Silbo_PC312_GW/etc/config/* /etc/config/	   
+	            fi	
+	        cp /Web_page/Silbo_PC312_GW/etc/config/* /root/InterfaceManager/config/   	
+		cp /Web_page/Silbo_PC312_GW/usr/share/rpcd/menu.d/* /usr/share/rpcd/menu.d/ 
+		  
+	    fi
+		
+		if [ "$board_name" = "Silbo_GD44-A_GW" ]
+	    then
+		    cp /Web_page/GD44-A/www/luci2/view/* /www/luci2/view/
+		    cp /Web_page/GD44-A/www/luci2/template/* /www/luci2/template/
+		    if [ "$retainconfigflag" = "0" ]
+			then
+				cp /Web_page/GD44-A/etc/config/*  /etc/config/
+			fi 
+			cp /Web_page/GD44-A/etc/config/*  /root/InterfaceManager/config/
+	    fi
+		
+		if echo "$board_name" | grep -qE "(Silbo_IA44-B)";
+		then
+		    if [ "$retainconfigflag" = "0" ]
+			then
+				cp /Web_page/Silbo_IA44/Silbo_IA44-B/etc/config/* /etc/config/
+			fi
+			cp /Web_page/Silbo_IA44/Silbo_IA44-B/etc/config/* /root/InterfaceManager/config/
+			cp /Web_page/Common_IA_Files/root/ConfigFiles/* /root/ConfigFiles/
+		fi	
+		
+		if echo "$board_name" | grep -qE "(RF04-A)";
+	   then
+			cp /Web_page/Silbo_RF44/Silbo_RF04-A/configuration.network.js /www/luci2/view
+			cp /Web_page/Silbo_RF44/SystemStart.sh /root/InterfaceManager/script/
+		    cp /Web_page/Silbo_RF44/UpdateWanConfig.sh /bin/
+			cp /Web_page/Silbo_RF44/Silbo_RF04-A/featuresmenu.json /usr/share/rpcd/menu.d
+			if [ "$retainconfigflag" = "0" ]
+			then
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/network /etc/config
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/sysconfig /etc/config
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/wireless /etc/config
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/mwan3 /etc/config
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/mwan3config /etc/config
+			fi
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/network /root/InterfaceManager/config/
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/sysconfig /root/InterfaceManager/config/
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/wireless /root/InterfaceManager/config/
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/mwan3 /root/InterfaceManager/config/
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/mwan3config /root/InterfaceManager/config/
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/Add_MACAddr.sh /usr/local/bin/Testscripts
+				cp /Web_page/Silbo_RF44/Silbo_RF04-A/ReadMACAddr.sh /usr/local/bin/Testscripts
+			    cp /Web_page/Silbo_RF44/Silbo_RF04-A/test_script.sh /usr/local/bin/Testscripts
+			    cp /Web_page/Silbo_RF44/Silbo_RF04-A/testscriptconfig.cfg /usr/local/bin/Testscripts
+		fi
+		
+fi
+
+if echo "$board_name" | grep -qE "(_GW)";
+then
+	cp /Web_page/Silbo_IA44/status.overview.js /www/luci2/view/	
+    uci set boardconfig.board.GWFirmwareVer="1.00"
+	uci set boardconfig.board.GWApplicationSwVer="1.01"
+fi
+
+if [ "$wifi_enable_disable" -eq "0" ]
+then
+	uci delete network.ra0
+	uci delete firewall.wifi
+	uci delete firewall.ra0EWAN5
+	uci delete firewall.wificwan1_0
+	
+	uci commit network
+	uci commit firewall
+	
+	uci delete dhcp.ra0
+	uci commit dhcp
+	uci set wireless.ra0.disabled=1
+	uci commit wireless	
+		
+	wifi
+	uci add_list rpcd.root.read='!macidconfig'
+	uci add_list rpcd.root.write='!macidconfig'
+	uci add_list rpcd.admin.read='!macidconfig'
+	uci add_list rpcd.admin.write='!macidconfig'
+	uci add_list rpcd.@login[2].read='!macidconfig'
+	uci add_list rpcd.@login[2].write='!macidconfig'
+	uci add_list rpcd.root.read='!wirelessconfig'
+	uci add_list rpcd.root.write='!wirelessconfig'
+	uci add_list rpcd.admin.read='!wirelessconfig'
+	uci add_list rpcd.admin.write='!wirelessconfig'
+	uci add_list rpcd.@login[2].read='!wirelessconfig'
+	uci add_list rpcd.@login[2].write='!wirelessconfig'
+	uci commit rpcd
+	
+	# To remove wi-fi scan in the admin debug
+	# Check if the section is already commented
+	grep -q "^#config MiscUtilities 'MiscUtilities4'" /etc/config/DiagnosticMiscUtilities		
+	if [ $? -ne 0 ]; then
+	    sed -i "/^config MiscUtilities 'MiscUtilities4'/,/option utility 'Wi-Fi Scan'/ s/^/#/" /etc/config/DiagnosticMiscUtilities
+	fi		
+	uci commit DiagnosticMiscUtilities
+	
+	uci set sysconfig.wificonfig.wifi1enable=0
+    uci commit sysconfig
+elif  [ "$wifi_enable_disable" -eq "1" ] ||  [ "$wifi_enable_disable" -eq "FF" ]
+then
+
+		uci set network.ra0=interface
+		uci set network.ra0.ipaddr='192.168.100.1'
+		uci set network.ra0.netmask='255.255.255.0'
+		uci set network.ra0.proto='static'
+		uci set network.ra0.ifname='ra0'
+		uci commit network
+		wifi
+		uci del_list rpcd.root.read='!macidconfig'
+		uci del_list rpcd.root.write='!macidconfig'
+		uci del_list rpcd.admin.read='!macidconfig'
+		uci del_list rpcd.admin.write='!macidconfig'
+		uci del_list rpcd.@login[2].read='!macidconfig'
+		uci del_list rpcd.@login[2].write='!macidconfig'
+		uci del_list rpcd.root.read='!wirelessconfig'
+		uci del_list rpcd.root.write='!wirelessconfig'
+		uci del_list rpcd.admin.read='!wirelessconfig'
+		uci del_list rpcd.admin.write='!wirelessconfig'
+		uci del_list rpcd.@login[2].read='!wirelessconfig'
+		uci del_list rpcd.@login[2].write='!wirelessconfig'
+		uci commit rpcd
+	   uci set sysconfig.sysconfig.wifi1enable=1
+           uci commit sysconfig
+fi
+ 
+
+/etc/init.d/uhttpd restart
+uci commit sysconfig
+uci commit system
+uci commit boardconfig
+cp  /etc/config/boardconfig  /root/InterfaceManager/config/
+
+if [ "$retainconfigflag" = "0" ]
+then
+    serialNum=$(uci get boardconfig.board.serialnum)
+	topic=$(echo "${serialNum}/connectionDiagnostics")
+	uci set connectionDiagnostics.general.mqttTopic="$topic"
+	uci commit connectionDiagnostics
+	cp  /etc/config/sysconfig  /root/InterfaceManager/config/
+	cp  /etc/config/system  /root/InterfaceManager/config/
+	cp /etc/config/network /root/InterfaceManager/config/
+	cp /etc/config/networkinterfaces /root/InterfaceManager/config/
+	cp /etc/config/portbasedvlanconfig /root/InterfaceManager/config/
+	cp /etc/config/tagbasedvlanconfig /root/InterfaceManager/config/
+	cp /etc/config/rpcd /root/InterfaceManager/config/
+	cp /etc/config/connectionDiagnostics /root/InterfaceManager/config/
+	cp /etc/config/openwisp /root/InterfaceManager/config/
+	cp /etc/config/firewall /root/InterfaceManager/config/
+	cp /etc/config/dhcp /root/InterfaceManager/config/
+	cp /etc/config/wireless /root/InterfaceManager/config/
+	cp /etc/config/DiagnosticMiscUtilities /root/InterfaceManager/config/
+	cp /etc/config/openwisp-monitoring /root/InterfaceManager/config/
+elif  [ "$retainconfigflag" = "1" ]
+then
+    nmsstatus=$(uci get remoteconfig.nms.nmsenable)
+		if [ "$nmsstatus" = "1" ];then
+			cp /etc/config/remoteconfig /root/InterfaceManager/config/
+			cp /etc/config/openwisp /root/InterfaceManager/config/
+			cp /etc/config/openwisp-monitoring /root/InterfaceManager/config/
+        fi
+fi 
+uci set applist_config.appconfig.retainconfigflag=0
+uci commit applist_config
+exit 0

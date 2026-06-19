@@ -1,0 +1,20 @@
+/root/ConfigFiles/RouterAppConfig/Logs/RemoteAppLogs.txt {
+    size 45k
+    rotate 7
+    missingok
+    create 0640 root root
+}
+
+/tmp/Log/RouterRemotepingMsgLog {
+    size 45k
+    rotate 2
+    missingok
+    create 0640 root root
+}
+
+/tmp/Log/RouterlocalpingMsgLog {
+    size 45k
+    rotate 2
+    missingok
+    create 0640 root root
+}

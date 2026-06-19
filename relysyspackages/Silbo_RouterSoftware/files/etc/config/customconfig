@@ -1,0 +1,6 @@
+
+config generic 'customconfig'
+		option CustomModelname 'SILBO'
+		option manufacturer_url 'Invendis-Silbo'
+		option manufacturer 'Invendis'
+

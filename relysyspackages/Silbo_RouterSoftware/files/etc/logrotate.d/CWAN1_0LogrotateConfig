@@ -1,0 +1,24 @@
+/tmp/InterfaceManager/analytics/CWAN1_0Analytics {
+    size 45k
+    rotate 7
+    missingok
+    create 0640 root root
+}
+
+/tmp/InterfaceManager/analytics/CWAN1_0AmAnalytics {
+    size 45k
+    rotate 7
+    missingok
+    create 0640 root root
+}
+
+/tmp/InterfaceManager/analytics/CWAN1_0SmAnalytics {
+    size 45k
+    rotate 7
+    missingok
+    create 0640 root root
+}
+
+
+
+

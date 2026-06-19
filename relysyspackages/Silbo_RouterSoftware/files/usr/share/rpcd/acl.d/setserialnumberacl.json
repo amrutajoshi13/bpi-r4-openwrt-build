@@ -1,0 +1,30 @@
+{
+    "setserialnumberacl": {
+        "description": "Set Serial Number",
+        "read": {
+            "cgi-file": [ "download", ],
+            "ubus" : {
+                "rpc-diagnosticutilities":[
+                    "run"
+                ],
+                "file":[
+                    "read"
+                ],
+                "luci2.system":[
+                    "init_action"
+                ]
+            },
+            "uci": [
+                "setserialnumber",
+                "applist_config"
+            ]
+        },
+        "write": {
+            "cgi-file": [ "upload", ],
+            "uci": [
+                "setserialnumber",
+                "applist_config"
+            ]
+        }
+    },
+}

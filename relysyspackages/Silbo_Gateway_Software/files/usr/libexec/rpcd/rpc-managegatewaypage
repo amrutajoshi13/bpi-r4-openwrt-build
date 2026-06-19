@@ -1,0 +1,34 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+SCRIPT="/bin/UpdateGatewaypages.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{}}'
+        ;;
+
+    call)
+        case "$2" in
+            configure)
+                response=$($SCRIPT 2>&1)
+                exit_code=$?
+                if [ "$exit_code" -ne 0 ]; then
+                # if [ $? -ne 0 ]; then
+                    echo '{"code":1,"output":"FAILURE :ACL Not updated based on Config File""}'
+                else
+                    echo '{"code":0,"output":"SUCCESS :ACL updated based on Config File"}'
+                fi
+                ;;
+
+            *)
+                echo '{"code":1,"output":"Invalid method"}'
+                exit 1
+                ;;
+        esac
+        ;;
+esac
+
+exit 0

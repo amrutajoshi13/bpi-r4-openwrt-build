@@ -1,0 +1,7 @@
+#!/bin/sh
+
+. /lib/functions.sh
+interface=$1
+rm /tmp/tunip
+ifconfig $interface | grep -i "inet addr" | cut -d ':' -f2 | cut -d " " -f1 > /tmp/tunip
+exit 0

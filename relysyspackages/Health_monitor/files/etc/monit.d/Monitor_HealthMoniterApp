@@ -1,0 +1,3 @@
+check process Device_Health with matching "Device_Health" every 1 cycles
+    start program = "/root/Device_Health > /dev/null 2>&1 &"
+    stop program = "/usr/bin/killall Device_Health > /dev/null 2>&1"

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="23.998" height="25.496" viewBox="0 0 23.998 25.496">
+  <g id="Web_Server" data-name="Web Server" transform="translate(-522 -154.746)">
+    <g id="vuesax_linear_monitor-recorder" data-name="vuesax/linear/monitor-recorder" transform="translate(30 -28)">
+      <g id="monitor-recorder" transform="translate(492 188)">
+        <path id="Vector" d="M16.127,8.777v.79c0,3.16-.718,3.941-3.58,3.941H3.58C.718,13.508,0,12.718,0,9.567V3.941C0,.79.718,0,3.58,0H4.838" transform="translate(2 2)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+        <path id="Vector-2" data-name="Vector" d="M0,0V3.514" transform="translate(10.063 15.507)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+        <path id="Vector-3" data-name="Vector" d="M0,0H16.127" transform="translate(2 10.332)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+        <path id="Vector-4" data-name="Vector" d="M0,0H9" transform="translate(5.563 19.492)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+        <path id="Vector-5" data-name="Vector" d="M0,0H20.127V19.021H0Z" fill="none" opacity="0"/>
+      </g>
+    </g>
+    <g id="vuesax_linear_cloud-add" data-name="vuesax/linear/cloud-add" transform="translate(231 -97.254)">
+      <g id="cloud-add" transform="translate(300 252)">
+        <g id="Group" transform="translate(1.269 1.544)">
+          <path id="Vector-6" data-name="Vector" d="M2.193,0a2.339,2.339,0,0,0,0,4.668h1.2" transform="translate(0 5.405)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+          <path id="Vector-7" data-name="Vector" d="M.306,5.405C-1.7-.175,6.762-2.406,7.73,3.456a3.328,3.328,0,0,1-.525,6.618H7.149" transform="translate(1.918 0)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+        </g>
+        <path id="Vector-8" data-name="Vector" d="M0,0H15V15H0Z" fill="none" opacity="0"/>
+      </g>
+    </g>
+  </g>
+</svg>

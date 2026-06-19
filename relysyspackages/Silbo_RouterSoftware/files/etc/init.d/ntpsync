@@ -1,0 +1,130 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2014 OpenWrt.org
+
+START=96
+STOP=99
+USE_PROCD=1
+
+unset SERVER
+unset PORT
+unset INTERVAL
+unset COUNT
+
+NTPC=$(which ntpclient)
+
+check_server() {
+	
+	local hostname
+	local port
+	
+	[ -n "$SERVER" ] && return
+	config_get hostname "$1" hostname
+	config_get port "$1" port
+	[ -z "$hostname" ] && return
+	
+	$NTPC -c 1 -p ${port:-123} -i "$INTERVAL" -h "$hostname" >> /tmp/ntpsynclog 2>&1 && { SERVER=$hostname; PORT=${port:-123}; }
+	
+}
+
+set_drift() {
+	config_get freq "$1" freq
+	[ -n "$freq" ] && adjtimex -f $freq >/dev/null
+}
+
+load_settings() {
+	local interval
+	local count
+	
+	config_get interval "$1" interval
+	config_get count "$1" count
+	
+	[ -n "$count" ] && COUNT=$count
+	[ -n "$interval" ] && INTERVAL=$interval
+	
+}
+
+start_service() {
+	
+	local retval
+	err1="Unknown host"
+	err2="Network is unreachable"
+	err3="rejected packet"
+	
+	config_load /etc/config/ntpclient
+	config_foreach load_settings ntpclient
+	
+	
+	NTP_RUNNING=$(ps  | grep "$NTPC" | grep -v grep)
+	if [ -n "$NTP_RUNNING" ] 
+	then
+		echo "ntpclient already running" > /tmp/ntpsynclog 2>&1
+		exit 0
+	fi
+
+	
+	echo "" > /tmp/ntpsyncstatus.cfg 2>&1
+	echo "starting ntpclient..." > /tmp/ntpsynclog 2>&1
+	echo "start: check_server" >> /tmp/ntpsynclog 2>&1
+	config_foreach set_drift ntpdrift
+	config_foreach check_server ntpserver
+	echo "end: check_server" >> /tmp/ntpsynclog 2>&1
+	
+	if [ -z "$SERVER" ] 
+	then
+		echo "check_server: ntpclient failed to sync with time server" >> /tmp/ntpsynclog 2>&1
+		echo "status:failure" >> /tmp/ntpsynclog 2>&1
+		echo "SyncStatus=1" >> /tmp/ntpsyncstatus.cfg 2>&1
+		exit 1
+	fi
+	
+	logger starting ntpclient
+	while [ "$COUNT" -gt 0 ]
+	do 
+		output=$($NTPC -c 1 -i "$INTERVAL" -s -l -p "$PORT" -h "$SERVER" 2>&1)
+		OutputRetVal=$?
+		echo "count: $COUNT, output: $output" >> /tmp/ntpsynclog 2>&1
+		if  echo "$output" | grep -q -i "$err1" ||  echo "$output" | grep -q -i "$err2" ||  echo "$output" | grep -q -i "$err3"
+		then
+			retval=1
+		else
+			retval=$OutputRetVal
+			if [ "$retval" = "0" ]
+			then
+				break
+			fi
+		fi
+		COUNT=$(( COUNT - 1))
+	done
+
+
+	if [ $retval = 0 ]
+	then
+		echo "ntpclient successfully synced with time server" >> /tmp/ntpsynclog 2>&1
+		echo "system clock : $(date) " >> /tmp/ntpsynclog 2>&1
+		echo "setting the hardware clock using the system Clock as reference..." >> /tmp/ntpsynclog 2>&1
+		hwclock -w --localtime >> /tmp/ntpsynclog 2>&1
+		echo "hardware clock set. hardware clock : $(hwclock -r --localtime)" >> /tmp/ntpsynclog 2>&1
+		echo "status:success" >> /tmp/ntpsynclog 2>&1
+		currentDate=$(date +"%Y-%m-%d %H:%M:%S")
+		echo "SyncStatus=0" >> /tmp/ntpsyncstatus.cfg 2>&1
+		echo "SyncTime=\"$currentDate\"" >> /tmp/ntpsyncstatus.cfg 2>&1
+	else
+		echo "ntpclient failed to sync with time server" >> /tmp/ntpsynclog 2>&1
+		echo "status:failure" >> /tmp/ntpsynclog 2>&1
+		echo "SyncStatus=1" >> /tmp/ntpsyncstatus.cfg 2>&1
+	fi
+	
+	# modify the timestamp of a file in /etc directory
+	touch /etc/timestamp
+}
+
+boot_service() {
+	sleep 15s
+	start
+}
+
+stop_service() {
+	echo "stoping ntpclient..." >> /tmp/ntpsynclog 2>&1
+	logger stopping ntpclient
+	killall ntpclient
+}

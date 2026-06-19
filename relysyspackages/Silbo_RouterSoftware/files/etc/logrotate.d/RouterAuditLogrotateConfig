@@ -1,0 +1,13 @@
+/tmp/Log/RouterAuditApp/RouterAuditLog.txt{
+    size 100k
+    rotate 3
+    missingok
+    create 0644 root root
+}
+
+/tmp/Log/RouterAuditApp/logreceiver_status.txt{
+    size 20k
+    rotate 2
+    missingok
+    create 0644 root root
+}

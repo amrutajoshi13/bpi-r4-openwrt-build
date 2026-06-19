@@ -1,0 +1,18 @@
+#copy the SDCardManager folder to 
+	/home/
+#change the path in the script accordingly
+	line numbers : 2,3,4
+#from
+	$(scp /home/shakthi/shakthi_workspace/SDCardManager/SDCardManager.sh root@192.168.0.24:/root/SDCardSrc_02/SDCardManager/)
+	$(scp /home/shakthi/shakthi_workspace/SDCardManager/partitions_4gb.fdisk root@192.168.0.24:/root/SDCardSrc_02/SDCardManager/)
+	$(scp /home/shakthi/shakthi_workspace/SDCardManager/partitions_8gb.fdisk root@192.168.0.24:/root/SDCardSrc_02/SDCardManager/)
+#to (in shell script)
+	$(scp /home/SDCardManager/SDCardManager.sh root@192.168.0.24:/root/SDCardSrc_02/SDCardManager/)
+	$(scp /home/SDCardManager/partitions_4gb.fdisk root@192.168.0.24:/root/SDCardSrc_02/SDCardManager/)
+	$(scp /home/SDCardManager/partitions_8gb.fdisk root@192.168.0.24:/root/SDCardSrc_02/SDCardManager/)
+#open terminal 
+#give permission
+	chmod 777 ./partition.sh
+#run 
+	./partition.sh
+

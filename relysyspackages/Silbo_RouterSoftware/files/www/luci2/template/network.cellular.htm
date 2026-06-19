@@ -1,0 +1,86 @@
+<div style="border-bottom: 1px solid #70707038">
+	<h1 class="header">Cellular Configuration</h1>
+</div>
+
+<div class="pagecontent">
+
+	<div style="text-align: right;">
+		<button type="button" id="btn_update_cellular" title="Update Cellular" class="btn btn-success">Update</button>
+	</div>
+
+	<div style="text-align: right;">
+		<button type="button" id="btn_updatesim" title="Update SIM" class="btn btn-success">Update</button>
+	</div>
+	<div id="Update-Note-Celluar"></div>
+
+	<ul class="nav nav-tabs" id="my_tab" data-tabs="tabs">
+		<li class="TabC TabCel active">
+			<a id="sectiontab_cellular" href="#tab_cellular" data-toggle="tab">Cellullar Settings
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabBand">
+			<a id="sectiontab_bandop" href="#tab_bandop" data-toggle="tab">Band and Operator Lock
+				<span class="badge"></span>
+			</a>
+		</li>
+
+		<li class="TabC TabSMS">
+			<a id="sectiontab_sms" href="#tab_sms" data-toggle="tab">SMS Settings
+				<span class="badge"></span>
+			</a>
+		</li>
+		
+		<li class="TabC TabSIM">
+			<a id="sectiontab_sim" href="#tab_sim" data-toggle="tab">SIM Switching
+				<span class="badge"></span>
+			</a>
+		</li>
+	</ul>
+
+	<div class="tab-content" id="tabs">
+		<div class="tab-pane TabC TabCel active" id="tab_cellular">
+			<div id="section_cellular"></div>
+		</div>
+
+		<div class="tab-pane TabC TabBand" id="tab_bandop">
+			<div id="section_bandop"></div>
+		</div>
+
+		<div class="tab-pane TabC TabSMS" id="tab_sms">
+			<div id="section_sms"></div>
+		</div>
+
+		<div class="tab-pane TabC TabSIM" id="tab_sim">
+			<div id="section_sim"></div>
+		</div>
+
+	</div>
+
+</div>
+
+
+<style>
+	#Update-Note-Celluar {
+		margin: -64px 0px -2px 0px;
+		width: 750px;
+	}
+</style>
+<script>
+	$(document).ready(function () {
+		$('#btn_update_cellular').show();
+		$('#btn_updatesim').hide();
+
+		$('#my_tab a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+			var target = $(e.target).attr("href");
+			if (target === "#tab_sim") {
+				$('#btn_update_cellular').hide();
+				$('#btn_updatesim').show();
+			} else {
+				$('#btn_update_cellular').show();
+				$('#btn_updatesim').hide();
+			}
+		});
+	});
+</script>

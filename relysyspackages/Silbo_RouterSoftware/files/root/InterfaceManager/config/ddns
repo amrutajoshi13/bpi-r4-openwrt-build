@@ -1,0 +1,17 @@
+
+config ddns 'global'
+	option ddns_dateformat '%F %R'
+	option ddns_loglines '250'
+	option upd_privateip '0'
+
+config service
+	option interface 'WAN1'
+	option service_name 'dnsprovider.com'
+	option domain 'yourhostname.net'
+	option username 'user'
+	option password 'userpass'
+	option ip_source 'network'
+	option ip_network 'WAN1'
+	option enabled '1'
+	option lookup_host 'yourhostname.net'
+

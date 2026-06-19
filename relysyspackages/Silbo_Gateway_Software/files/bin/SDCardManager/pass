@@ -1,0 +1,177 @@
+shakthi@shakthi-OptiPlex-3050:~/shakthi_workspace/SDCardManager/partition$ ./partition.sh 
+root@192.168.0.24's password: 
+/home/shakthi/shakthi_workspace/SDCardManager/partition: not a regular file
+logging in.....   
+spawn ssh -t root@192.168.0.24 sh /root/SDCardManager.sh 4GB ;df -h
+root@192.168.0.24's password: 
+using 4GB as memory card size
+Testing whether memory card is properly inserted or not
+Verifying copied application source directories
+Verifying previously mounted partitions
+Creating Partitions
+Value out of range.
+created partitions successfully
+
+fdiskRetVal:0,
+fdiskRetMsg:
+Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+Device does not contain a recognized partition table.
+Created a new DOS disklabel with disk identifier 0xb75df830.
+
+Command (m for help): Partition type
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended (container for logical partitions)
+Select (default p): Partition number (1-4, default 1): First sector (2048-7405567, default 2048): Last sector, +/-sectors or +/-size{K,M,G,T,P} (2048-7405567, default 7405567): 
+Created a new partition 1 of type 'Linux' and of size 1 GiB.
+
+Command (m for help): The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+fdiskRetVal:
+Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): Partition type
+   p   primary (1 primary, 0 extended, 3 free)
+   e   extended (container for logical partitions)
+Select (default p): Partition number (2-4, default 2): First sector (2099200-7405567, default 2099200): Last sector, +/-sectors or +/-size{K,M,G,T,P} (2099200-7405567, default 7405567): 
+Created a new partition 2 of type 'Linux' and of size 1 GiB.
+
+Command (m for help): The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.,
+fdiskRetMsg:
+Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): Partition type
+   p   primary (2 primary, 0 extended, 2 free)
+   e   extended (container for logical partitions)
+Select (default p): Partition number (3,4, default 3): First sector (4196352-7405567, default 4196352): Last sector, +/-sectors or +/-size{K,M,G,T,P} (4196352-7405567, default 7405567): 
+Created a new partition 3 of type 'Linux' and of size 1 GiB.
+
+Command (m for help): The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+fdiskRetVal:
+Welcome to fdisk (util-linux 2.34).
+Changes will remain in memory only, until you decide to write them.
+Be careful before using the write command.
+
+
+Command (m for help): Partition type
+   p   primary (3 primary, 0 extended, 1 free)
+   e   extended (container for logical partitions)
+Select (default e): 
+Selected partition 4
+First sector (6293504-7405567, default 6293504): First sector (6293504-7405567, default 6293504): Last sector, +/-sectors or +/-size{K,M,G,T,P} (6293504-7405567, default 7405567): 
+Created a new partition 4 of type 'Linux' and of size 543 MiB.
+
+Command (m for help): The partition table has been altered.
+Syncing disks.,
+fdiskRetMsg:
+
+formatting partitions to ext4 file system
+formatted partition '/dev/mmcblk0p1' successfully
+
+FormatRetVal:0,
+FormatOutput:mke2fs 1.44.5 (15-Dec-2018)
+Creating filesystem with 262144 4k blocks and 65536 inodes
+Filesystem UUID: 336266f9-a85a-4078-abdb-7aebac3b96f4
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (8192 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+formatted partition '/dev/mmcblk0p2' successfully
+
+FormatRetVal:0,
+FormatOutput:mke2fs 1.44.5 (15-Dec-2018)
+Creating filesystem with 262144 4k blocks and 65536 inodes
+Filesystem UUID: 5bc37e15-8e98-4ed8-bf7e-778a91dc4488
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (8192 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+formatted partition '/dev/mmcblk0p3' successfully
+
+FormatRetVal:0,
+FormatOutput:mke2fs 1.44.5 (15-Dec-2018)
+Creating filesystem with 262144 4k blocks and 65536 inodes
+Filesystem UUID: 9780a30b-daf3-451b-b5f6-ddfbbdcee4c2
+Superblock backups stored on blocks: 
+	32768, 98304, 163840, 229376
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (8192 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+formatted partition '/dev/mmcblk0p4' successfully
+
+FormatRetVal:0,
+FormatOutput:mke2fs 1.44.5 (15-Dec-2018)
+Creating filesystem with 139008 4k blocks and 34800 inodes
+Filesystem UUID: f8c65298-3c0a-48e4-8834-9e2bb639f41b
+Superblock backups stored on blocks: 
+	32768, 98304
+
+Allocating group tables: done                            
+Writing inode tables: done                            
+Creating journal (4096 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+creating mount points
+NTFS signature is missing.
+Failed to mount '/dev/mmcblk0p1': Invalid argument
+The device '/dev/mmcblk0p1' doesn't seem to have a valid NTFS.
+Maybe the wrong device is used? Or the whole disk instead of a
+partition (e.g. /dev/sda, not /dev/sda1)? Or the other way around?
+NTFS signature is missing.
+Failed to mount '/dev/mmcblk0p2': Invalid argument
+The device '/dev/mmcblk0p2' doesn't seem to have a valid NTFS.
+Maybe the wrong device is used? Or the whole disk instead of a
+partition (e.g. /dev/sda, not /dev/sda1)? Or the other way around?
+NTFS signature is missing.
+Failed to mount '/dev/mmcblk0p3': Invalid argument
+The device '/dev/mmcblk0p3' doesn't seem to have a valid NTFS.
+Maybe the wrong device is used? Or the whole disk instead of a
+partition (e.g. /dev/sda, not /dev/sda1)? Or the other way around?
+NTFS signature is missing.
+Failed to mount '/dev/mmcblk0p4': Invalid argument
+The device '/dev/mmcblk0p4' doesn't seem to have a valid NTFS.
+Maybe the wrong device is used? Or the whole disk instead of a
+partition (e.g. /dev/sda, not /dev/sda1)? Or the other way around?
+Creating fstab file
+enabling and restarting fstab/block-mount
+Verifying newly mounted partitions
+SD card partitions mounted successfully
+Now creating directories for applications
+Filesystem                Size      Used Available Use% Mounted on
+/dev/root                26.0M     26.0M         0 100% /rom
+tmpfs                    60.9M    220.0K     60.7M   0% /tmp
+/dev/mtdblock6          518.4M    828.0K    479.6M   0% /overlay
+overlayfs:/overlay        4.3M    324.0K      3.9M   7% /
+tmpfs                   512.0K         0    512.0K   0% /dev
+tmpfs                    60.9M    220.0K     60.7M   0% /sshusers/tmp
+/dev/mmcblk0p1          975.9M      2.5M    906.2M   0% /mnt/disk/AppSrc
+/dev/mmcblk0p2          975.9M      2.5M    906.2M   0% /mnt/disk/AppData
+/dev/mmcblk0p3          975.9M      2.5M    906.2M   0% /root
+/dev/mmcblk0p4          518.4M    828.0K    479.6M   0% /overlay
+Connection to 192.168.0.24 closed.

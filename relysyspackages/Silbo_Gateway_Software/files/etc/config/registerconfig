@@ -1,0 +1,7 @@
+
+config registerconfig 'Device1'
+	option registername_0 'V1'
+	option Datatype_0 '11'
+	option startregister_0 '1'
+	option registercount_0 '1'
+

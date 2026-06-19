@@ -1,0 +1,11 @@
+
+config burst_control 'limits'
+    option max_messages '100'
+    option expiry_window '60'
+    option burst_window_sec '1'
+    option burst_threshold '5'
+    option trigger_duration_min '5'
+
+config batchinsert 'logs'
+    option commit_interval '60'
+    option batch_limit '10'

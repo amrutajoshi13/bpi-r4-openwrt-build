@@ -1,0 +1,6 @@
+/tmp/Log/DataCollectorAppRS232Temperature/DataCollectorLogRS232Temperature.txt{
+    size 5k
+    rotate 5
+    missingok
+    create 0644 root root
+}

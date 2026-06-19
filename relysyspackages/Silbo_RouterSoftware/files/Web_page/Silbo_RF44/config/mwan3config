@@ -1,0 +1,16 @@
+
+config redirect 'CWAN1'
+	option name 'CWAN1'
+	option wanpriority '1'
+	option validtrackip '2'
+	option trackIp1 '8.8.8.8'
+	option trackIp2 '8.8.4.4'
+	option reliability '1'
+	option count '3'
+	option timeout '1'
+	option up '3'
+	option down '3'
+	option interval '5'
+
+
+

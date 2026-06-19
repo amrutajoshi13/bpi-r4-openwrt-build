@@ -1,0 +1,23 @@
+{
+    "logoutacl": {
+        "description": "Logout",
+        "read": {
+			"ubus" : {
+                "rpc-logout":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "mwan3config",
+                
+            ]
+        },
+        "write": {
+            "uci": [
+               "mwan3config",
+                
+            ]
+        }
+    }
+}

@@ -1,0 +1,5 @@
+config watchdogconfigsw 'watchdogconfigsw'
+    option memory '2000'
+    option time '30'
+    option load '10'
+

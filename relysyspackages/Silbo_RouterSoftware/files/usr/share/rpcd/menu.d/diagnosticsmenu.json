@@ -1,0 +1,60 @@
+{
+    "diagnostics": {
+        "title": "Diagnostics",
+        "index": 80
+    },
+    "diagnostics/miscUtilities": {
+        "title": "Admin Debug",
+        "acls": [ "miscutilities" ],
+        "view": "diagnostics/miscUtilities",
+        "index": 10
+    },
+    "diagnostics/syslog": {
+        "title": "System Log",
+        "acls": [ "status" ],
+        "view": "diagnostics/syslog",
+        "index": 20
+    },
+    "diagnostics/dmesg": {
+        "title": "Kernel Log",
+        "acls": [ "status" ],
+        "view": "diagnostics/dmesg",
+        "index": 30
+    },
+    "diagnostics/troubleshooting": {
+        "title": "TCP Dump Debug",
+        "acls": [ "tcpdumpconfig" ],
+        "view": "diagnostics/troubleshooting",
+        "index": 40                    
+    },
+    "diagnostics/updatecliconfig": {
+        "title": "Terminal Hub",
+        "acls": [ "updatecliconfig" ],
+        "view": "diagnostics/updatecliconfig",
+        "index": 50
+	}, 
+	"diagnostics/debug": {
+      "title": "Routing Debug",
+       "acls": [ "routingdebug" ],
+       "view": "diagnostics/debug",
+       "index": 60
+    },
+    "diagnostics/updatecustomconfig": {
+        "title": "Custom Config",
+        "acls": [ "updatecustomconfig" ],
+        "view": "diagnostics/updatecustomconfig",
+        "index": 70
+    },
+    "diagnostics/logsmanagement": {
+        "title": "Logs Management",
+        "acls": [ "logsmanagemnet" ],
+        "view": "diagnostics/logsmanagement",
+        "index": 80
+    },
+    "diagnostics/watchdogconfig": {
+		"title": "Watchdog Enable/Disable",
+		"acls": [ "watchdogconfig" ],
+		"view": "diagnostics/watchdogconfig",
+		"index": 90
+    }
+} 

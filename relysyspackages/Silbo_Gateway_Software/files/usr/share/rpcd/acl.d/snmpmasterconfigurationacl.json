@@ -1,0 +1,20 @@
+{
+    "SnmpMasterConfig": {
+        "description": "Snmp Master Configuration",
+        "read": {
+            "uci": [
+                "SnmpMasterConfigGeneric"
+            ],
+            "ubus": {
+                "rpc-uploadSNMPmib": [
+                    "configure"
+                ]
+            }
+        },
+        "write": {
+            "uci": [
+                "SnmpMasterConfigGeneric"
+            ]
+        }
+    }
+}

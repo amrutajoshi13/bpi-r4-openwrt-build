@@ -1,0 +1,6 @@
+/root/apptimestatus.txt{
+    size 10k
+    rotate 5
+    missingok
+    create 0644 root root
+}

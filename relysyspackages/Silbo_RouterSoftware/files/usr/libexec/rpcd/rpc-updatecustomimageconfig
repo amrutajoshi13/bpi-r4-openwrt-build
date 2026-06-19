@@ -1,0 +1,36 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+
+UpdateConfigScript="/root/InterfaceManager/script/Update_CustomConfig.sh"
+
+
+case "$1" in
+    list)
+        echo '{"configure":{}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+                            response=$($UpdateConfigScript)
+							if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"FAILURE : Custom Logo Configuration Failed\"}"
+                            else
+                               	echo "{\"code\":0,\"output\":\"SUCCESS : Custom Logo Configuration Updated\"}"
+                            fi
+                                                                                 
+                            ;;
+                        
+		             *)
+		                    echo '{"code":"1","output":"invalid method"}'
+		                    exit 1
+		                    ;;     
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0
+

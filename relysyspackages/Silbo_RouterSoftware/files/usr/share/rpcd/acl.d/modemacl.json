@@ -1,0 +1,24 @@
+{
+    "modemconfig": {
+        "description": "Modem Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-updateModemConfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "modemconfig",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "modemconfig",
+                
+            ]
+        }
+    }
+}

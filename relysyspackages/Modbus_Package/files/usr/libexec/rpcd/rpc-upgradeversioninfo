@@ -1,0 +1,62 @@
+#!/bin/sh
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+# called by application configuration and application manager web-pages
+
+#InstalledFirmwareVersion=$(/legato/systems/current/bin/app version FlowMeterProjectUtilities 2>&1)
+InstalledFirmwareVersion=1.0
+#IPKInfo=$(opkg info ipks 2>&1)
+IPKInfo=1.0
+
+case "$1" in
+    list)
+        echo '{"installedversion":{}}'
+        ;;
+
+    call)
+        case "$2" in
+            installedversion)
+               # firmware installed version
+				#if echo "$InstalledFirmwareVersion" | grep -qis "is not installed"
+				#then
+					#echo "No Packages are installed on system" >> "$AutoUpgradeLog"
+					#InstalledFirmwareVersion="0.0"
+				#else
+					#InstalledFirmwareVersion=$(echo "$InstalledFirmwareVersion" | awk -F' ' '/RelCellularManagerApp/{ print $2 }' 2>&1)
+			    #fi
+				##FirmwareVersion="{\"ReleasedVersion\":\"$InstalledFirmwareVersion\"}"
+				#FirmwareVersion="{\"ReleasedVersion\":\"1.0\"}"
+
+			
+                ## ipk installed version
+                #if echo "$IPKInfo" | grep -qis "Version"
+				#then
+					#VERSION=$(echo "$IPKInfo" | awk -F':' '/Version/ {print $2}' | sed -e 's/^[ \t]*//')
+					#InstalledIPKVersion=$(echo "$VERSION" | sed 's/-.*//')
+				#else
+					#InstalledIPKVersion="1.1"
+				#fi
+			    ##IPKVersion="{\"ReleasedVersion\":\"$InstalledIPKVersion\"}"
+			     #IPKVersion="{\"ReleasedVersion\":\"1.0\"}"
+
+			    #echo "{\"FirmwareVersion\":$FirmwareVersion,\"IPKVersion\":$IPKVersion}"
+			    #
+			    
+			     config_load "/etc/config/boardconfig"
+                 config_get IPKVersion "board" GWFirmwareVer
+                 config_get FirmwareVersion "board" GWApplicationSwVer
+				 echo "{\"FirmwareVersion\":\"$FirmwareVersion\",\"IPKVersion\":\"$IPKVersion\"}" 
+			    ;; 
+                
+            *)
+                echo '{"code":"1","output":"invalid method"}'
+                exit 1
+            ;;
+
+        esac #rpc-upgrademanager method
+    ;;
+
+esac # ubus method
+
+exit 0

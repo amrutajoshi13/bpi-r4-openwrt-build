@@ -1,0 +1,81 @@
+{
+    "configuration": {
+        "title": "Settings",
+        "index": 30
+    },
+    
+   /* "configuration/modem": {
+        "title": "Modem",
+        "acls": [ "modemconfig" ],
+        "view": "configuration/modem",
+        "index": 10
+         
+    },*/
+    
+    "configuration/network": {
+        "title": "Network",
+        "acls": [ "sysconfig" ],
+        "view": "configuration/network",
+        "index": 20
+         
+    },
+    
+   /*  "configuration/simswitchconfig": {
+        "title": "SIM Switch",
+        "acls": [ "simswitchconfig" ],
+        "view": "configuration/simswitchconfig",
+        "index": 25
+         
+    },
+    
+    "configuration/internetconnection": {
+        "title": "Internet",
+        "acls": [ "internetconnection" ],
+        "view": "configuration/internetconnection",
+        "index": 30
+         
+    },*/
+  
+       
+ /*   "configuration/vpnconfig1": {
+        "title": "VPN",
+        "acls": [ "vpnconfig1" ],
+        "view": "configuration/vpnconfig1",
+        "index": 40
+         
+    },
+    
+    "configuration/firewall": {
+        "title": "Firewall",
+        "acls": [ "firewall" ],
+        "view": "configuration/firewall",
+        "index": 50
+         
+    },
+    
+    "configuration/customfirewall": {
+        "title": "Loopback Rule",
+        "acls": [ "customfirewall" ],
+        "view": "configuration/customfirewall",
+        "index": 60
+         
+    },
+    
+    
+    "configuration/remotemonit": {
+        "title": "Remote Monitoring",
+        "acls": [ "remoteconfig" ],
+        "view": "configuration/remotemonit",
+        "index": 90
+         
+    },  
+    
+    "configuration/greconfig": {
+        "title": "Tunnel",
+        "acls": [ "greconfig" ],
+        "view": "configuration/greconfig",
+        "index": 90
+         
+    }, */
+    
+}

@@ -1,0 +1,15 @@
+{
+        "timebasedevents": {
+		"description": "TimeBased Event Configuration",
+		"read": {
+			"uci": [
+				"TimeBasedEventsActions"
+			]
+		},
+		"write": {
+			"uci": [
+				"TimeBasedEventsActions"
+			]
+		}
+	},
+}

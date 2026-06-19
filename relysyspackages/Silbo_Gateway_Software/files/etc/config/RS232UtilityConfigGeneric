@@ -1,0 +1,14 @@
+
+config RS232UtilityConfigGeneric 'rs232utilityconfig'
+	option ModbusProtocol 'RTU'
+	option Stopbits '1'
+	option Databits '8'
+	option Baudrate '9600'
+	option StartRegister '32'
+	option NumberOfRegisters '2'
+	option FunctionalCode '3'
+	option Parity '0'
+	option flow_control '0'
+	option SerialPort '/dev/ttyS2'
+	option delay '50'
+

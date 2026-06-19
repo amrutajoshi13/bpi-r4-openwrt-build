@@ -1,0 +1,6 @@
+/tmp/Log/DataCollectorApp/DataCollectorLog.txt{
+    size 10k
+    rotate 5
+    missingok
+    create 0644 root root
+}

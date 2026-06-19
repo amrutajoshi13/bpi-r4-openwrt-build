@@ -1,0 +1,1364 @@
+<div style="border-bottom: 1px solid #70707038">
+  <h1 class="header">Logs Management</h1>
+</div>
+<div id="dataLoader" class="data-loader" style="display: none;">
+  <div class="loader-box">
+    <div class="spinner"></div>
+    <div class="loader-text">Loading data… Please wait</div>
+  </div>
+</div>
+<div class="pagecontent">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Log Analytics & Monitoring</h3>
+      <div class="header-buttons">
+        <button class="filter-toggle-button" id="filterToggleButton" title="Filters">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path
+              d="M3.9 54.9C10.5 40.9 24.5 32 40 32l432 0c15.5 0 29.5 8.9 36.1 22.9s4.6 30.5-5.2 42.5L320 320.9 320 448c0 12.1-6.8 23.2-17.7 28.6s-23.8 4.3-33.5-3l-64-48c-8.1-6-12.8-15.5-12.8-25.6l0-79.1L9 97.3C-.7 85.4-2.8 68.8 3.9 54.9z" />
+          </svg> Filters
+        </button>
+        <button class="btn primary" id="logs_download" data-toggle="modal" data-target="#exampleModal" title="Download">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <path
+              d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 242.7-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7 288 32zM64 352c-35.3 0-64 28.7-64 64l0 32c0 35.3 28.7 64 64 64l384 0c35.3 0 64-28.7 64-64l0-32c0-35.3-28.7-64-64-64l-101.5 0-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352 64 352zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z" />
+          </svg> Download
+        </button>
+
+      </div>
+    </div>
+    <div class="panel-body">
+      <div id="container">
+        <div class="overlay" id="overlay"></div>
+        <div class="filter-section-container" id="filterPanel">
+          <div class="filter-panel-header">
+            <h3>Smart Filter Hub</h3>
+            <button class="filter-close-button" id="filterCloseButton" aria-label="Close filters">&times;</button>
+          </div>
+          <div class="filter-group">
+            <button class="filter-header" id="filter-header-1" aria-expanded="false" aria-controls="filter-content-1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path
+                  d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z" />
+              </svg>Category <span class="selected-count">0</span>
+            </button>
+            <div class="filter-content" id="filter-content-1" aria-hidden="true">
+              <div class="filter-search-box">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                  <path
+                    d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM272 416C351.5 416 416 351.5 416 272C416 192.5 351.5 128 272 128C192.5 128 128 192.5 128 272C128 351.5 192.5 416 272 416z" />
+                </svg>
+                <input type="text" placeholder="Search...">
+              </div>
+              <div class="filter-options" id="category-options">
+              </div>
+              <div class="filter-actions">
+                <button class="apply-filter">Apply</button>
+                <button class="clear-filter">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-header" id="filter-header-2" aria-expanded="false" aria-controls="filter-content-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                <path
+                  d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480L40 480c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24l0 112c0 13.3 10.7 24 24 24s24-10.7 24-24l0-112c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z" />
+              </svg>Severity <span class="selected-count">0</span>
+            </button>
+            <div class="filter-content" id="filter-content-2" aria-hidden="true">
+              <div class="filter-search-box"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                  <path
+                    d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM272 416C351.5 416 416 351.5 416 272C416 192.5 351.5 128 272 128C192.5 128 128 192.5 128 272C128 351.5 192.5 416 272 416z" />
+                </svg><input type="text" placeholder="Search..."></div>
+              <div class="filter-options" id="severity-options">
+              </div>
+              <div class="filter-actions">
+                <button class="apply-filter">Apply</button>
+                <button class="clear-filter">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-header" id="filter-header-3" aria-expanded="false" aria-controls="filter-content-3">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                <path
+                  d="M264.5 5.2c14.9-6.9 32.1-6.9 47 0l218.6 101c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 149.8C37.4 145.8 32 137.3 32 128s5.4-17.9 13.9-21.8L264.5 5.2zM476.9 209.6l53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 277.8C37.4 273.8 32 265.3 32 256s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0l152-70.2zm-152 198.2l152-70.2 53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 405.8C37.4 401.8 32 393.3 32 384s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0z" />
+              </svg>Source <span class="selected-count">0</span>
+            </button>
+            <div class="filter-content" id="filter-content-3" aria-hidden="true">
+              <div class="filter-search-box"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                  <path
+                    d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM272 416C351.5 416 416 351.5 416 272C416 192.5 351.5 128 272 128C192.5 128 128 192.5 128 272C128 351.5 192.5 416 272 416z" />
+                </svg><input type="text" placeholder="Search..."></div>
+              <div class="filter-options" id="source-options">
+              </div>
+              <div class="filter-actions">
+                <button class="apply-filter">Apply</button>
+                <button class="clear-filter">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="filter-group">
+            <button class="filter-header" id="filter-header-4" aria-expanded="false" aria-controls="filter-content-4">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                <path
+                  d="M128 0c17.7 0 32 14.3 32 32l0 32 128 0 0-32c0-17.7 14.3-32 32-32s32 14.3 32 32l0 32 48 0c26.5 0 48 21.5 48 48l0 48L0 160l0-48C0 85.5 21.5 64 48 64l48 0 0-32c0-17.7 14.3-32 32-32zM0 192l448 0 0 272c0 26.5-21.5 48-48 48L48 512c-26.5 0-48-21.5-48-48L0 192zm64 80l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm128 0l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM64 400l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm144-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm112 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16z" />
+              </svg>Date Range <span class="selected-count">0</span>
+            </button>
+            <div class="filter-content" id="filter-content-4" aria-hidden="true">
+              <div class="filter-options date-range-options">
+                <div class="date-input-group">
+                  <label for="date-min">From:</label>
+                  <input type="date" id="date-min" name="date-min">
+                </div>
+                <div class="date-input-group">
+                  <label for="date-max">To:</label>
+                  <input type="date" id="date-max" name="date-max">
+                </div>
+              </div>
+              <div class="filter-actions">
+                <button class="apply-filter">Apply</button>
+                <button class="clear-filter">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <button class="clear-all-filters">Clear All Filters</button>
+
+        </div>
+        <div id="pdfLoader" class="pdf-loader">
+          <div class="loader-box">
+            <div class="spinner"></div>
+            <div class="loader-text">Generating PDF… Please wait</div>
+          </div>
+        </div>
+        <table id="logTable">
+          <thead>
+            <tr>
+              <!-- <th class="sortable" data-key="id">ID <span class="sort-icons">
+              <svg class=" up-arrow" viewBox="0 0 16 16">
+                <path d="M8 4L3 9H13L8 4Z" />
+              </svg>
+              <svg class=" down-arrow" viewBox="0 0 16 16">
+                <path d="M8 12L13 7H3L8 12Z" />
+              </svg>
+            </span></th> -->
+              <th class="sortable" data-key="date">Date <span class="sort-icons"> <svg class="up-arrow"
+                    viewBox="0 0 16 16">
+                    <path d="M8 4L3 9H13L8 4Z" />
+                  </svg>
+                  <svg class="down-arrow" viewBox="0 0 16 16">
+                    <path d="M8 12L13 7H3L8 12Z" />
+                  </svg></span></th>
+              <th class="sortable" data-key="category">Category <span class="sort-icons"> <svg class="up-arrow"
+                    viewBox="0 0 16 16">
+                    <path d="M8 4L3 9H13L8 4Z" />
+                  </svg>
+                  <svg class="down-arrow" viewBox="0 0 16 16">
+                    <path d="M8 12L13 7H3L8 12Z" />
+                  </svg></span></th>
+              <th class="sortable" data-key="source">Source <span class="sort-icons"> <svg class="up-arrow"
+                    viewBox="0 0 16 16">
+                    <path d="M8 4L3 9H13L8 4Z" />
+                  </svg>
+                  <svg class="down-arrow" viewBox="0 0 16 16">
+                    <path d="M8 12L13 7H3L8 12Z" />
+                  </svg></th>
+              <th class="sortable" data-key="severity">Severity <span class="sort-icons"> <svg class="up-arrow"
+                    viewBox="0 0 16 16">
+                    <path d="M8 4L3 9H13L8 4Z" />
+                  </svg>
+                  <svg class="down-arrow" viewBox="0 0 16 16">
+                    <path d="M8 12L13 7H3L8 12Z" />
+                  </svg></span></th>
+              <th class="sortable" data-key="message">Log Message <span class="sort-icons"> <svg class="up-arrow"
+                    viewBox="0 0 16 16">
+                    <path d="M8 4L3 9H13L8 4Z" />
+                  </svg>
+                  <svg class="down-arrow" viewBox="0 0 16 16">
+                    <path d="M8 12L13 7H3L8 12Z" />
+                  </svg></span></th>
+            </tr>
+          </thead>
+          <tbody id="logBody">
+          </tbody>
+        </table>
+        <div class="pagination-controls">
+          <div class="pagination-info">
+            <span>Logs per page:</span>
+            <select id="itemsPerPage">
+              <option value="10">10</option>
+              <option value="30">30</option>
+              <option value="50">50</option>
+            </select>
+            <span id="pageInfo">Page 1 of 1</span>
+          </div>
+          <div class="pagination-buttons">
+            <button id="prevPageBtn" disabled>
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" width="16" height="16" fill="currentColor">
+                <path
+                  d="M160 96c6.2 0 12.3 2.3 17 7 9.4 9.4 9.4 24.6 0 33.9L81 232l96 96c9.4 9.4 9.4 24.6 0 33.9s-24.6 9.4-33.9 0l-112-112c-9.4-9.4-9.4-24.6 0-33.9l112-112c4.7-4.7 10.9-7 17-7z" />
+              </svg>
+
+            </button>
+            <span id="pageNumber">Page 1 of 1</span>
+            <button id="nextPageBtn">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" width="16" height="16" fill="currentColor">
+                <path
+                  d="M96 96c-6.2 0-12.3 2.3-17 7-9.4 9.4-9.4 24.6 0 33.9L175 232 79 328c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l112-112c9.4-9.4 9.4-24.6 0-33.9l-112-112c-4.7-4.7-10.9-7-17-7z" />
+              </svg>
+
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- <div class="pagecontent"> -->
+
+
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header" style="border-bottom:1px solid #dddd">
+          <h3 class="modal-title" id="updatetext">Please Selcet the Category to Download</h3>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-3">
+              <label style="float:right">Select Category:</label>
+            </div>
+            <div id="downloadoptions"></div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id='submit_data'>Apply</button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- </div> -->
+</div>
+
+
+
+
+
+
+
+
+<style>
+  #logTable {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  #logTable th,
+  #logTable td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+
+  #logTable th:nth-child(1),
+  #logTable td:nth-child(1) {
+    width: 125px;
+  }
+
+  #logTable th:nth-child(2),
+  #logTable td:nth-child(2) {
+    width: 130px;
+
+  }
+
+  #logTable th:nth-child(3),
+  #logTable td:nth-child(3) {
+    width: 135px;
+  }
+
+  #logTable th:nth-child(4),
+  #logTable td:nth-child(4) {
+    width: 125px;
+  }
+
+  #logTable th:nth-child(5),
+  #logTable td:nth-child(5) {
+    width: auto;
+    white-space: normal;
+  }
+
+  .data-loader {
+    /* position: fixed; */
+    top: 10%;
+    left: 15%;
+    width: calc(100% - 15%);
+    height: calc(100% - 10%);
+
+    background: rgba(255, 255, 255, 0.88);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 1000;
+  }
+
+
+
+
+
+  .data-loader .loader-box {
+    margin-top: 10vh;
+    text-align: center;
+  }
+
+  .data-loader .spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid #e2e8f0;
+    border-top: 3px solid #1e5fa8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 8px auto;
+  }
+
+  .data-loader .loader-text {
+    font-size: 13px;
+    color: #1e5fa8;
+    font-weight: 500;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .pagecontent {
+    border-color: #dbe5f1;
+    background: #ffffff;
+    box-shadow: 0px 10px 20px rgba(0, 60, 120, 0.06);
+    border: 1px solid #dbe5f1;
+    border-radius: 8px;
+    width: 95%;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  .header-content {
+    width: 100%;
+    max-width: 1300px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, #1e5fa8, #0f3f73);
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 16px;
+    box-sizing: border-box;
+  }
+
+  .header-title {
+    color: white;
+    margin: 0;
+    font-size: 1.25rem;
+
+    font-weight: 600;
+  }
+
+  .subtitle {
+    text-transform: none !important;
+    padding-top: 6px;
+    font-size: 10px;
+
+  }
+
+  .header-buttons {
+    display: flex;
+    gap: 8px;
+
+  }
+
+  .filter-toggle-button,
+  .btn.primary {
+    background: #ffffff;
+    color: #1e5fa8;
+    border: 1px solid #1e5fa8;
+
+    padding: 4px 10px;
+
+    font-weight: 500;
+    font-size: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.25s ease;
+  }
+
+  .filter-toggle-button:hover,
+  .btn.primary:hover {
+    background: #1e5fa8;
+    color: #ffffff;
+    border-color: #1e5fa8;
+  }
+
+  .filter-toggle-button svg,
+  .btn.primary svg {
+    width: 14px;
+
+    height: 14px;
+    fill: currentColor;
+    margin-right: 4px;
+  }
+
+  .filter-toggle-button i {
+    font-size: 13px;
+
+  }
+
+  /* ----------------------
+     FILTER PANEL CSS
+  ------------------------ */
+
+  .filter-section-container {
+    position: fixed;
+    top: 115px;
+
+    right: 0;
+    height: 55%;
+
+    width: 300px;
+
+    background-color: var(--filter-white-bg, #ffffff);
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.35s ease;
+    padding: 0 16px 16px;
+
+    box-sizing: border-box;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+
+    box-shadow: -4px 0 16px rgba(0, 60, 120, 0.08);
+
+    border: 1px solid var(--border-color, #e5e7eb);
+  }
+
+  /* =========================
+   FILTER SCROLLBAR STYLE
+========================= */
+
+  .filter-section-container {
+    scrollbar-width: thin;
+    scrollbar-color: #114d73 #f1f5f9;
+    -webkit-overflow-scrolling: touch;
+  }
+
+
+  .filter-section-container::-webkit-scrollbar {
+    width: 6px;
+
+  }
+
+  .filter-section-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+
+    border-radius: 10px;
+  }
+
+  .filter-section-container::-webkit-scrollbar-thumb {
+    background-color: #114d73;
+
+    border-radius: 10px;
+    border: 1px solid #f1f5f9;
+  }
+
+  .filter-section-container::-webkit-scrollbar-thumb:hover {
+    background-color: #0f3f5e;
+
+  }
+
+  .filter-options {
+    scrollbar-width: thin;
+    scrollbar-color: #114d73 #f1f5f9;
+  }
+
+  .filter-options::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .filter-options::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+
+  .filter-options::-webkit-scrollbar-thumb {
+    background-color: #114d73;
+    border-radius: 10px;
+  }
+
+  .filter-section-container.open {
+    transform: translateX(0%);
+  }
+
+  @media (max-width: 768px) {
+    .filter-section-container {
+      width: 100%;
+      top: 100px;
+      height: 75%;
+
+      right: 0;
+      left: 0;
+      border-radius: 10px 10px 0 0;
+
+      box-shadow: 0 -3px 14px rgba(0, 0, 0, 0.08);
+
+      transform: translateY(100%);
+    }
+
+    .filter-section-container.open {
+      transform: translateY(0);
+    }
+  }
+
+  .filter-group {
+    margin-bottom: 10px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+
+    transition: box-shadow 0.2s ease;
+    background-color: #fff;
+  }
+
+  .filter-group:hover {
+    box-shadow: 0 2px 8px rgba(0, 60, 120, 0.05);
+
+  }
+
+  .filter-header {
+    background-color: var(--light-bg);
+    padding: 8px 14px;
+
+    border: none;
+    border-radius: 6px;
+    width: 100%;
+    font-weight: 500;
+    font-size: 12px;
+
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    transition: background-color 0.2s ease, color 0.2s ease;
+    color: var(--text-color);
+  }
+
+  .filter-header:hover {
+    background-color: var(--light-blue);
+    color: var(--primary-blue);
+  }
+
+  .filter-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .filter-panel-header h3 {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+  }
+
+  .filter-close-button {
+    background: none;
+    border: none;
+    font-size: 1.6em;
+
+    color: var(--medium-text);
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s ease;
+  }
+
+  .filter-close-button:hover {
+    color: var(--error-color);
+  }
+
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.35);
+
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+  }
+
+  .overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .filter-header[aria-expanded="true"] {
+    background-color: var(--primary-blue);
+    color: var(--white-bg);
+    border-radius: 6px 6px 0 0;
+  }
+
+  .filter-header svg {
+    width: 14px;
+
+    height: 14px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+
+  .filter-header .selected-count {
+    font-size: 10px;
+
+    font-weight: 500;
+    color: var(--subtle-text);
+    margin-left: auto;
+  }
+
+  .filter-header[aria-expanded="true"] .selected-count {
+    color: #ffffff;
+  }
+
+  .filter-content {
+    padding: 0 14px;
+
+    background-color: #fff;
+    border-top: 1px solid #f0f0f0;
+    display: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+  }
+
+  .filter-content.expanded {
+    display: block;
+    max-height: 500px;
+    padding: 10px 14px 14px;
+
+  }
+
+  /* =========================
+   FILTER SEARCH BOX
+========================= */
+
+  .filter-search-box {
+    display: flex;
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #dbe5f1;
+    border-radius: 6px;
+    padding: 4px 8px;
+
+    margin-bottom: 8px;
+
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+
+  .filter-search-box:focus-within {
+    border-color: #114d73;
+    box-shadow: 0 0 0 2px rgba(17, 77, 115, 0.15);
+  }
+
+
+  .filter-search-box svg {
+    width: 14px;
+
+    height: 14px;
+    fill: #114d73;
+
+    margin-right: 6px;
+
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+
+  .filter-search-box input[type="text"] {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 12px;
+
+    color: #1f2937;
+    padding: 2px 0;
+  }
+
+
+  .filter-search-box input[type="text"]::placeholder {
+    color: #94a3b8;
+    font-size: 12px;
+  }
+
+
+  .filter-options {
+    margin-bottom: 8px;
+    max-height: 220px;
+
+    overflow-y: auto;
+    padding-right: 6px;
+  }
+
+  .filter-options label {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+
+    margin-bottom: 6px;
+    color: #444;
+    cursor: pointer;
+  }
+
+  .filter-options label:hover {
+    color: var(--primary-blue);
+  }
+
+  .filter-options input[type="checkbox"],
+  .filter-options input[type="radio"] {
+    margin-right: 8px;
+    width: 14px;
+
+    height: 14px;
+    border: 1px solid #ccc;
+
+    border-radius: 3px;
+    appearance: none;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .filter-options input[type="radio"] {
+    border-radius: 50%;
+  }
+
+  .filter-options input[type="checkbox"]:checked {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+  }
+
+  .filter-options input[type="checkbox"]:checked::before {
+    content: '✔';
+    position: absolute;
+    font-size: 10px;
+
+    top: -1px;
+    left: 2px;
+    color: white;
+  }
+
+  .filter-options input[type="radio"]:checked::before {
+    content: '';
+    display: block;
+    width: 7px;
+
+    height: 7px;
+    background-color: white;
+    border-radius: 50%;
+    margin: 3px auto;
+  }
+
+  .filter-option-count {
+    font-size: 10px;
+
+    margin-left: auto;
+    color: #666;
+    background-color: #eef3f9;
+    padding: 1px 5px;
+    border-radius: 8px;
+  }
+
+  .date-range-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    margin-top: 8px;
+  }
+
+  .date-input-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+  }
+
+  .date-input-group label {
+    font-weight: 600;
+    width: 45px;
+
+    font-size: 12px;
+  }
+
+  .date-input-group input[type="date"] {
+    flex-grow: 1;
+    padding: 6px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  .filter-actions {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+
+  }
+
+  .filter-actions button {
+    padding: 4px 10px;
+
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .filter-actions .apply-filter {
+    background-color: var(--primary-blue);
+    color: white;
+  }
+
+  .filter-actions .apply-filter:hover {
+    background-color: var(--dark-blue);
+  }
+
+  .filter-actions .clear-filter {
+    background-color: #6b7280;
+    color: white;
+  }
+
+  .filter-actions .clear-filter:hover {
+    background-color: #4b5563;
+  }
+
+  .clear-all-filters {
+    background-color: #1e5fa8;
+
+    color: white;
+    padding: 8px;
+
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+  }
+
+  .clear-all-filters:hover {
+    background-color: #174a84;
+  }
+
+  .no-filters {
+    text-align: center;
+    color: var(--subtle-text);
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  :root {
+    --primary-blue: #1e5fa8;
+
+    --light-blue: #eaf4fb;
+    --dark-text: #2c3e50;
+    --medium-text: #5e728c;
+    --light-border: #e2e8f0;
+    --shadow-light: rgba(0, 0, 0, 0.05);
+    --shadow-medium: rgba(0, 0, 0, 0.1);
+    --info-color: #28a745;
+    --warning-color: #ffc107;
+    --error-color: #dc3545;
+    --hover-bg: #f4f9ff;
+
+    --dark-blue: #174a84;
+    --text-color: #34495e;
+    --subtle-text: #7f8c8d;
+    --border-color: #e0e0e0;
+    --light-bg: #f9f9f9;
+    --white-bg: #ffffff;
+  }
+
+
+  #container {
+    border: 1px solid #dbe5f1;
+
+    border-radius: 8px 8px 0 0;
+
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: #ffffff;
+    overflow: hidden;
+    margin-bottom: 14px;
+
+    font-size: 13px;
+
+  }
+
+
+  th,
+  td {
+    padding: 8px 12px;
+
+    text-align: left;
+    border-bottom: 1px solid var(--light-border);
+    vertical-align: middle;
+    font-size: 12px;
+
+    line-height: 1.4;
+
+  }
+
+
+  thead th {
+    background-color: var(--light-blue);
+    font-weight: 700;
+    color: var(--primary-blue);
+    text-transform: uppercase;
+    font-size: 11px;
+
+    letter-spacing: 0.3px;
+    position: relative;
+    user-select: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .sortable:hover {
+    background-color: #e3f0fb;
+
+    color: var(--dark-text);
+  }
+
+  .sortable {
+    position: relative;
+    padding-right: 32px;
+
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .sort-icons {
+    position: absolute;
+    right: 8px;
+
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 14px;
+    height: 20px;
+    pointer-events: none;
+  }
+
+  .sort-icons svg {
+    width: 10px;
+
+    height: 10px;
+    margin: 1px 0;
+    fill: var(--primary-blue);
+    opacity: 0.35;
+    transition: opacity 0.3s ease;
+  }
+
+  .sorted-asc .up-arrow {
+    opacity: 1;
+  }
+
+  .sorted-desc .down-arrow {
+    opacity: 1;
+  }
+
+  tbody tr:hover {
+    background-color: var(--hover-bg);
+    transition: background-color 0.2s ease;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+
+  .log-message {
+    font-family: 'Roboto Mono', monospace;
+    color: var(--medium-text);
+    font-size: 11px;
+
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  td[data-label="Date:"] {
+    width: 110px;
+
+  }
+
+  th.sortable {
+    min-width: 110px;
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    width: 100%;
+    max-width: 1300px;
+    padding: 10px 16px;
+
+    border-radius: 10px;
+
+    font-size: 12px;
+
+    color: #374151;
+    margin-top: 16px;
+
+  }
+
+  .pagination-info {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+  }
+
+  .pagination-info select {
+    padding: 4px 8px;
+
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    color: #111827;
+    font-size: 11px;
+
+    cursor: pointer;
+  }
+
+  .pagination-info select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(30, 95, 168, 0.15);
+  }
+
+  .pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-wrap: wrap;
+  }
+
+  .pagination-buttons button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-blue);
+    color: #ffffff;
+    padding: 4px 10px;
+
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 11px;
+
+    transition: background-color 0.2s ease;
+  }
+
+  .pagination-buttons button i {
+    font-size: 0.9rem;
+
+  }
+
+  .pagination-buttons button:hover:not(:disabled) {
+    background-color: var(--dark-blue);
+  }
+
+  .pagination-buttons button:disabled {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  .pagination-buttons span#pageNumber {
+    font-size: 12px;
+    font-weight: 500;
+    color: #374151;
+  }
+
+
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+
+    }
+
+    .container {
+      padding: 0;
+    }
+
+    h2 {
+      font-size: 1.4em;
+
+      margin-bottom: 18px;
+    }
+
+    table {
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+      display: block;
+      width: 100% !important;
+    }
+
+    thead tr {
+      display: none;
+    }
+
+    tbody tr {
+      margin-bottom: 10px;
+
+      border: 1px solid var(--light-border);
+      border-radius: 6px;
+
+      box-shadow: 0 2px 6px var(--shadow-light);
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    tbody td {
+      padding: 8px 12px;
+
+      border-bottom: 1px dashed #f0f4f8;
+      position: relative;
+      padding-left: 48%;
+      text-align: left;
+      font-size: 12px !important;
+
+      color: #374151;
+      line-height: 1.4;
+    }
+
+    tbody td:last-child {
+      border-bottom: none;
+    }
+
+    tbody td::before {
+      content: attr(data-label);
+      position: absolute;
+      top: 8px;
+      left: 12px;
+      width: calc(50% - 24px);
+      font-weight: 600;
+      color: var(--medium-text);
+      font-size: 11px;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pagination-controls {
+      flex-direction: column;
+      align-items: stretch;
+      text-align: center;
+      padding: 14px 10px;
+      gap: 12px;
+    }
+
+    .pagination-info {
+      justify-content: center;
+      width: 100%;
+      gap: 6px;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pagination-info select {
+      width: 100%;
+      max-width: 180px;
+      text-align: center;
+    }
+
+    .pagination-buttons {
+      justify-content: center;
+      width: 100%;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pagination-buttons button {
+      flex: 1 1 auto;
+      min-width: 100px;
+      justify-content: center;
+    }
+
+    .pagination-buttons span#pageNumber {
+      flex: 1 1 100%;
+      text-align: center;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    .header-content {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .header-title {
+      font-size: 1.1rem;
+
+      text-align: center;
+      width: 100%;
+    }
+
+    .header-buttons {
+      flex-direction: column;
+      width: 100%;
+      gap: 6px;
+    }
+
+    .filter-toggle-button,
+    .btn.primary {
+      width: 100%;
+      justify-content: center;
+      font-size: 12px;
+      padding: 6px;
+    }
+
+    .filter-toggle-button i,
+    .btn.primary i {
+      margin-right: 6px;
+    }
+  }
+
+
+
+  .pdf-loader {
+    display: none;
+  }
+
+  .loader-box {
+    padding: 10px 16px;
+
+    display: flex;
+    gap: 10px;
+
+  }
+
+  .spinner {
+    width: 18px;
+
+    height: 18px;
+    border: 3px solid #e0e0e0;
+    border-top: 3px solid #b02639;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .loader-text {
+    font-size: 12px;
+
+    color: #b02639;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+</style>
+
+
+
+
+
+<script>
+  document.querySelectorAll('.filter-search-box input[type="text"]').forEach(searchBox => {
+    searchBox.addEventListener('input', function () {
+      const filterGroup = this.closest('.filter-group');
+      const searchTerm = this.value.toLowerCase();
+      const options = filterGroup.querySelectorAll('.filter-options label');
+
+      options.forEach(option => {
+        const text = option.textContent.toLowerCase();
+        option.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+      });
+    });
+  });
+
+</script>
+<script src="/luci2/jspdf.umd.min.js"></script>
+<script src="/luci2/jspdf.plugin.autotable.min.js"></script>
+<script src="/luci2/html2pdf.bundle.min.js"></script>

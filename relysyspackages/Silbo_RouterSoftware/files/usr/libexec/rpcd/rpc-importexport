@@ -1,0 +1,183 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+factoryresetscript="/root/InterfaceManager/script/Restore.sh"
+ImportedBoardModel="/tmp/etc/config/system"
+ConfigBoardModel="/etc/config/system"
+config_file="/etc/config/networkinterfaces"	
+RebootLogfile="/root/ConfigFiles/RebootLog/RebootLog.txt"
+RebootreasonLogfile="/root/ConfigFiles/RebootLog/Rebootreason.txt"
+ftp_script="/root/InterfaceManager/script/features/ftp/ftpserver.sh"
+
+Enable_shm=$(uci get cloudconfigNH.cloudconfigNH.enablenwh)
+
+case "$1" in
+    list)
+        echo '{"rebootsys":{},"testarchive":{},"updateftp":{}}'
+        ;;
+    call)
+        case "$2" in
+                                        
+               rebootsys)
+                         date=$(date)
+                            echo "$date:[Webpage{maintenancereboot page}]:1" >> "$RebootLogfile"
+                            echo "$date:[Webpage{maintenancereboot page}]:1" > "$RebootreasonLogfile"
+						    respreboot=$(/root/usrRPC/script/Board_Recycle_12V_Script.sh)
+						    if [ "$?" -ne 0 ]
+							then
+								echo "{\"code\":1,\"output\":\"Reboot failure!!\"}"
+							else
+								echo "{\"code\":0,\"output\":\"Reboot Success!!\"}"
+							fi
+						    ;;
+							    
+		testarchive)     
+				          
+                #extracting tar file in tmp folder
+                #RetMsg=$(tar -zxv -f "${ArchivedFileWithPath}" -C "${ArchiveDLPath}" 2>&1)
+                 config_load importexportconfig
+                 config_get enableretainboardconfig "importexportconfig" enableretainboardconfig
+		a=$(mkdir /tmp/etc 2>&1) 
+		a=$(mkdir /tmp/etc/config 2>&1)
+
+		/bin/import_utility
+						
+	            ImportedBoardModelValue=$(grep -w "option model" ${ImportedBoardModel})
+	            ConfigBoardModelValue=$(grep -w "option model" ${ConfigBoardModel})
+			echo "retainconfig $enableretainboardconfig "
+			echo "$ImportedBoardModelValue $ConfigBoardModelValue" 
+	            	            	
+				#enableretainboardconfig value is parsed and compared to make sure configuration imported is silbo config files
+				#ImportedBoardModelValue is used to make sure same model's configuration is imported
+				if [ "$enableretainboardconfig" = "1" ] && [ "$ImportedBoardModelValue" = "$ConfigBoardModelValue" ]
+				then
+				 
+				  rm -f /tmp/etc/config/AddiotionalCommands
+				  rm -f /tmp/etc/config/applist_config
+				  rm -f /tmp/etc/config/boardconfig
+				  rm -f /tmp/etc/config/boardconfigfile
+				  rm -f /tmp/etc/config/DiagnosticMiscUtilities
+				  rm -f /tmp/etc/config/etherwake
+				  rm -f /tmp/etc/config/fstab
+				  rm -f /tmp/etc/config/hd-idle
+				  rm -f /tmp/etc/config/importexportconfig
+				  rm -f /tmp/etc/config/ltemodulefirmwareupgrade
+				  rm -f /tmp/etc/config/luci
+				  rm -f /tmp/etc/passwd
+				  rm -f /tmp/etc/config/rpcd
+				  rm -f /tmp/etc/config/samba
+				  rm -f /tmp/etc/config/setserialnumber
+				  rm -f /tmp/etc/config/system
+				  rm -f /tmp/etc/config/systemgpio
+				  rm -f /tmp/etc/shadow
+				  rm -f /tmp/etc/config/testapp
+				  rm -f /tmp/etc/config/testappenable
+				  rm -f /tmp/etc/config/ubootenv
+				#If The SHM is disabled we want to delete backup.txt 
+				if [ "$Enable_shm" = "0" ]; then 
+					rm -f /tmp/backup.txt
+				fi
+				    #rm -f /tmp/backup.txt
+
+				cp -r /tmp/etc/* /etc
+				
+			Serialnum=$(uci get boardconfig.board.serialnum)	
+		
+		    # Remove Mac Address from networkinterfaces and network file  
+			sh /root/InterfaceManager/script/RemoveMacAddress.sh	
+			
+			lan_interface=""
+			wan_interface=""
+
+			# Read the config file line by line
+			while IFS= read -r line; do
+				# Extract interface if line contains 'option interface'
+				if echo "$line" | grep -q "option interface"; then
+					current_interface=$(echo "$line" | awk '{print $3}' | tr -d "'")
+				fi
+
+				# Extract type if line contains 'option type'
+				if echo "$line" | grep -q "option type"; then
+					current_type=$(echo "$line" | awk '{print $3}' | tr -d "'")
+        
+					# Set the LAN or WAN interface based on the current type
+					if [[ "$current_type" == "LAN" && -z "$lan_interface" ]]; then
+						lan_interface="$current_interface"
+					elif [[ "$current_type" == "WAN" && -z "$wan_interface" ]]; then
+						wan_interface="$current_interface"
+					fi
+				fi
+
+				# Stop if both interfaces are found
+				if [[ -n "$lan_interface" && -n "$wan_interface" ]]; then
+				break
+				fi
+			done < /etc/config/networkinterfaces
+
+			laninterface="$lan_interface"
+			waninterface="$wan_interface"
+
+			LANMACID=$(uci get boardconfig.board.lanmacid)	
+            EWANMACID=$(uci get boardconfig.board.wanmacid)
+			
+			uci set network."${laninterface}".macaddr="$LANMACID"
+			uci set networkinterfaces."${laninterface}".macaddress="$LANMACID"
+			
+			uci set network."${waninterface}".macaddr="$EWANMACID"
+			uci set networkinterfaces."${waninterface}".macaddress="$EWANMACID"
+			
+			uci commit networkinterfaces						
+			uci commit network
+			echo "logger -t Import/Export -p customs.info "Config file imported successfully""		
+
+			sh /bin/validate.sh &
+			sh /bin/UpdateConfigurationsMaintenanceReboot updatemaintenancereboot &
+			sh /bin/customfirewallrules.sh &
+			sh /root/InterfaceManager/script/features/url_filtering/urlblocklist.sh &
+			sh /root/InterfaceManager/script/features/mac_binding/UpdateMacConfig.sh &
+			sh /bin/routing.sh &
+			sh /root/InterfaceManager/script/IpSecStart.sh &
+			sh /bin/UpdateWebserver.sh &
+			sh /bin/UpdateConfigurationsRouterApp &
+			sh /bin/macidblocking.sh &
+			sh /root/InterfaceManager/script/features/mac_binding/UpdateMacConfig.sh &
+			sh /root/InterfaceManager/script/features/url_filtering/urlblocklist.sh &
+			sh /root/InterfaceManager/script/vpn/pptp/pptp_handler.sh &
+			sh /root/InterfaceManager/script/vpn/pptp/pptpstatus.sh &
+			sh /root/InterfaceManager/script/vpn/l2tp/l2tp_handler.sh &
+			sh /root/InterfaceManager/script/vpn/l2tp/l2tpstatus.sh &
+			sh /root/InterfaceManager/script/ethernet/ethernet_handler.sh  &
+			sh /root/InterfaceManager/script/wireless/wireless_handler.sh  &
+			sh /root/InterfaceManager/script/cellular/cellular_handler.sh  &
+		
+			sleep 60
+			date=$(date)
+			echo "$date:[Configuration Import]:6" >> "$RebootLogfile"
+			echo "$date:[Configuration Import]:6" > "$RebootreasonLogfile"
+			 respreboot=$(/root/usrRPC/script/Board_Recycle_12V_Script.sh)
+			elif [ "$ImportedBoardModelValue" != "$ConfigBoardModelValue"  ]
+				then
+				    echo "{\"code\":1,\"output\":\"Invalid Import archieve\"}"
+				fi			   
+                ;;
+			 updateftp)
+		            response=$($ftp_script)
+	
+				    if [ "$?" -ne 0 ]
+					then
+						echo "{\"code\":1,\"output\":\"FTP failure!!\"}"
+					else
+						echo "{\"code\":0,\"output\":\"FTP Success!!\"}"
+					fi
+			    ;;			    
+							    
+                *)
+								echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

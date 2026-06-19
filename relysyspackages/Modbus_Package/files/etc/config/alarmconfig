@@ -1,0 +1,6 @@
+
+config alarmconfig 'Device1'
+	option Category_0 '1'
+	option alarmEnabled_0 '0'
+	option Code_0 '1'
+

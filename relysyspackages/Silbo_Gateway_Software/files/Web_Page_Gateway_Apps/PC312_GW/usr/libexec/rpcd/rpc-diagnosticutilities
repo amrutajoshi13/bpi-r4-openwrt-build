@@ -1,0 +1,2041 @@
+#!/bin/sh
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+IOUtilitiesCfg="DiagnosticIOUtilities"
+MISCUtilitiesCfg="DiagnosticMiscUtilities"
+APIPath="/root/DiagnosticUtilities/api"
+AISensorMaintenanceAPICfg="AISensorMaintenanceAPIArgs"
+IOCardSettingsFile="IOCardSettings"
+IOCardSettingsSection="IOMapping"
+USRCMDPATH="/usr/sbin"
+CMDPATH="/sbin"
+USRBINCMDPATH="/usr/bin"
+USRRPCCMDPATH="/root/usrRPC/script"
+siminfoscript="/bin/SimUtility.sh"
+readsmsscript="/bin/readSMS.sh"
+testappinfoscript="/root/InterfaceManager/script/testapp.sh"
+atcommandinfoscript="/root/InterfaceManager/script/RunATCommand.sh"
+BINCMDPATH="/bin"
+ReAPMqttHealthResponse="Silbo/Health/HealthPeriodicPublish"
+ReAPMqttHost="localhost"
+ReAPMqttPort="1883"
+ReAPMqttQos="1"
+PingTestScript="/bin/pingTest.sh"
+SetSerialNumberScript="/bin/SetSerialNumber.sh"
+SetMACIdScript="/bin/SetMACId.sh"
+ReAPMqttGPSResponse="Silbo/GPS/GPSPeriodicPublish"
+SIM1ConsumedDatafile="/etc/sim1data"
+SIM2ConsumedDatafile="/etc/sim2data"
+SpeedTestScript="/bin/speedtest.sh"
+ClearSIM1Datascript="/root/InterfaceManager/script/Reset_sim1_data_usage.sh"
+ClearSIM2Datascript="/root/InterfaceManager/script/Reset_sim2_data_usage.sh"
+
+sysconfigUCIPath=/etc/config/sysconfig
+sysconfigsection="sysconfig"
+sshpath="/etc/config/dropbear"
+dropbearrestart="/etc/init.d/dropbear restart"
+MonthlyData="/root/InterfaceManager/script/Monthly_Data_Usage.sh"
+DataUsage="/root/InterfaceManager/script/DataUsage.sh"
+Mdebug="/bin/Mdebug.sh"
+getoperatornetwork="/bin/getoperatornetwork.sh"
+case "$1" in
+    list)
+        echo '{"run":{"utility":"UtilityName","action":"ActionName","section":"sectionName","usrinputs":{"input1":"Input1Values","input2":"Input2Value","input3":"Input3Value"}}}'
+        ;;
+        
+    call)
+        case "$2" in
+            run)
+                # read the arguments
+                read -r input;
+    
+                # parse the received arguments
+                json_load "$input" > /dev/null 2>&1
+                json_get_var UtilityName utility
+                json_get_var ActionName action
+                json_get_var SectionName section
+                json_select usrinputs > /dev/null 2>&1
+                json_get_var Input1Value input1
+                json_get_var Input2Value input2
+                json_get_var Input3Value input3
+                json_select .. > /dev/null 2>&1
+                
+                case "$UtilityName" in
+                    
+                    "Scan Network operators(Takes >3 mins)")               
+                        if [ "$ActionName" = "SCAN" ]                                                   
+                        then
+                            rm /bin/operatorlist.txt 
+                            $($getoperatornetwork)                                                          
+                            echo '{"code":0,"output":"Network"}'
+                        else                                                                       
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"    
+                        fi                                                                                  
+                        ;;
+                    "Network operator list(First Perform Scan Network Operators)")                               
+						if [ "$ActionName" = "SHOW" ]                                                                             
+						then
+							rm /bin/operatorshow.txt                        
+							valueinfo=$(cat /tmp/operatorshow.txt)                                                                  
+							if [[ -z $valueinfo ]]                                                           
+							then                                                                                                 
+								echo "{\"code\":1,\"output\":\"Empty valueinfo\"}"                              
+							else                                                                                                 
+								echo -e "{\"code\":0,\"output\":\n\"$valueinfo\"}"                                                
+							fi                                                                                                   
+							else                                                                                                      
+								echo "{\"code\":1,\"output\":\"invalid action\"}"                                                    
+							fi                                                                                                        
+						    ;;	
+                   
+                    "Modem Debug Info")                            
+                      if [ "$ActionName" = "READ" ]
+                            then                              
+                                $($Mdebug)
+                                output=$(cat /tmp/Mdebug.txt)
+                                echo -e "{\"code\":0,\"output\":\n\"$output\"}"
+                            else 
+                                echo "{\"code\":1,\"output\":\"invalid action\"}"
+                            fi   
+                                        ;; 
+ 
+                    "Modem Debug Info")
+                      if [ "$ActionName" = "READ" ]
+	                    then
+	                        $($Mdebug)
+	                        output=$(cat /tmp/Mdebug.txt)
+	                       	echo -e "{\"code\":0,\"output\":\n\"$output\"}"                                        
+	                    else
+	                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                    fi
+					;;
+					
+                   
+                    "Wi-Fi Scan")
+						if [ "$ActionName" = "GET" ]
+	                    then
+	                        rm /tmp/ScanInfofile.txt
+	                        touch /tmp/ScanInfofile.txt
+							iwpriv ra0 set SiteSurvey=0 2>&1 
+							sleep 1                                         
+							iwpriv ra0 get_site_survey > /tmp/ScanInfofile.txt   
+							sleep 1                            
+							ScanInfo=$(cat /tmp/ScanInfofile.txt 2>&1)                                    
+							echo -e "{\"code\":0,\"output\":\n\"$ScanInfo\"}"                                        
+	                    else
+	                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                    fi
+					;;
+					
+					
+					"Show VPN Certificate Name")
+		                    if [ "$ActionName" = "SHOW" ]
+		                    then
+		                        certificatename=$(ls /etc/openvpn/* | cut -d "/" -f4)
+		                        
+		                        if [ "x$certificatename" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"No certificate\"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$certificatename\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;	       
+                
+                    "Enable ssh")
+	                    if [ "$ActionName" = "RUN" ]
+	                    then
+	                        uci set dropbear.root.RootLogin='1'
+	                        uci commit dropbear
+	                        $dropbearrestart
+	                        
+	                            echo "{\"code\":1,\"output\":\"ssh enabled\"}"
+	                    else
+	                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                    fi
+					;;	
+					"Disable ssh")
+	                    if [ "$ActionName" = "RUN" ]
+	                    then
+	                        uci set dropbear.root.RootLogin='0'
+							uci commit dropbear
+	                        $dropbearrestart
+	                            echo "{\"code\":1,\"output\":\"ssh disabled\"}"
+	                    else
+	                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                    fi
+					;;			
+					
+					
+					"Enable ssh(Admin)")
+	                    if [ "$ActionName" = "RUN" ]
+	                    then
+	                        uci set dropbear.admin=dropbear
+							uci set dropbear.admin.PasswordAuth='on'
+							uci set dropbear.admin.RootPasswordAuth='on'
+							uci set dropbear.admin.Port='22'
+							uci set dropbear.admin.RootLogin='0'
+							uci commit dropbear
+	                        $dropbearrestart
+	                        
+	                            echo "{\"code\":1,\"output\":\"ssh enabled\"}"
+	                    else
+	                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                    fi
+					;;	
+					"Disable ssh(Admin)")
+	                    if [ "$ActionName" = "RUN" ]
+	                    then
+	                        uci delete dropbear.admin
+	                         uci commit dropbear
+	                        $dropbearrestart
+	                            echo "{\"code\":1,\"output\":\"ssh disabled\"}"
+	                    else
+	                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                    fi
+					;;			
+					
+						"Send test SMS")
+			
+							if [ "$ActionName" = "SEND" ]
+		                    then
+		                        
+				                PrintStringLen=${#Input2Value}
+		                        if [ "$PrintStringLen" -gt 160 ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"string length should not be greater than 16 characters\"}"
+		                            exit 0
+		                        else
+	                                SendSMSInfo=$( /bin/sendSMS.sh "$Input1Value" "$Input2Value"  2>&1)
+			                        
+			                        if [ "x$SendSMSInfo" = "x" ]
+			                        then
+			                            echo "{\"code\":1,\"output\":\"empty SendSMSInfo \"}"
+			                        else
+			                            echo -e "{\"code\":0,\"output\":\n\"$SendSMSInfo\"}"
+			                        fi
+			                   fi     
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+		                    
+						;;		
+						
+						"ReadlatestSMS")
+			
+							if [ "$ActionName" = "READ" ]
+		                    then
+		                        res=$($readsmsscript)		                        
+			                    ReadSMSInfo=$(cat /tmp/readsms.txt 2>&1)
+		                   		                        
+		                        if [ "x$ReadSMSInfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty ReadSMSInfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$ReadSMSInfo\"}"
+		                        fi			                        
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+		                    
+						  ;;							
+						
+                    "Digital Input")
+                        config_load "$IOUtilitiesCfg"
+                        config_get CardType "$SectionName" CardType
+                        config_get CardNumber "$SectionName" CardNumber
+                        
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if [ "$CardNumber" = "1" ]
+                            then
+                                if echo "$Input1Value" | grep -qE '^[0-9]+$'
+                                then
+                                    ReadDIOutput=$(${APIPath}/${CardType}/Read_Individual_Digital_IN_Utility "$Input1Value" 2>&1)
+                                    ReadDIRetVal=$?
+                                    if [ "$ReadDIRetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read Digital input $Input1Value\"}"
+                                    else
+                                        echo "{\"code\":0,\"output\":\"DI[$Input1Value] = $ReadDIOutput\"}"
+                                    fi
+                                elif [ "$Input1Value" = "ALL" ]
+                                then
+                                    ReadAllDIOutput=$(${APIPath}/${CardType}/Read_All_Digital_IN_Utility 2>&1)
+                                    ReadDIRetVal=$?
+                                    if [ "$ReadDIRetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read All Digital inputs\"}"
+                                    else
+                                        ReadDIOutput=$(echo "$ReadAllDIOutput" | awk -F'+' '{ for (i=1;i<=NF;i++) {printf "\nDI[%s]=%s",i,$i} }')
+                                        echo "{\"code\":0,\"output\":\"Digital Input Values : $ReadDIOutput\"}"
+                                    fi
+                                else
+                                    echo "{\"code\":1,\"output\":\"invalid user inputs\"}"
+                                fi
+                            else
+                                echo "{\"code\":0,\"output\":\"invalid CardNumber\"}"
+                            fi
+                        else
+                            echo "{\"code\":0,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                    
+                    "Analog Input")
+                        config_load "$IOUtilitiesCfg"
+                        config_get CardType "$SectionName" CardType
+                        config_get CardNumber "$SectionName" CardNumber
+                        
+                        if [ "x$Input1Value" = "x" ]
+                        then
+                            echo "{\"code\":0,\"output\":\"invalid analog input number\"}"
+                            exit 1
+                        fi
+                        
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if [ "$CardNumber" = "1" ]
+                            then
+                                CfgAINumber="AnalogInput${Input1Value}"
+
+                                config_load "$IOCardSettingsFile"
+                                config_get IOCard1 "$IOCardSettingsSection" IOCard1
+                                if [ "$IOCard1" = "AI2DI4DO4" ]
+                                then
+                                    IOCardFile="C1_AI2DI4DO4"
+                                elif [ "$IOCard1" = "DIO16" ]
+                                then
+                                    IOCardFile="IOCard1_DIO16"
+                                fi
+                                
+                                config_load  "$IOCardFile"
+                                config_get CfgNoOfSamples "$CfgAINumber" NoOfSamples
+                                config_get CfgCurDevResistance "$CfgAINumber" CurDevResistance
+                                config_get CfgSamplingRate "$CfgAINumber" SamplingRate
+                                config_get CfgInputRange "$CfgAINumber" InputRange
+                                config_get CfgConversionMode "$CfgAINumber" ConversionMode
+                                CfgChannelNumber=$(echo "$CfgAINumber" | sed "s/[^0-9]//g")
+        
+                                # apis
+                                SetADCChannelNumber=$(/root/DiagnosticUtilities/api/AI2DI4DO4/Set_Adc_Params_Utility "$CfgSamplingRate" "$CfgInputRange" "$CfgConversionMode" "$CfgChannelNumber" )
+                                SetADCChannelNumberRetVal=$?
+                                if [ $SetADCChannelNumberRetVal != 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"failed to select adc channel\"}"
+                                    exit 1
+                                fi
+                                
+                                RawValue=$(/root/DiagnosticUtilities/api/AI2DI4DO4/Read_Adc_Raw_Value_Utility 1)
+                                RawValueRetVal=$?
+                                if [ $RawValueRetVal != 0 ]
+                                then
+                                    RawValue="Error"
+                                fi
+                                
+                                # read configuration from uci file
+                                config_load "$AISensorMaintenanceAPICfg"
+                                config_get CfgImin "$CfgAINumber" Imin
+                                config_get CfgSmin "$CfgAINumber" Smin
+                                config_get CfgSlope "$CfgAINumber" Slope
+                                config_get CfgYcalOffset "$CfgAINumber" YcalOffset
+                                config_get CfgSensorType "$CfgAINumber" SensorType
+                                config_get CfgInputType "$CfgAINumber" InputType
+                                
+                                if [ "$CfgSensorType" = "temperature_C" ]
+                                then
+                                    if [ "$CfgInputType" = "current_mA" ]
+                                    then
+                                        RawToCurrentValue=$(/root/DiagnosticUtilities/api/AI2DI4DO4/Convert_Raw_Adc_Value_To_Current_Utility "$CfgNoOfSamples" "$CfgCurDevResistance")
+                                        RawToCurrentRetVal=$?
+                                        [ $RawToCurrentRetVal != 0 ] && RawToCurrentValue="Error"
+                                        
+                                        RawToTempratureValue=$(${APIPath}/${CardType}/Convert_Raw_Adc_Value_To_Temperature_Calibrate_Utility "$CfgSlope" "$CfgImin" "$CfgSmin" "$CfgYcalOffset" "$CfgNoOfSamples" "$CfgCurDevResistance")
+                                        RawToTempratureRetVal=$?
+                                        [ $RawToTempratureRetVal != 0 ] && RawToTempratureValue="Error"
+
+                                        Output=$(printf "RAW        AI[$Input1Value] = $RawValue V\nCurrent    AI[$Input1Value] = $RawToCurrentValue mA\nTemprature AI[$Input1Value] = $RawToTempratureValue C")
+                                        echo "{\"code\":0,\"output\":\"$Output\"}"
+                                    else
+                                        Output=$(printf "RAW        AI[$Input1Value] = $RawValue V\nsensor input type $CfgInputType not supported")
+                                        echo "{\"code\":1,\"output\":\"$Output\"}" 
+                                    fi
+                                elif [ "$CfgSensorType" = "chlorine_mgl" ]
+                                then
+                                    if [ "$CfgInputType" = "current_mA" ]
+                                    then
+                                        RawToCurrentValue=$(/root/DiagnosticUtilities/api/AI2DI4DO4/Convert_Raw_Adc_Value_To_Current_Utility "$CfgNoOfSamples" "$CfgCurDevResistance")
+                                        RawToCurrentRetVal=$?
+                                        [ $RawToCurrentRetVal != 0 ] && RawToCurrentValue="Error"
+
+                                        RawToChlorineValue=$(${APIPath}/${CardType}/Convert_Raw_Adc_Value_To_Chlorine_Calibrate_Utility "$CfgSlope" "$CfgImin" "$CfgSmin" "$CfgYcalOffset" "$CfgNoOfSamples" "$CfgCurDevResistance")
+                                        RawToChlorineRetVal=$?
+                                        [ $RawToChlorineRetVal != 0 ] && RawToChlorineValue="Error"
+
+                                        Output=$(printf "RAW        AI[$Input1Value] = $RawValue V\nCurrent    AI[$Input1Value] = $RawToCurrentValue mA\nChlorine   AI[$Input1Value] = $RawToChlorineValue mgl")
+                                        echo "{\"code\":0,\"output\":\"$Output\"}"
+                                    else
+                                        Output=$(printf "RAW        AI[$Input1Value] = $RawValue V\nsensor input type $CfgInputType not supported")
+                                        echo "{\"code\":1,\"output\":\"$Output\"}"
+                                    fi
+                                else
+                                    Output=$(printf "RAW        AI[$Input1Value] = $RawValue V\nsensor type $CfgSensorType not supported")
+                                    echo "{\"code\":1,\"output\":\"$Output\"}"
+                                fi
+                            else
+                                echo "{\"code\":1,\"output\":\"invalid CardNumber\"}"
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "Digital Output")
+                        config_load "$IOUtilitiesCfg"
+                        config_get CardType "$SectionName" CardType
+                        config_get CardNumber "$SectionName" CardNumber
+                        
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            if [ "$CardNumber" = "1" ]
+                            then
+                                if echo "$Input1Value" | grep -qE '^[0-9]+$'
+                                then
+                                    ReadDOOutput=$(${APIPath}/${CardType}/Read_Individual_Digital_OUT_Utility "$Input1Value" 2>&1)
+                                    ReadDORetVal=$?
+                                    if [ "$ReadDORetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read Digital output $Input1Value\"}"
+                                    else
+                                        echo "{\"code\":0,\"output\":\"DO[$Input1Value] = $ReadDOOutput\"}"
+                                    fi
+                                elif [ "$Input1Value" = "ALL" ]
+                                then
+                                    ReadAllDOOutput=$(${APIPath}/${CardType}/Read_All_Digital_OUT_Utility 2>&1)
+                                    ReadDORetVal=$?
+                                    if [ "$ReadDORetVal" != 0 ]
+                                    then
+                                        echo "{\"code\":1,\"output\":\"Failed to read All Digital outputs\"}"
+                                    else
+                                        ReadDOOutput=$(echo "$ReadAllDOOutput" | awk -F'+' '{ for (i=1;i<=NF;i++) {printf "\nDO[%s]=%s",i,$i} }')
+                                        echo "{\"code\":0,\"output\":\"Digital Output Values : $ReadDOOutput\"}"
+                                    fi
+                                else
+                                    echo "{\"code\":1,\"output\":\"invalid user inputs\"}"
+                                fi
+                            else
+                                echo "{\"code\":0,\"output\":\"invalid CardNumber\"}"
+                            fi
+                        elif [ "$ActionName" = "WRITE" ]
+                        then
+                            if [ "$CardNumber" = "1" ]
+                            then
+                                if echo "$Input1Value" | grep -qE '^[0-9]+$'
+                                then
+                                    if [ "$Input2Value" = "ON" ]
+                                    then
+                                        DoValue="1"
+                                    else
+                                        DoValue="0"
+                                    fi
+                                    
+                                    WriteDOOutput=$(${APIPath}/${CardType}/Write_Individual_Digital_OUT_Utility "$Input1Value" "$DoValue" 2>&1)
+                                    WriteDORetVal=$?
+                                    
+                                    if [ "$WriteDORetVal" != 0 ]
+                                    then
+                                        [ "$Input2Value" = "ON" ] && echo "{\"code\":0,\"output\":\"Failed to turn ON Digital Output $Input1Value\"}"
+                                        [ "$Input2Value" = "OFF" ] && echo "{\"code\":0,\"output\":\"Failed to turn OFF Digital Output $Input1Value\"}"
+                                    else
+                                        [ "$Input2Value" = "ON" ] && echo "{\"code\":0,\"output\":\"Digital Output $Input1Value turned ON\"}"
+                                        [ "$Input2Value" = "OFF" ] && echo "{\"code\":0,\"output\":\"Digital Output $Input1Value turned OFF\"}"
+                                    fi
+                                elif [ "$Input1Value" = "ALL" ]
+                                then
+                                    if [ "$Input2Value" = "ON" ]
+                                    then
+                                        DoValue="0x0f"
+                                    else
+                                        DoValue="0x00"
+                                    fi
+                                    WriteAllDOOutput=$(${APIPath}/${CardType}/Write_All_Digital_OUT_Utility "$DoValue" 2>&1)
+                                    WriteAllDORetVal=$?
+                                    if [ "$WriteAllDORetVal" != 0 ]
+                                    then
+                                        [ "$Input2Value" = "ON" ] && echo "{\"code\":0,\"output\":\"Failed to turn ON All Digital Output\"}"
+                                        [ "$Input2Value" = "OFF" ] && echo "{\"code\":0,\"output\":\"Failed to turn OFF All Digital Output\"}"
+                                    else
+                                        [ "$Input2Value" = "ON" ] && echo "{\"code\":0,\"output\":\"turned ON all Digital Output\"}"
+                                        [ "$Input2Value" = "OFF" ] && echo "{\"code\":0,\"output\":\"turned OFF all Digital Output\"}"
+                                    fi
+                                else
+                                    echo "{\"code\":1,\"output\":\"invalid user inputs\"}"
+                                fi
+                            else
+                                echo "{\"code\":0,\"output\":\"invalid CardNumber\"}"
+                            fi
+                        fi
+                        ;;
+                        
+                    "Clear Database Table")
+                        config_load "$MISCUtilitiesCfg"
+                        config_get DatabasePath "$SectionName" "${Input1Value}DatabasePath" 
+                        config_get DatabaseName "$SectionName" "${Input1Value}Database" 
+                        config_get TableName "$SectionName" "${Input1Value}Table" 
+                        config_get ConfigFile "$SectionName" "${Input1Value}ConfigFile"
+    
+                        if [ ! -s "$ConfigFile" ]
+                        then
+                            [ "x$DatabasePath" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database path '$DatabasePath'\"}" && exit 1 
+                            [ "x$DatabaseName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database '$DatabaseName'\"}" && exit 1 
+                            [ "x$TableName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid table '$TableName'\"}" && exit 1 
+                        fi
+         
+                        ClearTableStatus=$(/root/DiagnosticUtilities/scripts/DatabaseInterface.sh --command "clear_table" --databasepath "$DatabasePath" --database "$DatabaseName" --table "$TableName" 2>&1)
+                        ClearTableRetVal=$?
+                        echo "{\"code\":\"$ClearTableRetVal\",\"output\":\"$ClearTableStatus\"}"
+                        ;;
+                    
+                    "View Database Table")
+                        config_load "$MISCUtilitiesCfg"
+                        config_get DatabasePath "$SectionName" "${Input1Value}DatabasePath" 
+                        config_get DatabaseName "$SectionName" "${Input1Value}Database" 
+                        config_get TableName "$SectionName" "${Input1Value}Table" 
+                        DatabaseWithPath="${DatabasePath}/${DatabaseName}"
+
+                        [ "x$DatabasePath" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database path '$DatabasePath'\"}" && exit 1 
+                        [ "x$DatabaseName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid database '$DatabaseName'\"}" && exit 1 
+                        
+                        if [ "$DatabaseName" = "AISensorMaintenance.db" ] 
+                        then 
+                            ReadTableOutput=$(/usr/bin/sqlite3 -column -header "$DatabaseWithPath" "select * from $Input2Value order by rowid DESC limit 5;" 2>&1)
+                            ReadTableRetVal=$?
+                            ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                            echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                        else
+                            [ "x$TableName" = "x" ] && echo "{\"code\":1,\"output\":\"invalid table '$TableName'\"}" && exit 1 
+                            ReadTableOutput=$(/usr/bin/sqlite3 -column -header "$DatabaseWithPath" "select * from $TableName order by rowid DESC limit 5;" 2>&1)
+                            ReadTableRetVal=$?
+                            ReadTableOutput=$(echo "$ReadTableOutput" | tr -d "\"\'")
+                            echo "{\"code\":\"$ReadTableRetVal\",\"output\":\"$ReadTableOutput\"}"
+                        fi
+                        ;;
+                    
+                    "Reboot Device")
+                        if [ "$ActionName" = "REBOOT" ]
+                        then
+                            if ! echo "$Input1Value" | grep -qE '^Software$|^Hardware$'
+                            then
+                                echo '{"code":"1","output":"invalid reboot type"}'
+                            else
+                                if [ "$Input1Value" = "Software" ]
+                                then
+                                    echo '{"code":"0","output":"command received"}'
+                                    reboot > /dev/null 2>&1
+                                else
+                                    echo '{"code":"0","output":"command received"}'
+                                    output=$(${APIPath}/AI2DI4DO4/Board_Recycle_12V_Utility 2>&1)
+                                    retval=$?
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                                       
+                    "Get Date")
+                        if [ "$ActionName" = "GET" ]
+                        then
+                            if ! echo "$Input1Value" | grep -qE '^RTC$|^SYSTEM$'
+                            then
+                               echo '{"code":0,"output":"invalid command arguments"}'
+                            else
+                                if [ "$Input1Value" = "SYSTEM" ]
+                                then
+                                    SysTime=$(date +"%F %T")
+                                    echo "{\"code\":0,\"output\":\"System date and time: $SysTime\"}"
+                                else
+                                    HWTime=$(hwclock -r 2>&1 | awk -F' ' '{NF-=2;print}')
+                                    ModifiedHWTime=$(date -D"%c" -d"$HWTime" +"%F %T")
+                                    echo "{\"code\":0,\"output\":\"RTC date and time: $ModifiedHWTime\"}"
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                   "NTP Sync")
+                        if [ "$ActionName" = "SYNC" ]
+                        then
+                            #NTPSync=$(/etc/init.d/ntpsync restart 2>&1)
+                            #NTPSyncStatus=$(awk -F'=' '/SyncStatus/{print $2}' /tmp/ntpsyncstatus.cfg)
+                            #NTPSyncTime=$(awk -F'=' '/SyncTime/{print $2}' /tmp/ntpsyncstatus.cfg)
+                            #NTPSyncTime=$(echo "$NTPSyncTime" | sed "s/\"//g" )
+                            #if [ "$NTPSyncStatus" = "0" ]
+                            #then
+                                #echo "{\"code\":0,\"output\":\"status : success, Sync Time: $NTPSyncTime\"}"
+                            #else
+                                #echo "{\"code\":0,\"output\":\"NTP sync failure\"}"
+                            #fi
+                            
+                            /root/InterfaceManager/script/TimeSync.sh 
+                            echo '{"code":0,"output":"Invoked NTP Sync script"}'
+                            
+                            
+                        else
+							echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "Print on LCD")
+                        config_load "$MISCUtilitiesCfg"
+                        config_get CardType "$SectionName" CardType
+                        config_get CardNumber "$SectionName" CardNumber
+                        
+                        PrintStringLen=${#Input1Value}
+                        if [ "$PrintStringLen" -gt 16 ]
+                        then
+                            echo "{\"code\":1,\"output\":\"string length should not be greater than 16 characters\"}"
+                            exit 0
+                        fi 
+                        
+                        if [ "$ActionName" = "PRINT" ]
+                        then
+                            if echo "$Input2Value" | grep -qE '^[0-9]+$'
+                            then
+                                PrintLcdOutput=$(${APIPath}/AI2DI4DO4/Lcd_Print_Utility $Input2Value $Input3Value "$Input1Value" 2>&1)
+                                PrintLcdRetVal=$?
+                                if [ "$PrintLcdRetVal" != 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Lcd print failure\"}"
+                                else
+                                    echo "{\"code\":0,\"output\":\"Lcd print success\"}"
+                                fi
+                            else
+                                PrintLcdLine1Output=$(${APIPath}/AI2DI4DO4/Lcd_Print_Utility 1 $Input3Value "$Input1Value" 2>&1)
+                                PrintLcdLine1RetVal=$?
+                                PrintLcdLine2Output=$(${APIPath}/AI2DI4DO4/Lcd_Print_Utility 2 $Input3Value "$Input1Value" 2>&1)
+                                PrintLcdLine2RetVal=$?
+                                PrintLcdLine3Output=$(${APIPath}/AI2DI4DO4/Lcd_Print_Utility 3 $Input3Value "$Input1Value" 2>&1)
+                                PrintLcdLine3RetVal=$?
+                                PrintLcdLine4Output=$(${APIPath}/AI2DI4DO4/Lcd_Print_Utility 4 $Input3Value "$Input1Value" 2>&1)
+                                PrintLcdLine4RetVal=$?
+                                if [ "$PrintLcdLine1RetVal" != 0 ] || [ "$PrintLcdLine2RetVal" != 0 ] || [ "$PrintLcdLine3RetVal" != 0 ] || [ "$PrintLcdLine4RetVal" != 0 ]
+                                then
+                                    echo -e "{\"code\":1,\"output\":\"Lcd print failure\"}"
+                                else
+                                    echo "{\"code\":0,\"output\":\"Lcd print success\"}"
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "Clear LCD")
+                        config_load "$MISCUtilitiesCfg"
+                        config_get CardType "$SectionName" CardType
+                        config_get CardNumber "$SectionName" CardNumber
+                        
+                        if [ "$ActionName" = "CLEAR" ]
+                        then
+                            if echo "$Input1Value" | grep -qE '^[0-9]+$'
+                            then
+                                ClearLcdOutput=$(${APIPath}/AI2DI4DO4/Lcd_ClearLine_Utility $Input1Value 2>&1)
+                                ClearLcdRetVal=$?
+                                if [ "$ClearLcdRetVal" != 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"Clear Lcd failure \"}"
+                                else
+                                    echo "{\"code\":0,\"output\":\"cleared line $Input1Value on lcd\"}"
+                                fi
+                            elif [ "$Input1Value" = "ALL LINES" ]
+                            then
+                                ClearLcdLine1Output=$(${APIPath}/AI2DI4DO4/Lcd_ClearLine_Utility 1 2>&1)
+                                ClearLcdLine1RetVal=$?
+                                ClearLcdLine2Output=$(${APIPath}/AI2DI4DO4/Lcd_ClearLine_Utility 2 2>&1)
+                                ClearLcdLine2RetVal=$?
+                                ClearLcdLine3Output=$(${APIPath}/AI2DI4DO4/Lcd_ClearLine_Utility 3 2>&1)
+                                ClearLcdLine3RetVal=$?
+                                ClearLcdLine4Output=$(${APIPath}/AI2DI4DO4/Lcd_ClearLine_Utility 4 2>&1)
+                                ClearLcdLine4RetVal=$?
+                                if [ "$ClearLcdLine1RetVal" != 0 ] || [ "$ClearLcdLine2RetVal" != 0 ] || [ "$ClearLcdLine3RetVal" != 0 ] || [ "$ClearLcdLine4RetVal" != 0 ]
+                                then
+                                    echo -e "{\"code\":1,\"output\":\"failure\"}"
+                                else
+                                    echo "{\"code\":0,\"output\":\"cleared all lines successfully\"}"
+                                fi
+                            else
+                                echo "{\"code\":1,\"output\":\"Invalid input\"}"
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "Set Date")
+                        if [ "$ActionName" = "SET" ]
+                        then
+                            SetSystemDateOutput=$(date -s "$Input1Value" 2>&1)
+                            SetSystemDateRetVal=$?
+                            if [ "$SetSystemDateRetVal" != 0 ]
+                            then
+                                echo "{\"code\":1,\"output\":\"$SetSystemDateOutput\"}"
+                            else
+                                SetHardwareDateOutput=$(hwclock -w --localtime 2>&1)
+                                SetHardwareDateRetVal=$?
+                                if [ "$SetHardwareDateRetVal" != 0 ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"$SetHardwareDateOutput\"}"
+                                else
+                                    echo "{\"code\":0,\"output\":\"Date set successfully\"}"
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "Signal Strength")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            PortDetails="/tmp/InterfaceManager/status/${Input1Value}.ports" 
+                            ComPort=$(awk -F'=' '/ComPort=/{print $2}' "$PortDetails")
+                            if [ "x$ComPort" = "x" ]
+                            then
+                                echo "{\"code\":1,\"output\":\"com port not found\"}"
+                            else
+                                config_load modem
+                                config_get ModemManufacturer "$Input1Value" manufacturer
+                                config_get ModemModel "$Input1Value" model
+                                
+                                case "$ModemManufacturer" in 
+                                    "fibocom") 
+                                        case "$ModemModel" in 
+                                            "H330S")
+                                                GcomScript="/root/DiagnosticUtilities/scripts/fibocom_H330S_sigstrength.gcom"
+                                                ;;
+                                            *)
+                                                echo "{\"code\":1,\"output\":\"modem model $ModemModel not supported\"}"
+                                                exit 1
+                                                ;;
+                                        esac
+                                        ;;
+                                    *)
+                                        echo "{\"code\":1,\"output\":\"modem manufacturer $ModemManufacturer not supported\"}"
+                                        exit 1
+                                        ;;
+                                esac 
+    
+                                GetStrength=$(gcom -d "$ComPort" -s "$GcomScript" 2>&1)
+                                CSQ=$(echo "$GetStrength" | awk -F[,\ ] '/^\+CSQ/ {print $2}')
+                                if [ "x$CSQ" != "x" ]
+                                then
+                                    if [ $CSQ -ge 0 -a $CSQ -le 31 ]
+                                    then
+                                        CSQ_PER=$(($CSQ * 100/31))
+                                        CSQ_PER=$CSQ_PER"%"
+                                        echo "{\"code\":0,\"output\":\"Signal strength: $CSQ_PER\"}"
+                                    else
+                                        CSQ_PER="-"
+                                        echo "{\"code\":1,\"output\":\"Signal strength: $CSQ_PER\"}"
+                                    fi
+                                else
+                                    CSQ_PER="-"
+                                    echo "{\"code\":1,\"output\":\"Signal strength: $CSQ_PER\"}"
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                    
+                    "Update Card Identification Number")
+                        if [ "$ActionName" = "UPDATE" ]
+                        then
+                            PortDetails="/tmp/InterfaceManager/status/${Input1Value}.ports" 
+                            ComPort=$(awk -F'=' '/ComPort=/{print $2}' "$PortDetails")
+                            if [ "x$ComPort" = "x" ]
+                            then
+                                echo "{\"code\":1,\"output\":\"com port not found\"}"
+                            else
+                                config_load modem
+                                config_get ModemManufacturer "$Input1Value" manufacturer
+                                config_get ModemModel "$Input1Value" model
+                                
+                                case "$ModemManufacturer" in 
+                                    "fibocom") 
+                                        case "$ModemModel" in 
+                                            "H330S")
+                                                GcomScript="/root/DiagnosticUtilities/scripts/fibocom_H330S_ccid.gcom"
+                                                ;;
+                                            *)
+                                                echo "{\"code\":1,\"output\":\"modem model $ModemModel not supported\"}"
+                                                exit 1
+                                                ;;
+                                        esac
+                                        ;;
+                                    *)
+                                        echo "{\"code\":1,\"output\":\"modem manufacturer $ModemManufacturer not supported\"}"
+                                        exit 1
+                                        ;;
+                                esac 
+    
+                                GetCCID=$(gcom -d "$ComPort" -s "$GcomScript" 2>&1)
+                                CCID=$(echo "$GetCCID" | awk -F[,\ ] '/^\+CCID/ {print $2}')
+                                CCID=$(echo $CCID | tr -d '\r')
+                                if [ "x$CCID" != "x" ]
+                                then
+                                    echo "{\"code\":1,\"output\":\"ccid: $CCID\"}"
+                                    uci set DeviceConfigCtrl.devicedetails.CCIDNumber=${CCID}
+                                    uci commit DeviceConfigCtrl
+                                else
+                                    echo "{\"code\":1,\"output\":\"ccid: $CCID\"}"
+                                fi
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "Network Mode")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            PortDetails="/tmp/InterfaceManager/status/${Input1Value}.ports"
+                            ComPort=$(awk -F'=' '/ComPort=/{print $2}' "$PortDetails")
+                            if [ "x$ComPort" = "x" ]
+                            then
+                                echo "{\"code\":1,\"output\":\"com port not found\"}"
+                            else
+                                config_load modem
+                                config_get ModemManufacturer "$Input1Value" manufacturer
+                                config_get ModemModel "$Input1Value" model
+                                
+                                case "$ModemManufacturer" in 
+                                    "fibocom") 
+                                        case "$ModemModel" in 
+                                            "H330S") 
+                                                GcomScript="/root/DiagnosticUtilities/scripts/fibocom_H330S_netmode.gcom"
+                                                ;;
+                                            *)
+                                                echo "{\"code\":1,\"output\":\"modem model $ModemModel not supported\"}"
+                                                exit 1
+                                                ;;
+                                        esac
+                                        ;;
+                                    *)
+                                        echo "{\"code\":1,\"output\":\"modem manufacturer $ModemManufacturer not supported\"}"
+                                        exit 1
+                                        ;;
+                                esac
+                                
+                                GetMode=$(gcom -d "$ComPort" -s "$GcomScript" 2>&1)
+                                XREG=$(echo "$GetMode" | awk -F[,\ ] '/^\+XREG/ {print $3}')             
+                                if [ "x$XREG" != "x" ]                                                     
+                                then                                                                                 
+                                    case $XREG in
+                                        0) NetMode="Not Registered";;
+                                        1) NetMode="GPRS";;
+                                        2) NetMode="EDGE";;
+                                        3) NetMode="WCDMA";; 
+                                        4) NetMode="HSDPA";;
+                                        5) NetMode="HSUPA";;                      
+                                        6) NetMode="HSUPA & HSDPA";;
+                                        7) NetMode="GSM";;
+                                        8) NetMode="HSPA+";;
+                                        *) NetMode="$XREG";;                               
+                                    esac
+                                else
+                                    NetMode="-"
+                                fi
+                                echo "{\"code\":1,\"output\":\"Network Mode: $NetMode\"}"
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "Battery Status")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                            BatteryStatus=$(${APIPath}/AI2DI4DO4/stc3115_Advanced_Without_while 2>&1)
+                            BatteryStatusRetVal=$?
+                            if [ "$BatteryStatusRetVal" != "0" ]
+                            then
+                                echo "{\"code\":0,\"output\":\"Battery not present\"}"
+                            else    
+                                echo "{\"code\":0,\"output\":\"$BatteryStatus\"}"
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "SDCard Test")
+                        if [ "$ActionName" = "TEST" ]
+                        then
+                            SDCardStatus=$(/root/DiagnosticUtilities/scripts/SDCardTest.sh 2>&1)
+                            echo $SDCardStatus > /tmp/test.txt
+                            SDCardStatusRetVal=$?
+                            if [ "$SDCardStatusRetVal" != "0" ]
+                            then 
+                                echo "{\"code\":0,\"output\":\"$SDCardStatus\"}"
+                            else
+                                echo "{\"code\":0,\"output\":\"$SDCardStatus\"}"
+                            fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+                    "Run lsusb")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                        lausbinfo=$(${USRBINCMDPATH}/lsusb 2>&1)
+		                        
+		                        if [ "x$lausbinfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty lausbinfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$lausbinfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						
+				  "Run lsusb -t")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                        lausbtinfo=$(${USRBINCMDPATH}/lsusb -t 2>&1)
+		                        
+		                        if [ "x$lausbtinfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty lausbtinfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$lausbtinfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;		
+						
+				 "Run ps w")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                        pswinfo=$(/bin/ps w 2>&1)
+		                        
+		                        if [ "x$pswinfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty pswinfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$pswinfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;	
+						
+				 "Run Test App")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+								config_load testappenable
+								config_get enable "testappen" enable
+								if [ "$enable" != '0' ]
+                                then 
+									testappinfo=$($testappinfoscript)
+									echo '{"code":0,"output":"Invoked Test Application"}'
+								else
+									echo '{"code":0,"output":"Cannot run Test Application"}'
+								fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;		
+						
+				"Show Test Result")
+		                    if [ "$ActionName" = "SHOW" ]
+		                    then
+		                        showtestresultinfo=$(cat /root/Test_APP/testreport.txt 2>&1)
+								if [ "x$showtestresultinfo" = "x" ]
+									then
+										echo "{\"code\":1,\"output\":\"empty Test Result \"}"
+									else
+										echo -e "{\"code\":0,\"output\":\n\"$showtestresultinfo\"}"
+								fi
+		                        
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;					
+						
+			   "Restart mwan3")
+		                    if [ "$ActionName" = "RESTART" ]
+		                    then
+		                        restartmwan3info=$(/usr/sbin/mwan3 restart 2>&1)
+		                        
+		                        echo '{"code":0,"output":"Restarting mwan3"}'
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;				
+						
+			   "Read GPIO 499")
+		                    if [ "$ActionName" = "READ" ]
+		                    then
+		                        GPIO499Info=$(cat /sys/class/gpio/gpio499/value 2>&1)
+		                        
+		                        if [ "x$GPIO499Info" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty GPIO499Info \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$GPIO499Info\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;	
+						
+			 "Read GPIO 500")
+		                    if [ "$ActionName" = "READ" ]
+		                    then
+		                        GPIO500Info=$(cat /sys/class/gpio/gpio500/value 2>&1)
+		                        
+		                        if [ "x$GPIO500Info" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty GPIO500Info \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$GPIO500Info\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						
+			"Ping")
+			
+							if [ "$ActionName" = "PING" ]
+		                    then
+		                        pinginfo=$(/bin/ping -c 5 "$Input1Value"  2>&1)
+		                        
+		                        if [ "x$pinginfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty pinginfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$pinginfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						
+			"Set Serial Number")
+			
+					if [ "$ActionName" = "SET" ]
+		                    then
+		                        
+		                        len=`echo $Input1Value |awk '{print length}'`
+		                        if [ $len -eq 11 ]
+		                        then
+									temp=$(echo "$Input1Value" | cut -b 1,2)
+		                              if [ $temp = "13" ]
+		                              then
+										uci set boardconfig.board.serialnum="$Input1Value"
+				                        uci commit boardconfig
+				                        
+				                        uci set boardconfigfile.boardconfigfile.serialnum="$Input1Value"
+				                        uci commit boardconfigfile
+			                        
+			                            echo "{\"code\":0,\"output\":\"Set Serial Number : SUCCESS \"}"
+			                          else
+			                             echo "{\"code\":1,\"output\":\"Invalid Serial Number \"}"
+			                        fi
+			                       # echo "{\"code\":0,\"output\":\"$temp\"}"
+		                        else
+		                        
+			                         echo "{\"code\":1,\"output\":\"Invalid serial number \"}"
+		                        fi 
+		                        
+		             else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		             fi
+						;;
+						
+			"Set MAC ID")
+			
+					if [ "$ActionName" = "SET" ]
+		                    then		                    
+		                        Serial=$(uci get boardconfig.board.serialnum)
+		                        
+								macfirst=$(echo "$Serial" | cut -b 2,3)
+
+								macsecond=$(echo "$Serial" | cut -b 4,5)
+								
+								macthird=$(echo "$Serial" | cut -b 6)
+								
+								last=$(echo "$Serial" | tail -c 5)
+								
+								macfour=$(echo "$last" | cut -b 1,2)
+								
+								macfive=$(echo "$last" | cut -b 3,4)
+								
+								uci set boardconfig.board.macid="9C:${macfirst}:${macsecond}:${macthird}0:${macfour}:${macfive}"
+								
+								uci set boardconfig.board.macid1="9C:${macfirst}:${macsecond}:${macthird}1:${macfour}:${macfive}"
+								
+								uci set boardconfig.board.macid2="9C:${macfirst}:${macsecond}:${macthird}2:${macfour}:${macfive}"
+								
+								uci set boardconfig.board.macid3="9C:${macfirst}:${macsecond}:${macthird}3:${macfour}:${macfive}"
+								
+								uci commit boardconfig
+		                        
+		                        echo "{\"code\":0,\"output\":\"Set MAC ID : SUCCESS \"}"
+		                        
+		             else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		             fi
+						;;			
+						
+			"SpeedTest")
+			
+							if [ "$ActionName" = "RUN" ]
+		                    then
+		                        speedinfo=$($SpeedTestScript "$Input1Value"  2>&1)
+		                        
+		                        if [ "x$speedinfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty speedinfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$speedinfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;			
+						
+			"Run AT Command")
+			
+							if [ "$ActionName" = "RUN" ]
+		                    then
+		                        atcommandinfo=$($atcommandinfoscript "$Input1Value"  2>&1)
+		                        
+		                        if [ "x$atcommandinfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty command output \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$atcommandinfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+								
+						
+		   "traceroute")
+			
+							if [ "$ActionName" = "RUN" ]
+		                    then
+		                        tracerouteinfo=$(/bin/traceroute "$Input1Value"  2>&1)
+		                        
+		                        if [ "x$tracerouteinfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty tracerouteinfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$tracerouteinfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;				
+						
+		 							
+			"ReadGPIO")
+						if [ "$ActionName" = "READ" ]
+		                    then
+		                       if ! echo "$Input1Value" | grep -qE '^SIM1PRESENCE$|^SIM2PRESENCE$|^SIMSELECTION$'
+		                            then
+		                               echo '{"code":0,"output":"invalid command arguments"}'
+		                       else
+				                     if [ "$Input1Value" = "SIM1PRESENCE" ] 
+				                     then
+				                        GPIO499Info=$(cat /sys/class/gpio/gpio499/value 2>&1)
+				                        
+				                        if [ "x$GPIO499Info" = "x" ]
+				                        then
+				                            echo "{\"code\":1,\"output\":\"empty GPIO499Info \"}"
+				                        else
+				                            echo -e "{\"code\":0,\"output\":\n\"$GPIO499Info\"}"
+				                        fi
+				                     elif [ "$Input1Value" = "SIM2PRESENCE" ] 
+				                     then
+				                         GPIO500Info=$(cat /sys/class/gpio/gpio500/value 2>&1)
+				                        
+				                        if [ "x$GPIO500Info" = "x" ]
+				                        then
+				                            echo "{\"code\":1,\"output\":\"empty GPIO500Info \"}"
+				                        else
+				                            echo -e "{\"code\":0,\"output\":\n\"$GPIO500Info\"}"
+				                        fi
+				                     else
+				                          GPIO502Info=$(cat /sys/class/gpio/gpio502/value 2>&1)
+				                        
+				                        if [ "x$GPIO502Info" = "x" ]
+				                        then
+				                            echo "{\"code\":1,\"output\":\"empty GPIO502Info \"}"
+				                        else
+				                            echo -e "{\"code\":0,\"output\":\n\"$GPIO502Info\"}"
+				                        fi 
+				                     fi
+				             fi
+				               
+				                       
+		                else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                fi
+						;;								
+						     
+                        
+                  "ipsec status all")
+		                    if [ "$ActionName" = "GET" ]
+		                    then
+		                        ipsecstatusallinfo=$(${USRCMDPATH}/ipsec statusall 2>&1)
+		                        
+		                        if [ "x$ipsecstatusallinfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty ipsecstatusallinfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$ipsecstatusallinfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						
+				"ClearSIM1Data")
+		                    if [ "$ActionName" = "CLEAR" ]
+		                    then
+		                        clearsim1datainfo=$($ClearSIM1Datascript 2>&1)
+		                        
+		                        if [ "x$clearsim1datainfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty clearsim1datainfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$clearsim1datainfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						
+				"ClearSIM2Data")
+		                    if [ "$ActionName" = "CLEAR" ]
+		                    then
+		                        clearsim2datainfo=$($ClearSIM2Datascript 2>&1)
+		                        
+		                        if [ "x$clearsim1datainfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty clearsim1datainfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$clearsim1datainfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						
+						
+						"Create Bridge with SW_LAN")
+		                    if [ "$ActionName" = "CREATE" ]
+		                    then
+		                    rm -rf /tmp/bridge_created.txt
+                            sh /root/InterfaceManager/script/Create_Bridge.sh $Input1Value 
+                            out=$(cat /tmp/bridge_created.txt)   
+                                  if [ "x$out" = "x" ]
+				  	              then
+				 			 	       echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+							      else
+			                           echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                      fi		
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+					
+						"Show Bridge")
+		                    if [ "$ActionName" = "SHOW" ]
+		                    then
+		                     rm /tmp/bridge.txt
+								        brctl show  > /tmp/bridge.txt  
+								           out=$(cat /tmp/bridge.txt) 
+								        		
+											   if [ "x$out" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                                   fi				                        
+									
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;				
+						
+						"Delete Bridge")
+		                    if [ "$ActionName" = "DELETE" ]
+		                    then
+		                    rm -rf /tmp/bridge_deleted.txt
+                            sh /root/InterfaceManager/script/Delete_Bridge.sh 
+                            out=$(cat /tmp/bridge_deleted.txt)   
+                                  if [ "x$out" = "x" ]
+				  	              then
+				 			 	       echo "{\"code\":1,\"output\":\"command not executed successfully\"}"
+							      else
+			                           echo -e "{\"code\":0,\"output\":\n\"$out\"}"
+			                      fi		
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+						
+						#"Delete Interface from Bridge")
+		                    #if [ "$ActionName" = "DELETE" ]
+		                    #then
+		                          #echo $Input1Value
+		                          #brctl delif mybr0 $Input1Value 
+								   #echo '{"code":0,"output":"Deleted "$Input1Value" from Bridge"}'					                        
+									
+							 #else
+		                        #echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    #fi
+						#;;				
+						
+						
+					     "Switch SIM to Secondary (Takes >2 mins)")
+                        if [ "$ActionName" = "RUN" ]
+                        then
+                            #NTPSync=$(/etc/init.d/ntpsync restart 2>&1)
+                            #NTPSyncStatus=$(awk -F'=' '/SyncStatus/{print $2}' /tmp/ntpsyncstatus.cfg)
+                            #NTPSyncTime=$(awk -F'=' '/SyncTime/{print $2}' /tmp/ntpsyncstatus.cfg)
+                            #NTPSyncTime=$(echo "$NTPSyncTime" | sed "s/\"//g" )
+                            #if [ "$NTPSyncStatus" = "0" ]
+                            #then
+                                #echo "{\"code\":0,\"output\":\"status : success, Sync Time: $NTPSyncTime\"}"
+                            #else
+                                #echo "{\"code\":0,\"output\":\"NTP sync failure\"}"
+                            #fi
+                            
+                            /bin/simswitch 2 
+                            echo '{"code":0,"output":"Invoked sim switch script"}'
+                            
+                            
+                        else
+							echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;				
+				"Force Send GPS Packet")
+		                    if [ "$ActionName" = "SEND" ]
+		                    then
+			                    config_load /etc/config/sysconfig
+                                config_get cellularmodem1 "sysconfig" cellularmodem1
+			                    if [ "$cellularmodem1" = "QuectelEC200T" ]
+			                    then
+			                    echo "{\"code\":0,\"output\":\"Present 4G Module does not support sending GPS SIA Packet\"}"
+			                    else
+				                    	pingtest=$($PingTestScript)
+								        pingres=$(cat /bin/pingTest.txt)
+								
+										if [ "$pingres" = "0" ]
+										then
+				                        gpsrequestinfo=$(mosquitto_pub -d -t "Silbo/GPS/GPSPeriodicSub" -m "GPSPeriodicReq" 2>&1)
+								               echo "{\"code\":0,\"output\":\"GPS command published\"}"
+								               break
+								        else
+								               echo "{\"code\":1,\"output\":\"WAN is Down\"}"
+								        fi
+								 fi       
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi		                    
+						;;		
+						
+				"Force Send Health Packet")
+		                    if [ "$ActionName" = "SEND" ]
+		                    then		                    
+		                        pingtest=$($PingTestScript)
+						        pingres=$(cat /bin/pingTest.txt)
+						
+								if [ "$pingres" = "0" ]
+								then
+						               mosquitto_pub -h "$ReAPMqttHost" -p "$ReAPMqttPort" -t "$ReAPMqttHealthResponse" -m "$pingres" -q "1"
+						               echo "{\"code\":0,\"output\":\"Health command published\"}"
+
+						               break
+						        else
+						               echo "{\"code\":1,\"output\":\"WAN is Down\"}"
+						        fi
+		                    
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;				
+						
+				 "Show Board Configuration")
+		                    if [ "$ActionName" = "SHOW" ]
+		                    then
+		                        rm /tmp/boardinfo.txt
+		                        config_load boardconfig
+		                        config_get serialnum "board" serialnum
+		                        config_get moduletype "board" moduletype
+		                        config_get macid "board" lanmacid                                
+                                config_get macid1 "board" wanmacid   
+                                config_get macid2 "board" wifimacid   
+		                        config_get imei "board" imei
+		                        config_get FirmwareVer "board" FirmwareVer
+		                        config_get ApplicationSwVer "board" ApplicationSwVer
+
+								board_name=$(cat /tmp/sysinfo/board_name)
+
+		                        echo "Serial Number : $serialnum" >> /tmp/boardinfo.txt
+		                        if echo "$board_name" | grep -qE "(Silbo_RF44|GD44|RF04R)";
+								then
+								     echo "WAN MAC ID : $macid1" >> /tmp/boardinfo.txt
+								else
+									
+									if echo "$board_name" | grep -qE "(Silbo_IAB44-B_GW|PC312)";
+									then
+										echo "LAN MAC ID : $macid" >> /tmp/boardinfo.txt
+									else
+										echo "WAN MAC ID : $macid1" >> /tmp/boardinfo.txt
+										echo "LAN MAC ID : $macid" >> /tmp/boardinfo.txt
+									fi
+								fi
+								
+								
+								var=$(cat /tmp/sysinfo/board_name)
+								if  [ "$var" != "Silbo_RD44-A" ] && [ "$var" != "Silbo_RD44-3" ] && [ "$var" != "Silbo_RF04-A_GW" ] && [ "$var" != "Silbo_IA04-A" ]  ;then
+		                           echo "WIFI MAC ID : $macid2" >> /tmp/boardinfo.txt
+		                        fi
+					if [ "$board_name" != "Silbo_PC312_GW" ]; then
+		                        	echo "IMEI : $imei" >> /tmp/boardinfo.txt
+					fi
+		                        echo "Firmware Version : $FirmwareVer" >> /tmp/boardinfo.txt
+		                        echo "Application Software Version : $ApplicationSwVer" >> /tmp/boardinfo.txt
+
+
+		                        boardinfo=$(cat /tmp/boardinfo.txt)
+		                        if [ "x$boardinfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty boardinfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$boardinfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;		
+
+				"Run ifconfig")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+		                        ifconfiginfo=$(${CMDPATH}/ifconfig 2>&1)
+		                        
+		                        if [ "x$ifconfiginfo" = "x" ]
+		                        then
+		                            echo "{\"code\":1,\"output\":\"empty ifconfiginfo \"}"
+		                        else
+		                            echo -e "{\"code\":0,\"output\":\n\"$ifconfiginfo\"}"
+		                        fi
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+						
+			"iPerf3 Server")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then
+								                #Iperfpid=$(pgrep -f "iperf3" &) 
+								                 #kill -9 $Iperfpid
+								                 rm /tmp/iperf3log.txt
+								                 iperfserverinfo=$(iperf3 -s -1 --logfile  /tmp/iperf3log.txt )                 
+												out=$(cat /tmp/iperf3log.txt) 
+												#iperfserverinfo=$(${USRBINCMDPATH}/iperf3 -s 2>&1 & )
+											   if [ "x$iperfserverinfo" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command executed successfully $out\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$iperfserverinfo\"}"
+			                                   fi				                        
+										#PSOutput=$(ps w)
+									#if echo "$PSOutput" | grep -i "iperf3"
+									#then
+										#echo "{\"code\":1,\"output\":\"command executed successfully\"}"		                        
+									#else
+										#echo "{\"code\":0,\"output\":\"invalid action\"}"
+									#fi
+							 else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;
+					
+			"iPerf3 Client")
+		                    if [ "$ActionName" = "RUN" ]
+		                    then		  
+		                            rm /tmp/iperf3log.txt
+								                 iperfserverinfo=$(iperf3 -c "$Input1Value" --logfile  /tmp/iperf3log.txt )                 
+												out=$(cat /tmp/iperf3log.txt) 
+												#iperfserverinfo=$(${USRBINCMDPATH}/iperf3 -s 2>&1 & )
+											   if [ "x$iperfserverinfo" = "x" ]
+												then
+													echo "{\"code\":1,\"output\":\"command executed successfully $out\"}"
+												 else
+			                                      echo -e "{\"code\":0,\"output\":\n\"$iperfserverinfo\"}"
+			                                   fi		                         
+		 
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;	
+								
+			   "ReadSIMInfo")
+							if [ "$ActionName" = "READ" ]
+		                    then		                        
+		                         config_load "$sysconfigUCIPath"
+                                 config_get CellularOperationMode "$sysconfigsection" CellularOperationMode
+                                 
+									if ! echo "$Input1Value" | grep -qE '^SIM1$|^SIM2$'
+		                            then
+		                               echo '{"code":0,"output":"invalid command arguments"}'
+		                            else
+		                                if [ "$Input1Value" = "SIM1" ]
+		                                then
+		                                ActiveSIM=$(cat /tmp/simnumfile)
+		                                if [ "$ActiveSIM" = "1" ] 
+		                                then		                                
+		                                    siminfo=$($siminfoscript)
+			                        
+					                        if [ "x$siminfo" = "x" ]
+					                        then
+					                            echo "{\"code\":1,\"output\":\"empty siminfo \"}"
+					                        else
+					                            activesim= $(cat /bin/siminfo.txt | grep "Active SIM") 
+					                            ccidoutput=$(cat /bin/siminfo.txt | grep "QCCID" | cut -d ":" -f2)                          
+					                           # echo -e "{\"code\":0,\"output\":\n\"$activesim\"}"
+					                            echo -e "{\"code\":0,\"output\":\n\"$ccidoutput\"}"
+					                           
+						                        if [ "x$ccidoutput" = "x" ]
+						                        then
+													echo -e "{\"code\":0,\"output\":\n\"CCID empty\"}"
+						                        else
+						                           echo -e "{\"code\":0,\"output\":\n\"QCCID : $ccidoutput\"}"
+						                        fi
+					                        fi
+					                        else
+					                           echo -e "{\"code\":0,\"output\":\n\"Currently SIM is not active\"}"
+					                      fi 
+		                                else
+		                                   
+		                                     if [ "$CellularOperationMode" = "singlecellularsinglesim" ]
+											 then
+												  echo -e "{\"code\":0,\"output\":\n\"Cellular Operation mode doesn't support this action\"}"
+										     else
+										     ActiveSIM=$(cat /tmp/simnumfile)
+		                                    if [ "$ActiveSIM" = "2" ] 
+		                                    then	
+										        	 siminfo=$($siminfoscript)
+			                        
+							                        if [ "x$siminfo" = "x" ]
+							                        then
+							                            echo "{\"code\":1,\"output\":\"empty siminfo \"}"
+							                        else
+							                            activesim2= $(cat /bin/siminfo.txt | grep "Active SIM") 
+							                            ccidoutput2=$(cat /bin/siminfo.txt | grep "QCCID" | cut -d ":" -f2)                          
+									                    if [ "x$ccidoutput2" = "x" ]
+								                        then
+															echo -e "{\"code\":0,\"output\":\n\"Empty CCID2\"}"
+								                        else
+								                           echo -e "{\"code\":0,\"output\":\n\"QCCID : $ccidoutput2\"}"
+								                        fi
+							                        fi
+							                        else
+							                        
+							                        echo -e "{\"code\":0,\"output\":\n\"Currently SIM is not active\"}"
+							                        fi			  		  
+				   
+											 fi  
+		                                fi
+		                            fi
+                                 
+			                        
+		                    else
+		                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+		                    fi
+						;;	
+						
+				#////////////////////////////////////
+						
+						 "Data Usage")
+		                    if [ "$ActionName" = "SHOW" ]
+		                    then
+		                    rm -rf /tmp/grepdata.txt
+                            sh /root/InterfaceManager/script/DataUsage.sh $Input1Value $Input2Value  $Input3Value > /dev/null 2>&1
+                            data_usage_info=$(cat /tmp/grepdata.txt)   
+                             if [[ -z $data_usage_info ]]                                                           
+                                        then                                                                                                 
+                                            echo "{\"code\":1,\"output\":\"Empty data_usage_info\"}"                              
+                                        else                                                                                                 
+                                            echo -e "{\"code\":0,\"output\":\n\"$data_usage_info\"}" 
+                                                                                         
+                                        fi  
+                            else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}"                           
+		                    fi		
+							;;	
+							
+							
+							 "Monthly Data Usage")
+		                    if [ "$ActionName" = "SHOW" ]
+		                    then
+		                    rm -rf /etc/each_month_data_usage.txt
+		                    sh /root/InterfaceManager/script/Monthly_Data_Usage.sh $Input1Value $Input2Value $Input3Value > /dev/null 2>&1
+		                    monthly_data_usage_info=$(cat /etc/each_month_data_usage.txt) 
+		                    if [[ -z $monthly_data_usage_info ]]                                                           
+                                        then                                                                                                 
+                                            echo "{\"code\":1,\"output\":\"Empty monthly_data_usage_info\"}"                              
+                                        else                                                                                                 
+                                            echo -e "{\"code\":0,\"output\":\n\"$monthly_data_usage_info\"}" 
+                                                                                         
+                                        fi  
+		                     else
+                            echo  "{\"code\":1,\"output\":\"invalid action\"}" 
+                                                      
+		                    fi	
+		                  
+							;;	             
+            						
+			  "ReadLogFiles")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                          config_load "$sysconfigUCIPath"
+                          config_get CellularOperationMode "$sysconfigsection" CellularOperationMode
+                          config_get cellularmodem1 "sysconfig" cellularmodem1
+
+                            if ! echo "$Input1Value" | grep -qE '^simnumfile$|^HealthMsgLog$|^RespHealthMsgLog$|^GPSMsgLog$|^RespGPSMsgLog$|^SIM1ConsumedData$|^SIM2ConsumedData$'
+                            then
+                                echo '{"code":"1","output":"invalid file type"}'
+                            else
+	                              if [ "$Input1Value" = "simnumfile" ]
+								  then
+									if [  "$CellularOperationMode" = "singlecellulardualsim" ]
+	                                then	
+										simnuminfo=$(cat /tmp/simnumfile 2>&1)
+										if [ "x$simnuminfo" = "x" ]
+											then
+												echo "{\"code\":1,\"output\":\"empty simnuminfo \"}"
+											else
+												echo -e "{\"code\":0,\"output\":\n\"$simnuminfo\"}"
+										fi
+				                    								
+									else
+									echo "{\"code\":1,\"output\":\"CellularOperationMode doesn't support this action\"}" 
+									fi
+									 elif [ "$Input1Value" = "HealthMsgLog" ] 
+				                     then
+				                         healthmsgInfo=$(cat /tmp/Log/HealthMsgLog 2>&1)
+				                         healthmsgInfo=$(echo "$healthmsgInfo" | sed 's/"/ /g')                                         
+
+				                        if [ "x$healthmsgInfo" = "x" ]
+				                        then
+				                            echo "{\"code\":1,\"output\":\"empty healthmsgInfo \"}"
+				                        else
+				                            echo -e "{\"code\":0,\"output\":\n\"$healthmsgInfo\"}"
+				                        fi
+				                       elif [ "$Input1Value" = "RespHealthMsgLog" ] 
+				                     then
+				                         resphealthmsgInfo=$(cat /tmp/Log/RespHealthMsgLog 2>&1)
+				                         resphealthmsgInfo=$(echo "$resphealthmsgInfo" | sed 's/"/ /g')                                         
+
+				                        if [ "x$resphealthmsgInfo" = "x" ]
+				                        then
+				                            echo "{\"code\":1,\"output\":\"empty resphealthmsgInfo \"}"
+				                        else
+				                            echo -e "{\"code\":0,\"output\":\n\"$resphealthmsgInfo\"}"
+				                        fi
+				                      
+				                      elif [ "$Input1Value" = "GPSMsgLog" ] 
+				                      then
+					                     if [  "$cellularmodem1" != "QuectelEC200T" ]
+		                                then				                         
+					                        gpsmsgInfo=$(cat /tmp/Log/GPSMsgLog 2>&1)
+					                        gpsmsgInfo=$(echo "$gpsmsgInfo" | sed 's/"/ /g')                                         
+			                        
+					                        if [ "x$gpsmsgInfo" = "x" ]
+					                        then
+					                            echo "{\"code\":1,\"output\":\"empty gpsmsgInfo \"}"
+					                        else
+					                            echo -e "{\"code\":0,\"output\":\n\"$gpsmsgInfo\"}"
+					                        fi
+						                    else echo "{\"code\":1,\"output\":\"Modem doesn't support this action\"}" 
+					                     fi  
+				                        
+				                     elif [ "$Input1Value" = "RespGPSMsgLog" ] 
+				                     then
+					                     if [  "$cellularmodem1" != "QuectelEC200T" ]
+			                             then				                     
+					                         respgpsmsgInfo=$(cat /tmp/Log/RespGPSMsgLog 2>&1)
+					                         respgpsmsgInfo=$(echo "$respgpsmsgInfo" | sed 's/"/ /g')                                         
+	
+						                        if [ "x$respgpsmsgInfo" = "x" ]
+						                        then
+						                            echo "{\"code\":1,\"output\":\"empty respgpsmsgInfo \"}"
+						                        else
+						                            echo -e "{\"code\":0,\"output\":\n\"$respgpsmsgInfo\"}"
+						                        fi 
+				                         else echo "{\"code\":1,\"output\":\"Modem doesn't support this action\"}" 
+	        				           fi 
+        				         
+        				            
+        				            elif [ "$Input1Value" = "SIM1ConsumedData" ] 
+				                     then
+				                     			                     
+				                         respsim1consumedmsgInfo=$(cat $SIM1ConsumedDatafile 2>&1)				                                          
+
+				                        if [ "x$respsim1consumedmsgInfo" = "x" ]
+				                        then
+				                            echo "{\"code\":1,\"output\":\"empty respsim1consumedmsgInfo \"}"
+				                        else
+				                            echo -e "{\"code\":0,\"output\":\n\"$respsim1consumedmsgInfo\"}"
+				                        fi 
+				                    #fi   
+				                    
+				                    elif [ "$Input1Value" = "SIM2ConsumedData" ] 
+				                     then
+				                     			                     
+				                         respsim2consumedmsgInfo=$(cat $SIM2ConsumedDatafile 2>&1)
+				                                                        
+
+				                        if [ "x$respsim2consumedmsgInfo" = "x" ]
+				                        then
+				                            echo "{\"code\":1,\"output\":\"empty respsim2consumedmsgInfo \"}"
+				                        else
+				                            echo -e "{\"code\":0,\"output\":\n\"$respsim2consumedmsgInfo\"}"
+				                        fi 
+				                    #fi      
+				                     
+								    else
+				                        echo "{\"code\":1,\"output\":\"invalid action\"}"
+									fi		
+						fi
+						
+						 #if ! echo "$Input1Value" | grep -qE '^simnumfile$|^HealthMsgLog$'
+		                 #then
+		                               #echo '{"code":0,"output":"invalid command arguments"}'
+		                              #config_load "$sysconfigUCIPath"
+									  #config_get CellularOperationMode "$sysconfigsection" CellularOperationMode
+									  #config_get cellularmodem1 "sysconfig" cellularmodem1
+		                       #else
+				                     #if [ "$Input1Value" = "simnumfile" ] 
+				                  		  #then
+									#if [  "$CellularOperationMode" = "singlecellulardualsim" ]
+	                              #then	
+										#simnuminfo=$(cat /tmp/simnumfile 2>&1)
+										#if [ "x$simnuminfo" = "x" ]
+											#then
+												#echo "{\"code\":1,\"output\":\"empty simnuminfo \"}"
+											#else
+												#echo -e "{\"code\":0,\"output\":\n\"$simnuminfo\"}"
+										#fi
+				                    								
+									#else
+									#echo "{\"code\":1,\"output\":\"CellularOperationMode doesn't support this action\"}" 
+									#fi
+				                     #elif [ "$Input1Value" = "SIM2PRESENCE" ] 
+				                     #then
+				                         #GPIO500Info=$(cat /sys/class/gpio/gpio500/value 2>&1)
+				                        
+				                        #if [ "x$GPIO500Info" = "x" ]
+				                        #then
+				                            #echo "{\"code\":1,\"output\":\"empty GPIO500Info \"}"
+				                        #else
+				                            #echo -e "{\"code\":0,\"output\":\n\"$GPIO500Info\"}"
+				                        #fi
+				                     #else
+				                          #GPIO502Info=$(cat /sys/class/gpio/gpio502/value 2>&1)
+				                        
+				                        #if [ "x$GPIO502Info" = "x" ]
+				                        #then
+				                            #echo "{\"code\":1,\"output\":\"empty GPIO502Info \"}"
+				                        #else
+				                            #echo -e "{\"code\":0,\"output\":\n\"$GPIO502Info\"}"
+				                        #fi 
+				                     #fi
+				             #fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;	
+                        
+                        
+                        "ReadInterfaceStatus")
+                        if [ "$ActionName" = "READ" ]
+                        then
+                         
+                            if ! echo "$Input1Value" | grep -qE '^EWAN1$|^EWAN2$|^CWAN1$|^CWAN2$|^CWAN1_0$|^CWAN1_1$|^WIFI_WAN$'
+		                            then
+                                echo '{"code":"1","output":"invalid file type"}'
+                            else
+	                                if [ "$Input1Value" = "EWAN1" ]
+									then
+												EWAN1info=$(cat /tmp/InterfaceStatus/EWAN1Status 2>&1)
+												if [ "x$EWAN1info" = "x" ]
+													then
+														echo "{\"code\":1,\"output\":\"empty EWAN1info \"}"
+													else
+														echo -e "{\"code\":0,\"output\":\n\"$EWAN1info\"}"
+														
+												fi
+					                    else if [ "$Input1Value" = "EWAN2" ]
+					                    then
+					                       # echo "{\"code\":1,\"output\":\"invalid action EWAN1\"}"
+					                        
+					                        EWAN2info=$(cat /tmp/InterfaceStatus/EWAN2Status 2>&1)
+												if [ "x$EWAN2info" = "x" ]
+													then
+														echo "{\"code\":1,\"output\":\"empty EWAN2info \"}"
+													else
+														echo -e "{\"code\":0,\"output\":\n\"$EWAN2info\"}"
+												fi
+										else if [ "$Input1Value" = "CWAN1" ]
+					                    then
+										
+											CWAN1info=$(cat /tmp/InterfaceStatus/CWAN1Status 2>&1)
+												if [ "x$CWAN1info" = "x" ]
+													then
+														echo "{\"code\":1,\"output\":\"empty CWAN1info \"}"
+													else
+														echo -e "{\"code\":0,\"output\":\n\"$CWAN1info\"}"
+												fi
+										else if [ "$Input1Value" = "CWAN2" ]
+					                    then
+										
+											CWAN2info=$(cat /tmp/InterfaceStatus/CWAN2Status 2>&1)
+												if [ "x$CWAN2info" = "x" ]
+													then
+														echo "{\"code\":1,\"output\":\"empty CWAN2info \"}"
+													else
+														echo -e "{\"code\":0,\"output\":\n\"$CWAN2info\"}"
+												fi
+										else if [ "$Input1Value" = "CWAN1_0" ]
+										then
+												CWAN10info=$(cat /tmp/InterfaceStatus/CWAN1_0Status 2>&1)
+												if [ "x$CWAN10info" = "x" ]
+													then
+														echo "{\"code\":1,\"output\":\"empty CWAN1_0info \"}"
+													else
+														echo -e "{\"code\":0,\"output\":\n\"$CWAN10info\"}"
+												fi
+												
+										else if [ "$Input1Value" = "CWAN1_1" ]
+									    then
+												CWAN11info=$(cat /tmp/InterfaceStatus/CWAN1_1Status 2>&1)
+												if [ "x$CWAN11info" = "x" ]
+													then
+														echo "{\"code\":1,\"output\":\"empty CWAN1_1info \"}"
+													else
+														echo -e "{\"code\":0,\"output\":\n\"$CWAN11info\"}"
+												fi
+										else if [ "$Input1Value" = "WIFI_WAN" ]
+									   then
+												wifiwaninfo=$(cat /tmp/InterfaceStatus/WIFI_WANStatus 2>&1)
+												if [ "x$CWAN11info" = "x" ]
+													then
+														echo "{\"code\":1,\"output\":\"empty wifiwaninfo \"}"
+													else
+														echo -e "{\"code\":0,\"output\":\n\"$wifiwaninfo\"}"
+												fi	
+												
+												fi	
+												fi		
+																								
+												
+												 fi
+												
+											  fi			
+											fi	
+										fi			
+									fi 
+									
+									 #if [ "$Input1Value" = "EWAN2" ]
+									#then
+									#echo "{\"code\":1,\"output\":\"Inside IF\"}"
+												#EWAN2info=$(cat /tmp/InterfaceStatus/EWAN2Status 2>&1)
+												#if [ "x$EWAN2info" = "x" ]
+													#then
+														#echo "{\"code\":1,\"output\":\"empty EWAN2info \"}"
+													#else
+														#echo -e "{\"code\":0,\"output\":\n\"$EWAN2info\"}"
+												#fi
+					                    #else
+					                        #echo "{\"code\":1,\"output\":\"invalid action EWAN2\"}"
+									#fi 
+									
+									 #if [ "$Input1Value" = "CWAN1" ]
+									#then
+												#CWAN1info=$(cat /tmp/InterfaceStatus/CWAN1Status 2>&1)
+												#if [ "x$CWAN1info" = "x" ]
+													#then
+														#echo "{\"code\":1,\"output\":\"empty CWAN1info \"}"
+													#else
+														#echo -e "{\"code\":0,\"output\":\n\"$CWAN1info\"}"
+												#fi
+					                    #else
+					                        #echo "{\"code\":1,\"output\":\"invalid action CWAN1\"}"
+									#fi 
+									
+									#if [ "$Input1Value" = "CWAN2" ]
+									#then
+												#CWAN2info=$(cat /tmp/InterfaceStatus/CWAN2Status 2>&1)
+												#if [ "x$CWAN2info" = "x" ]
+													#then
+														#echo "{\"code\":1,\"output\":\"empty CWAN2info \"}"
+													#else
+														#echo -e "{\"code\":0,\"output\":\n\"$CWAN2info\"}"
+												#fi
+					                    #else
+					                        #echo "{\"code\":1,\"output\":\"invalid action CWAN2\"}"
+									#fi 
+									
+									#if [ "$Input1Value" = "CWAN1_0" ]
+									#then
+												#CWAN10info=$(cat /tmp/InterfaceStatus/CWAN1_0Status 2>&1)
+												#if [ "x$CWAN10info" = "x" ]
+													#then
+														#echo "{\"code\":1,\"output\":\"empty CWAN1_0info \"}"
+													#else
+														#echo -e "{\"code\":0,\"output\":\n\"$CWAN10info\"}"
+												#fi
+					                    #else
+					                        #echo "{\"code\":1,\"output\":\"invalid action CWAN1_0\"}"
+									#fi 
+									
+									#if [ "$Input1Value" = "CWAN1_1" ]
+									#then
+												#CWAN11info=$(cat /tmp/InterfaceStatus/CWAN1_1Status 2>&1)
+												#if [ "x$CWAN11info" = "x" ]
+													#then
+														#echo "{\"code\":1,\"output\":\"empty CWAN1_1info \"}"
+													#else
+														#echo -e "{\"code\":0,\"output\":\n\"$CWAN11info\"}"
+												#fi
+					                    #else
+					                        #echo "{\"code\":1,\"output\":\"invalid action CWAN1_1\"}"
+									#fi 
+									
+									#if [ "$Input1Value" = "WIFI_WAN" ]
+									#then
+												#wifiwaninfo=$(cat /tmp/InterfaceStatus/WIFI_WANStatus 2>&1)
+												#if [ "x$CWAN11info" = "x" ]
+													#then
+														#echo "{\"code\":1,\"output\":\"empty wifiwaninfo \"}"
+													#else
+														#echo -e "{\"code\":0,\"output\":\n\"$wifiwaninfo\"}"
+												#fi
+					                    #else
+					                        #echo "{\"code\":1,\"output\":\"invalid action WIFI_WAN\"}"
+									#fi 
+									
+						                             
+							fi
+                        else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;	
+                        
+                        
+                 
+                 "Restart Power")
+		                    
+		                     if [ "$ActionName" = "RESTART" ]
+		                          then		                          
+		                          echo '{"code":0,"output":"Command received"}'			                                    
+			                      restartpowerinfo=$(${USRRPCCMDPATH}/Board_Recycle_12V_Script.sh 2>&1)		                                                                 
+	                        else
+	                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                        fi
+                        ;;
+                        
+                "Hostname")
+			
+							if [ "$ActionName" = "CHANGE" ]
+		                    then                  
+		                        uci set system.system.hostname="$Input1Value"
+		                        uci commit system
+		                        hostnamefile="/www/luci2.html"
+		                        hostname=$(grep -w "title" /www/luci2.html | cut -d ">" -f 2 | cut -d "<" -f 1)
+		                        Replacehostname=$Input1Value
+		                        sed -i "s/${hostname}/${Replacehostname}/" ${hostnamefile}		                        
+		                        
+		                        echo "{\"code\":1,\"output\":\"Please reboot the device to see the change\"}"		                        
+		                    else
+	                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                        fi 		                       
+						;;  
+						   
+						
+			 "Model")
+			
+							if [ "$ActionName" = "CHANGE" ]
+		                    then
+								modelfile="/www/luci2/view/status.overview.js"
+		                        model=$(grep -w "Model" /www/luci2/view/status.overview.js | awk '{ print $3}')
+		                        Replacemodel=\"$Input1Value\"
+		                        sed -i "s/${model}/${Replacemodel}/" ${modelfile}		                        		                        
+		                        echo "{\"code\":0,\"output\":\"Please refresh the page to see the change\"}"		                        
+		                    else
+	                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+	                        fi 		                       
+						;; 
+						
+						
+						    			          
+                        
+                       
+               "Restart Modem")
+		                    
+		                 if [ "$ActionName" = "RESTART" ]
+                         then
+							  restartmodem1info=$(${USRRPCCMDPATH}/Recycle_WAN1_PWR_Script.sh 2>&1)
+                         else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;
+                        
+              "Upload")
+                          if [ "$ActionName" = "UPLOAD" ]
+                         then
+                             echo "{\"code\":1,\"output\":\"Uploading\"}"
+                         else
+                            echo "{\"code\":1,\"output\":\"invalid action\"}"
+                        fi
+                        ;;        		
+                        
+                    *)
+                        echo "{\"code\":1,\"output\":\"utility $UtilityName not supported\"}"
+                        ;;
+                    
+                esac
+                ;;
+                
+        *)
+            echo '{"code":"1","output":"invalid method"}'
+            exit 1
+            ;;
+            
+    esac #rpc-diagnosticutilities method
+    ;;
+esac # ubus method
+
+exit 0

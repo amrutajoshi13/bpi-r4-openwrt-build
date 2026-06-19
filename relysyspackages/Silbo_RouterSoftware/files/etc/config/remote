@@ -1,0 +1,6 @@
+
+config update
+	option passwd '12345678'
+	option ssid 'tr069'
+	option radioenable 'Enable'
+

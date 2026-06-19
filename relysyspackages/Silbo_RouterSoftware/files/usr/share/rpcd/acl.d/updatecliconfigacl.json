@@ -1,0 +1,27 @@
+{
+    "updatecliconfig": {
+        "description": "Update CLI Configuration",
+        "read": {
+                        "ubus" : {
+                "rpc-UpdateCLI":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "cliconfig",
+
+            ]
+        },
+        "write": {
+
+                        "ubus" : {
+                "rpc-UpdateCLI":[
+                "configure"
+                ],
+            },
+            "uci": [
+                "cliconfig",
+            ]
+        }
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "testapp": {
+        "description": "Test App",
+        "read": {
+            "cgi-file": [ "download", ],
+            "ubus" : {
+                "rpc-testApp":[
+                    "run"
+                ],
+                "file":[
+                    "read"
+                ],
+                "luci2.system":[
+                    "init_action"
+                ]
+            },
+            "uci": [
+                "testapp",
+                "applist_config"
+            ]
+        },
+        "write": {
+            "cgi-file": [ "upload", ],
+            "uci": [
+                "testapp",
+                "applist_config"
+            ]
+        }
+    },
+}

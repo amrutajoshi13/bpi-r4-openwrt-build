@@ -1,0 +1,69 @@
+{
+    "vpnconfig1": {
+        "description": "VPN Configuration",
+            "read": {
+				"ubus" : {
+                "rpc-updateVPNConfig":[
+                "configure",
+                "pptp",
+                "xl2tpd",
+                "wireguard",
+                "zerotier",
+                "wireguarddelete",
+                "startopenvpn",
+                "stopopenvpn",
+                "genearatefiles",
+                "testarchive",
+                "delete",
+                "countcertfiles",
+                "enableopenvpn"       
+               ],
+                "rpc-updateGREConfig":[
+                 "configuregre",
+                 "update",
+                 "testarchive",
+                "delete",
+                "countkeyfiles"          
+               ],
+               "rpc-updateIPIPConfig":[
+                 "configureipip",
+                 "update",
+                 "testarchive",
+                "delete",
+                "countkeyfiles"          
+               ]
+                
+            },
+                "uci": [
+                    "vpnconfig1",
+                    "openvpn",
+                    "wireguard",
+                     "zerotier",
+                     "pptp_i_config",
+                      "L2TP",
+                      "greconfig",
+					  "ipipconfig"
+                ]
+            },
+ 
+            "write": {
+				"ubus" : {
+                "rpc-updateVPNConfig":[
+                 "enableopenvpn"        
+               ]
+                
+            },
+				
+                "uci": [
+                    "vpnconfig1",
+                     "openvpn",
+                     "wireguard",
+                      "zerotier",
+                       "pptp_i_config",
+                        "L2TP",
+                        "greconfig",
+						"ipipconfig"
+                ]
+            }
+    }
+}

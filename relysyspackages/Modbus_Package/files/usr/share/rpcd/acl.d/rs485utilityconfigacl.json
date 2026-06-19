@@ -1,0 +1,21 @@
+{
+    "rs485utilityconfig": {
+        "description": "RS485 Utility Configuration",
+            "read": {
+                "ubus" : {
+                "rpc-rs485utilityupdate":[
+                    "configure"
+                ],
+},
+                "uci": [
+                    "RS485UtilityConfigGeneric"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "RS485UtilityConfigGeneric"
+                ]
+            }
+    }
+}

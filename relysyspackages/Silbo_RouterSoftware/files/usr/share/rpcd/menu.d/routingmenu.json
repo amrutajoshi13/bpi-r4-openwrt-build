@@ -1,0 +1,18 @@
+{
+    "routing": {
+        "title": "Routing",
+        "index": 30
+    },
+    "routing/routing": {
+       "title": "Policy-Based Routing",
+       "acls": [ "routingconfig" ],
+       "view": "routing/routing",
+       "index": 10     
+    },
+    "routing/dmz": {
+        "title": "DMZ",
+        "acls": [ "dmzconfig" ],
+        "view": "routing/dmz",
+        "index": 20
+    }
+}

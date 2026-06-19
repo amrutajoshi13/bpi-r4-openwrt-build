@@ -1,0 +1,12 @@
+
+config interface 'board'
+	option pcbnum '250-00092-02'
+	option FirmwareVer '1.17'
+	option ApplicationSwVer '1.17_RC5'
+	option model 'Silbo_RD44-A-EC200A'
+	option serialnum '45C31250050'
+	option wanmacid 'D0:93:95:B1:77:8A'
+	option lanmacid 'D0:93:95:B1:77:8B'
+	option wifimacid 'D0:93:95:B1:77:8C'
+	option imei '860108078469087'
+

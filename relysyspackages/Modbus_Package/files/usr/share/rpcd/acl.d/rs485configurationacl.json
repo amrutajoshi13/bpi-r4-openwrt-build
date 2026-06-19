@@ -1,0 +1,16 @@
+{
+    "rs485config": {
+        "description": "RS485 Configuration",
+            "read": {
+                "uci": [
+                    "RS485DeviceConfigGeneric"
+                ]
+            },
+ 
+            "write": {
+                "uci": [
+                    "RS485DeviceConfigGeneric"
+                ]
+            }
+    }
+}

@@ -1,0 +1,8 @@
+/tmp/Log/ReadDI/ReadDILog.txt{
+    size 100k
+    rotate 2
+    missingok
+    create 0644 root root
+}
+
+

@@ -1,0 +1,30 @@
+{
+    "vlanconfig": {
+        "description": "VLAN",
+        "read": {
+			"ubus" : {
+                "rpc-updateportbasedvlan":[
+                "configure",
+                "delete"
+                 
+                ],
+                 "rpc-updatetagbasedvlan":[
+                 "configurevlan",
+                 "delete"         
+               ],
+            },
+            "uci": [
+                "portbasedvlanconfig",
+                "tagbasedvlanconfig"
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "portbasedvlanconfig",
+                "tagbasedvlanconfig"
+                
+            ]
+        }
+    }
+}

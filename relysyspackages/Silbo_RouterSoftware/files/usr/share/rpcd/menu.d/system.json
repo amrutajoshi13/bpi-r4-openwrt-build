@@ -1,0 +1,56 @@
+{
+    "system": {
+        "title": "System",
+        "index": 70
+    },
+	
+    "system/system": {
+        "title": "Settings",
+        "acls": [ "system" ],
+        "view": "system/system",
+        "index": 5
+    },
+    "system/additionalcommands": {
+        "title": "Admin Setting",
+        "acls": [ "additionalcommands" ],
+        "view": "system/additionalcommands",
+        "index": 10
+    },
+    "system/users": {
+        "title": "Guest Logins",
+        "acls": [ "users" ],
+        "view": "system/users",
+        "index": 15
+    },
+    "system/webserverconfig": {
+        "title": "WebServer",
+        "acls": [ "webserverconfig" ],
+        "view": "system/webserverconfig",
+        "index": 20
+    },
+    "system/changepassword": {
+        "title": "Password",
+        "acls": [ "changepassword" ],
+        "view": "system/changepassword",
+        "index": 25
+    },
+    "system/importexportconfig": {
+        "title": "Import Export Configurations",
+        "acls": [ "backup" ],
+        "view": "system/importexportconfig",
+        "index": 30
+    },
+    "system/upgrade": {
+        "title": "Firmware Upgrade",
+        "acls": [ "upgrade" ],
+        "view": "system/upgrade",
+        "index": 35
+    }, 
+    "system/routerswinstalluninstall": {
+        "title": "Router Software Install/Uninstall",
+        "acls": [ "routerswinstalluninstallacl" ],
+        "view": "system/routerswinstalluninstall",
+        "index": 40
+    }
+    
+}

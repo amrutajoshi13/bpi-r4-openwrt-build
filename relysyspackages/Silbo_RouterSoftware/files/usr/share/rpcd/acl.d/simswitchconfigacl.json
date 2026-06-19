@@ -1,0 +1,24 @@
+{
+    "simswitchconfig": {
+        "description": "SIM Switch Configuration",
+        "read": {
+			"ubus" : {
+                "rpc-simswitchconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "simswitchconfig",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "simswitchconfig",
+                
+            ]
+        }
+    }
+}

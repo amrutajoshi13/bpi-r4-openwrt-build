@@ -1,0 +1,6 @@
+/root/ConfigFiles/WatchdogLog/watchdoglog.txt {
+    size 20k
+    rotate 3
+    missingok
+    create 0644 root root 
+}

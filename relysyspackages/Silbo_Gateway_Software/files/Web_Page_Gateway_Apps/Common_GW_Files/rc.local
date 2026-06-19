@@ -1,0 +1,68 @@
+# Put your custom commands here that should be executed once
+# the system init finished. By default this file does nothing.
+
+# setup for logrotate
+if [ ! -d "/var/lib" ]
+then
+    mkdir "/var/lib"
+fi
+chmod 644 /etc/logrotate.d/*
+
+#board_name=$(cat /tmp/sysinfo/board_name)
+
+# Read 1 byte from flash offset 0xF020
+flash_val=$(dd if=/dev/mtd2 bs=1 skip=$((0xF020)) count=1 2>/dev/null | hexdump -v -e '1/1 "%02X"')
+ 
+# If nothing read, treat as FF
+[ -z "$flash_val" ] && flash_val="FF"
+ 
+case "$flash_val" in
+    0B)
+        board_name="IDB54-C-GW"
+        ;;
+    0F)
+        board_name="IDF54-C-GW"
+        ;;
+    FF)
+        board_name=$(cat /tmp/sysinfo/board_name)
+        ;;
+    *)
+        # Safety fallback
+        board_name=$(cat /tmp/sysinfo/board_name)
+        ;;
+esac
+ 
+echo "board_name=$board_name"
+ 
+ 
+if echo "$board_name" | grep -qE "(PC3)";
+then
+ 
+     echo "NA,NA,NA,NA,NA,NA,NA" > /tmp/ModemAnalytics.txt
+ 
+fi
+
+# For System reset switch
+#echo 38 > /sys/class/gpio/export
+
+#Sim1 status gpio
+#echo 499 > /sys/class/gpio/export
+
+#Sim2 status gpio
+#echo 500 > /sys/class/gpio/export
+
+#rmmod ext4;rmmod exfat;rmmod mmc_core;rmmod hid_generic;rmmod hid;rmmod ext4;rmmod exfat;rmmod mmc_core;rmmod hid_generic;rmmod hid;rmmod fuse;rmmod usb_storage;rmmod scsi_mod;rmmod sd_mod;rmmod scsi_mod;rmmod wireguard;rmmod mmc_block;rmmod mmc_core;rmmod mtk_s;rmmod mmc_core;rmmod sdhci_pltfm;rmmod sdhci;rmmod mmc_core
+sh /etc/init.d/initGPIO.sh start
+/root/InterfaceManager/script/SystemBoot.sh
+#/bin/mount tmpfs /tmp -t tmpfs -o remount,size=16000k,nosuid,nodev
+sh /root/watchdog.sh &
+sh /root/user/init.d/*
+
+/sbin/hwclock -s
+sh /bin/UpdateRS232Port.sh
+sh /bin/UpdateRS485Port.sh
+sh /etc/init.d/GD44AppManager start
+#sh -x /root/InterfaceManager/script/TimeSync.sh
+#/usr/sbin/mwan3 restart
+
+exit 0

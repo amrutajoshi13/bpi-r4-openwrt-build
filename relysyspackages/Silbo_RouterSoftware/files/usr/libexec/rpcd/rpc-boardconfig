@@ -1,0 +1,37 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+boardconfigscript="/bin/boardconfigscript.sh"
+
+case "$1" in
+    list)
+        echo '{"configure":{}}'
+        ;;
+    call)
+        case "$2" in
+                    configure)
+                                                    
+								config_load boardconfigfile
+								config_get serialnum "boardconfigfile" serialnum
+							response=$(/bin/CreateBoardConfig.sh $serialnum)
+                            if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"Failure : Board Configuration\"}"
+                            else
+								echo "{\"code\":0,\"output\":\"Success : Board Configuration\"}"
+                            fi
+								
+		                ;;
+                
+		             *)
+		                    echo '{"code":"1","output":"invalid method"}'
+		                    exit 1
+		                    ;;
+     
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

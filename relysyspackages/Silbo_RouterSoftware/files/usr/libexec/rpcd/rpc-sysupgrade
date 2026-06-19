@@ -1,0 +1,51 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+factoryresetscript="/root/InterfaceManager/script/Restore.sh"
+
+case "$1" in
+    list)
+        echo '{"upgrade":{},"factoryreset":{}}'
+        ;;
+    call)
+        case "$2" in
+                    upgrade)
+                            uci set applist_config.appconfig.retainconfigflag=1                           
+                            uci set applist_config.appconfig.retainconfigflag1=1                           
+                            uci set applist_config.appconfig.gwretainconfigflag=1
+                            uci commit applist_config
+                            sleep 3
+                            response=$(sysupgrade -c /tmp/firmware.bin)
+
+                            if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"Upgrade Failure\"}"
+                            else
+								echo "{\"code\":0,\"output\":\"Upgrade Success\"}"
+                            fi                                                                                   
+                            ;;
+                            
+                          # response1=$(SystemstartScript)
+                           # echo "{\"code\":0,\"output\":\"$file\"}"
+                           
+                    factoryreset)
+                               #           echo "{\"code\":1,\"output\":\"Factory Reset failure!!\"}"
+								#sh -x /root/InterfaceManager/script/Restore.sh &
+							 responsefactoryreset=$($factoryresetscript)
+                            if [ "$?" -ne 0 ]
+                            then
+								echo "{\"code\":1,\"output\":\"Factory Reset failure!!\"}"
+                            else
+								echo "{\"code\":0,\"output\":\"Factory Reset Success!!\"}"
+							fi
+                            ;;                     
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+        ;;
+esac # ubus method
+
+exit 0

@@ -1,0 +1,24 @@
+{
+    "customfirewall": {
+        "description": "Loopback Rule Settings",
+        "read": {
+			"ubus" : {
+                "rpc-updatecustomfirewallconfig":[
+                "configure"
+                   
+                ]
+            },
+            "uci": [
+                "customfirewall",
+                
+            ]
+            
+        },
+        "write": {
+            "uci": [
+               "customfirewall",
+                
+            ]
+        }
+    }
+}

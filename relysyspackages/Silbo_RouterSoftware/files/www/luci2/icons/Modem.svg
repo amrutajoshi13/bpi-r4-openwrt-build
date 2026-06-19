@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="18.5" height="15.5" viewBox="0 0 18.5 15.5">
+  <g id="Modem" transform="translate(-19.75 -130.25)">
+    <path id="Vector" d="M4.474,0h8.053a10.93,10.93,0,0,1,1.485.079C16.365.333,17,1.417,17,4.375v5.25c0,2.958-.635,4.042-2.988,4.3A10.93,10.93,0,0,1,12.526,14H4.474a10.93,10.93,0,0,1-1.485-.079C.635,13.667,0,12.583,0,9.625V4.375C0,1.417.635.333,2.988.079A10.93,10.93,0,0,1,4.474,0Z" transform="translate(20.5 131)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path id="Vector-2" data-name="Vector" d="M0,0H3.5" transform="translate(30.183 136.166)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path id="Vector-3" data-name="Vector" d="M0,0H10" transform="translate(24 141.209)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/>
+    <path id="Vector-4" data-name="Vector" d="M.495.5H.5" transform="translate(26.759 135.666)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <path id="Vector-5" data-name="Vector" d="M.495.5H.5" transform="translate(24.009 135.666)" fill="none" stroke="#14213d" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  </g>
+</svg>

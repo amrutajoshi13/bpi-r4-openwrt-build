@@ -1,0 +1,19 @@
+opengt
+ set com 115200n81
+ set comecho off
+ set senddelay 0.02
+ waitquiet 0.2 0.2
+ flash 0.1
+
+:start
+ send "AT+CPMS=\"SM\",\"SM\",\"SM\"; +CMGD=1,4^m"
+ get 5 "" $s
+ print $s
+
+ send "AT+CPMS=\"ME\",\"ME\",\"ME\"; +CMGD=1,4^m"
+ get 5 "" $s
+ print $s
+
+
+:continue
+ exit 0

@@ -1,0 +1,74 @@
+{
+    "configuration": {
+        "title": "Configuration",
+        "index": 100
+    },
+     "configuration/deviceApplication": {
+        "title": "Device Application",
+        "acls": [ "status" ],
+        "view": "configuration/deviceApplication",
+        "index": 10
+    },
+   "configuration/cloudConfiguration": {
+         "title": "Cloud Configuration",
+         "acls": [ "newCloudConfigv2" ],
+         "view": "configuration/cloudConfiguration",
+         "index": 15
+     },
+    "configuration/digitalinputConfig": {
+        "title": "DI Configuration",
+        "acls": [ "digitalinputConfig" ],
+        "view": "configuration/digitalinputConfig",
+        "index": 20
+    },
+	"configuration/analoginputConfig": {
+        "title": "AI Configuration",
+        "acls": [ "analoginputconfig" ],
+        "view": "configuration/analoginputConfig",
+        "index": 25
+    },
+     "configuration/portconfiguration": {
+        "title": "Port Configurations",
+        "acls": [ "portconfig" ],
+        "view": "configuration/portconfiguration",
+        "index": 30
+    },
+    "configuration/modbusConfiguration": {
+         "title": "Modbus Configuration",
+         "acls": [ "deviceconfigV2" ],
+         "view": "configuration/modbusConfiguration",
+         "index": 35
+     },
+      "configuration/rs232Configuration": {
+         "title": "RS232 Configuration",
+         "acls": [ "rs232Config" ],
+         "view": "configuration/rs232Configuration",
+         "index": 40
+     },
+       "configuration/BACnetconfiguration": {
+        "title": "BACnet Configuration",
+        "acls": [ "BACnetConfig" ],
+        "view": "configuration/BACnetconfiguration",
+        "index": 45
+    },
+       "configuration/snmpMasterConfig": {
+        "title": "SNMP Configuration",
+        "acls": [ "SnmpMasterConfig" ],
+        "view": "configuration/snmpMasterConfig",
+        "index": 50
+    }
+     /*   "configuration/storageconfiguration": {         
+        "title": "Storage Configuration",     
+        "acls": [ "storageconfig" ],             
+        "view": "configuration/storageconfiguration",
+        "index": 55                 
+    },
+     "configuration/sensorEvents": {
+        "title": "Event Configuration",
+        "acls": [ "sensorEvents" ],
+        "view": "configuration/sensorEvents",
+        "index": 60
+    }   */    
+     
+}
+

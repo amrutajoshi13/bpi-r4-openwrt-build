@@ -1,0 +1,50 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+updateipconfig="/root/InterfaceManager/script/features/url_filtering/urlblocklist.sh"
+case "$1" in
+list)
+    echo '{"configure":{},"testarchive":{"archive":"ArchiveName"}}'
+    ;;
+call)
+    case "$2" in
+    configure)
+        response=$($updateipconfig)
+        RetVal=$?
+        echo "{\"code\":\"0\",\"output\":\"Updated Configurations\"}"
+        ;;
+
+    testarchive)
+        read -r input
+
+        json_load "$input" >/dev/null 2>&1
+
+        json_get_var ArchivedFileWithPath archive
+
+        if [ "x$ArchivedFileWithPath" = "x" ]; then
+            echo "{\"code\":1,\"output\":\"invalid input arguments\"}" >>"$logfile"
+            exit 1
+        else
+            uci set block.block.config="$ArchivedFileWithPath"
+            uci commit block
+        fi
+        #extracting tar file in tmp folder
+        RetMsg=$(cp "${ArchivedFileWithPath}" "${ArchiveDLPath}" 2>&1)
+        RetVal=$?
+        if [ "$RetVal" -ne 0 ]; then
+            echo "Failed to copy certificates error-$RetMsg" >>"$logfile"
+            exit 1
+        fi
+        rm -f "$ArchivedFileWithPath"
+        ;;
+    *)
+        echo '{"code":"1","output":"invalid method"}'
+        exit 1
+        ;;
+    esac #appmanager method
+    ;;
+esac # ubus method
+
+exit 0

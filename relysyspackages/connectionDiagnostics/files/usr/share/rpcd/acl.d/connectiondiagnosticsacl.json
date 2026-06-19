@@ -1,0 +1,26 @@
+
+{
+    "connectiondiagnostics": {
+        "description": "Connection Diagnostics",
+        "read": {
+                        "ubus" : {
+                "rpc-updatewanconfig":[
+                "configure"
+
+                ]
+            },
+            "uci": [
+                "connectiondiagnostics",
+
+            ]
+
+        },
+        "write": {
+            "uci": [
+               "connectiondiagnostics",
+
+            ]
+        }
+    }
+}
+

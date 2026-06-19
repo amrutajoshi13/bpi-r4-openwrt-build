@@ -1,0 +1,66 @@
+#!/bin/sh
+
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+UpdateConfigScript="/bin/UpdateConfigurationsGateway"
+Device_slave_id=$(uci get RS485UtilityConfigGeneric.rs485utilityconfig.Slaveid)
+
+case "$1" in
+    list)
+        echo '{"configure":{"application":"ApplicationName","action":"ActionName"}}'
+        ;;
+    call)
+        case "$2" in
+                   configure)
+		                # read the arguments
+		                read -r input;
+		                json_load "$input" > /dev/null 2>&1
+		                json_get_var ApplicationName application
+		                json_get_var ActionName action
+	                    case "$ApplicationName" in
+	                        "Update")
+	                            case "$ActionName" in
+	                                "updateinterface")
+		                                    response=$($UpdateConfigScript "rs485utilitycfg")
+		                                    RetVal=$?
+                                            if [ $RetVal -eq 0 ]; then
+												rm -f /www/RS485_utility.txt
+												sleep 1
+												touch /www/RS485_utility.txt
+												chmod 777 /www/RS485_utility.txt
+												cd /root/RS485UtilityComponent/ || exit 1
+												# ./RS485_2P_Utility $Device_slave_id >> /www/RS485_utility.txt
+												output=$(./RS485Utility "$Device_slave_id")
+												echo "$output" >> /www/RS485_utility.txt
+												cd
+												RS485RetVal=$?
+												if [ $RS485RetVal -eq 0 ]; then
+													echo "{\"code\":\"0\",\"output\":\"Configurations updated and RS485 utility executed successfully.\"}"
+												else
+													echo "{\"code\":\"1\",\"output\":\"Configurations updated, but RS485 utility failed with error code $RS485RetVal.\"}"
+												fi
+                               				else
+                                    				echo "{\"code\":\"1\",\"output\":\"Failed to update configurations with error code $RetVal.\"}"
+                                			fi
+
+
+
+		                                    echo "{\"code\":\"0\",\"output\":\"Updated Configurations\"}"                                   
+		                                     ;;
+	                                  *)
+	                                    echo '{"code":"1","output":"invalid action"}'
+	                                    exit 1
+	                                    ;;
+	                            esac #application action
+	                            ;;
+	                    esac #application name
+	                    ;;
+                    *)
+                    echo '{"code":"1","output":"invalid method"}'
+                    exit 1
+        esac #appmanager method
+            ;;
+esac # ubus method
+
+exit 0
